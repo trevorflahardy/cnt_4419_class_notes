@@ -273,7 +273,7 @@ This is where you have users "establish their identities".
 
 Determine subjects identities. This is often done through some form of authentication mechanism, such as a username and password, biometric authentication, or multi-factor authentication (MFA). The goal of authentication is to ensure that only authorized users can access sensitive resources, and to prevent unauthorized access that could lead to security breaches or data leaks.
 
-==== Authorization
+=== Authorization
 
 This is where you determine if a subject (user) has permission to access a resource. Ie, this is where you authorize the access from the user for a resource.
 
@@ -285,7 +285,7 @@ Expanded, authorization is the process of determining whether a user has permiss
   Authentication happens first, and then authorization happens after that. So you first need to establish the identity of the user (authentication) before you can determine what they are allowed to do (authorization).
 ]
 
-==== Authentication Factors
+== Authentication Factors
 
 We are going to start comparing these two things (authentication and authorization) to understand them better.
 
@@ -310,7 +310,7 @@ The professor went on to discuss *multi-factor authentication* (*MFA*), which is
   It really depends. Some email services allow you to login on any device, so in that case, the email code would be considered a "what you know" because it is something you have access to (your email account). However, if the email service is tied to a specific device (like a phone), then it could be considered a "what you have" because it is something you physically possess (the phone). So it really depends on the context and how the email code is being used for authentication.
 ]
 
-==== Authorization Factors
+== Authorization Factors
 
 So now we're talking about checking permissions. So there has to be some *data structure* that knows if some user has permission to access some resource. What are these data structures that the mechanism can use to remember permissions?
 
@@ -339,5 +339,23 @@ So now we're talking about checking permissions. So there has to be some *data s
   *Access Control Matrix (ACM)*: A two-dimensional array where the rows represent subjects (users) and the columns represent objects (resources). Each cell in the matrix contains the permissions that the corresponding user has for the corresponding resource. The ACM combines both ACLs and capabilities to enforce access control policies.
 ]
 
+#figure(
+  table(
+    columns: 6,
+    align: center,
+    table.header([], [*File 1*], [*File 2*], [*File 3*], [*File 4*], [*File 5*]),
+    [*root*], [RWX], [RWX], [RWX], [RWX], [RWX],
+    [*user1*], [RW], [R], [RWX], [$emptyset$], [$emptyset$],
+    [*user2*], [R], [RW], [$emptyset$], [R], [$emptyset$],
+    [*user3*], [$emptyset$], [$emptyset$], [R], [R], [RW],
+    [*user4*], [$emptyset$], [R], [$emptyset$], [$emptyset$], [R],
+  ),
+  caption: [Example Access Control Matrix (ACM). R = Read, W = Write, X = Execute, $emptyset$ = No Access. These are very inefficient for large systems, but they are a useful theoretical model for understanding access control policies.],
+)
+
 There are engineering tradeoffs between ACLs and capabilities. In theory they are the same, but one may be more efficient than the other in certain contexts. For example, ACLs may be more efficient for resources that have a small number of users with access, while capabilities may be more efficient for resources that have a large number of users with access. Additionally, ACLs can be easier to manage and understand for administrators, while capabilities can be more flexible and scalable in certain situations. Ultimately, the choice between ACLs and capabilities depends on the specific requirements and constraints of the system being designed.
 
+
+== RBAC: Role Based Access Control
+
+This is where the role determines permissions. So instead of assigning permissions to individual users, you assign permissions to roles, and then you assign users to those roles. For example, you might have a role called "admin" that has permissions to read, write, and execute all files, and then you would assign users to that role based on their job function or responsibilities. This can make it easier to manage permissions in large systems because you can simply assign users to roles rather than having to manage permissions for each individual user.

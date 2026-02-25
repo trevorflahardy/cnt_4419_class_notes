@@ -13,11 +13,11 @@
 
             <!-- WebGPU unavailable banner -->
             <div v-if="!webGpuAvailable"
-                class="mb-3 flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 dark:border-red-800/50 dark:bg-red-950/30">
+                class="mb-3 flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3">
                 <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
                 <div>
-                    <p class="text-sm font-semibold text-red-700 dark:text-red-400">WebGPU not available</p>
-                    <p class="mt-0.5 text-xs text-red-600/80 dark:text-red-400/70">
+                    <p class="text-sm font-semibold text-red-700">WebGPU not available</p>
+                    <p class="mt-0.5 text-xs text-red-600/80">
                         Your browser doesn't support WebGPU. Try Chrome 113+ or Edge 113+. AI flashcard generation
                         requires it.
                     </p>
@@ -26,16 +26,16 @@
 
             <!-- Model not downloaded banner -->
             <div v-else-if="!modelReady"
-                class="mb-3 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800/50 dark:bg-amber-950/30">
+                class="mb-3 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3">
                 <UIcon name="i-heroicons-cpu-chip" class="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-amber-700 dark:text-amber-400">AI model not downloaded</p>
-                    <p class="mt-0.5 text-xs text-amber-600/80 dark:text-amber-400/70">
+                    <p class="text-sm font-semibold text-amber-700">AI model not downloaded</p>
+                    <p class="mt-0.5 text-xs text-amber-600/80">
                         Download the on-device AI model to generate flashcards.
                     </p>
                     <div v-if="modelLoading" class="mt-2 space-y-1">
                         <UProgress :model-value="modelProgress" size="xs" color="warning" />
-                        <p class="text-xs text-amber-600/70 dark:text-amber-400/60">{{ modelProgressText }}</p>
+                        <p class="text-xs text-amber-600/70">{{ modelProgressText }}</p>
                     </div>
                     <UButton v-if="!modelLoading" size="xs" color="warning" variant="soft" class="mt-2"
                         icon="i-lucide-download" @click="downloadModel">
@@ -77,6 +77,10 @@
                 <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" :disabled="totalDue === 0"
                     @click="restartDueSession">
                     Restart Due Session
+                </UButton>
+                <UButton color="error" variant="soft" icon="i-lucide-trash-2" :disabled="!hasDeck"
+                    @click="confirmClearDeck">
+                    Clear Deck
                 </UButton>
             </div>
 
@@ -155,6 +159,10 @@
                     <UButton color="neutral" variant="ghost" @click="toggleAnswer">
                         {{ showAnswer ? 'Hide Answer' : 'Show Answer' }}
                     </UButton>
+                    <UButton color="error" variant="ghost" size="xs" icon="i-lucide-trash-2"
+                        @click="deleteCard(currentCard!.id)" title="Delete this card">
+                        Delete
+                    </UButton>
                 </div>
             </div>
 
@@ -179,11 +187,14 @@ const {
     generationStatus,
     totalDue,
     currentCard,
+    currentIndex,
     showAnswer,
     completion,
     generate,
     rateCurrent,
     restartDueSession,
+    deleteCard,
+    clearDeck,
     exportDeck,
     importDeck,
     toggleAnswer,
@@ -215,5 +226,11 @@ async function onImport(event: Event) {
     if (!file) return
     await importDeck(file)
     input.value = ''
+}
+
+function confirmClearDeck() {
+    if (confirm('Delete all flashcards? This cannot be undone.')) {
+        clearDeck()
+    }
 }
 </script>

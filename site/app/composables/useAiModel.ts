@@ -1,6 +1,3 @@
-// The engine MUST live at module level — never inside Vue reactive state.
-// Storing a WASM/Emscripten object in a Vue ref wraps it in a Proxy, which
-// breaks internal type-checks like Tokenizer.encode() → BindingError.
 type MLCEngine = any
 const MODEL_ID = 'Llama-3.2-3B-Instruct-q4f16_1-MLC'
 let _engine: MLCEngine | null = null

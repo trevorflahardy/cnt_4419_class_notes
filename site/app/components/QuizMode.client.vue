@@ -16,11 +16,11 @@
 
                 <!-- WebGPU unavailable -->
                 <div v-if="!webGpuAvailable"
-                    class="flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 dark:border-red-800/50 dark:bg-red-950/30">
+                    class="flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3">
                     <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
                     <div>
-                        <p class="text-sm font-semibold text-red-700 dark:text-red-400">WebGPU not available</p>
-                        <p class="mt-0.5 text-xs text-red-600/80 dark:text-red-400/70">
+                        <p class="text-sm font-semibold text-red-700">WebGPU not available</p>
+                        <p class="mt-0.5 text-xs text-red-600/80">
                             Your browser doesn't support WebGPU. Try Chrome 113+ or Edge 113+. Quiz generation requires
                             it.
                         </p>
@@ -29,16 +29,16 @@
 
                 <!-- Model not downloaded -->
                 <div v-else-if="!modelReady"
-                    class="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800/50 dark:bg-amber-950/30">
+                    class="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3">
                     <UIcon name="i-heroicons-cpu-chip" class="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-amber-700 dark:text-amber-400">AI model not downloaded</p>
-                        <p class="mt-0.5 text-xs text-amber-600/80 dark:text-amber-400/70">
+                        <p class="text-sm font-semibold text-amber-700">AI model not downloaded</p>
+                        <p class="mt-0.5 text-xs text-amber-600/80">
                             You must download the on-device AI model before generating a quiz.
                         </p>
                         <div v-if="modelLoading" class="mt-2 space-y-1">
                             <UProgress :model-value="modelProgress" size="xs" color="warning" />
-                            <p class="text-xs text-amber-600/70 dark:text-amber-400/60">{{ modelProgressText }}</p>
+                            <p class="text-xs text-amber-600/70">{{ modelProgressText }}</p>
                         </div>
                         <UButton v-if="!modelLoading" size="xs" color="warning" variant="soft" class="mt-2"
                             icon="i-lucide-download" @click="downloadModel">
@@ -117,7 +117,7 @@
                         <UProgress :model-value="generationProgress" size="xs" color="primary" />
                     </div>
                     <p v-if="generationError"
-                        class="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-400">
+                        class="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">
                         <UIcon name="i-heroicons-exclamation-circle" class="h-3.5 w-3.5 shrink-0" />
                         {{ generationError }}
                     </p>
@@ -370,9 +370,9 @@ const selectedTopics = ref<string[]>([])
 const letters = ['A', 'B', 'C', 'D']
 
 const difficulties = [
-    { value: 'easy', label: 'Easy', activeClass: 'border-green-500 bg-green-500/10 text-green-600 dark:text-green-400' },
-    { value: 'medium', label: 'Medium', activeClass: 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400' },
-    { value: 'hard', label: 'Hard', activeClass: 'border-red-500 bg-red-500/10 text-red-600 dark:text-red-400' },
+    { value: 'easy', label: 'Easy', activeClass: 'border-green-500 bg-green-500/10 text-green-600' },
+    { value: 'medium', label: 'Medium', activeClass: 'border-amber-500 bg-amber-500/10 text-amber-600' },
+    { value: 'hard', label: 'Hard', activeClass: 'border-red-500 bg-red-500/10 text-red-600' },
     { value: 'mixed', label: 'Mixed', activeClass: 'border-primary bg-primary/10 text-primary' },
 ]
 
@@ -497,8 +497,8 @@ const topicBreakdown = computed<TopicBreakdown[]>(() => {
 function reviewOptionClass(qi: number, oi: number) {
     const correct = questions.value[qi]?.correctIndex
     const userAns = userAnswers.value[qi]
-    if (oi === correct) return 'bg-green-500/10 font-medium text-green-700 dark:text-green-400'
-    if (oi === userAns && oi !== correct) return 'bg-red-500/10 text-red-700 dark:text-red-400'
+    if (oi === correct) return 'bg-green-500/10 font-medium text-green-700'
+    if (oi === userAns && oi !== correct) return 'bg-red-500/10 text-red-700'
     return 'text-muted'
 }
 

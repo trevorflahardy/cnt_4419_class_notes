@@ -5,14 +5,6 @@
 /* Nuxt UI handles --ui-bg, --ui-bg-muted, etc. via its own @layer theme.
    We only customize the page-level body background here. */
 
-:root {
-  --app-bg: #ffffff;
-}
-
-html.dark {
-  --app-bg: #020617;
-}
-
 html,
 body,
 #__nuxt {
@@ -20,22 +12,7 @@ body,
 }
 
 body {
-  background: var(--app-bg);
-}
-
-html.dark body {
-  background:
-    radial-gradient(
-      circle at 10% 10%,
-      rgba(16, 185, 129, 0.14),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 90% 15%,
-      rgba(30, 64, 175, 0.18),
-      transparent 35%
-    ),
-    var(--app-bg);
+  background: #ffffff;
 }
 
 /* Smooth transitions for theme switching */

@@ -2,7 +2,7 @@
     <div class="flex gap-2 message-enter" :class="isUser ? 'justify-end' : 'justify-start'">
         <!-- Assistant avatar -->
         <div v-if="!isUser" class="shrink-0 mt-1">
-            <div class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+            <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center">
                 <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-primary-500" />
             </div>
         </div>
@@ -11,11 +11,11 @@
             <!-- Message bubble -->
             <div class="px-3.5 py-2.5 text-sm leading-relaxed" :class="bubbleClasses">
                 <div v-if="showPending" class="flex items-center gap-1.5 py-1">
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"
                         style="animation-delay: 0ms" />
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"
                         style="animation-delay: 150ms" />
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"
                         style="animation-delay: 300ms" />
                 </div>
                 <div v-else v-html="renderedContent" class="prose-chat" />
@@ -24,7 +24,7 @@
             <!-- Sources -->
             <div v-if="message.sources?.length" class="mt-1.5">
                 <button
-                    class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-1 transition-colors"
+                    class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
                     @click="showSources = !showSources">
                     <UIcon :name="showSources ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'" class="w-3 h-3" />
                     {{ message.sources.length }} source{{ message.sources.length > 1 ? 's' : '' }}
@@ -40,8 +40,8 @@
 
         <!-- User avatar -->
         <div v-if="isUser" class="shrink-0 mt-1">
-            <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                <UIcon name="i-lucide-user" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center">
+                <UIcon name="i-lucide-user" class="w-4 h-4 text-gray-500" />
             </div>
         </div>
     </div>
@@ -75,9 +75,9 @@ const isUser = computed(() => props.message.role === 'user')
 
 const bubbleClasses = computed(() => {
     if (isUser.value) {
-        return 'bg-primary-500/10 dark:bg-primary-500/20 text-gray-900 dark:text-gray-100 rounded-2xl rounded-br-md'
+        return 'bg-primary-500/10 text-gray-900 rounded-2xl rounded-br-md'
     }
-    return 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-bl-md'
+    return 'bg-gray-100 text-gray-900 rounded-2xl rounded-bl-md'
 })
 
 const showPending = computed(() => {
@@ -92,11 +92,11 @@ const renderedContent = computed(() => {
 
     // Code blocks (``` ... ```)
     text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_match, _lang, code) => {
-        return `<pre class="bg-gray-900 text-gray-100 dark:bg-gray-950 rounded-lg p-3 my-2 text-xs overflow-x-auto"><code>${code.trim()}</code></pre>`
+        return `<pre class="bg-gray-900 text-gray-100 rounded-lg p-3 my-2 text-xs overflow-x-auto"><code>${code.trim()}</code></pre>`
     })
 
     // Inline code
-    text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">$1</code>')
+    text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-200 px-1 py-0.5 rounded text-xs">$1</code>')
 
     // Bold
     text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')

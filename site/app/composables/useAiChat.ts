@@ -22,6 +22,9 @@ export function useAiChat() {
     ])
 
     const isLoading = useState<boolean>('ai-chat-is-loading', () => false)
+    const queuedCount = useState<number>('ai-chat-queued-count', () => 0)
+    const _messageQueue: string[] = []
+    let _processingQueue = false
 
     const isModelLoading = computed(() => model.isLoading.value)
     const modelProgress = computed(() => (model.isReady.value ? 100 : model.progress.value))
@@ -61,6 +64,21 @@ export function useAiChat() {
             return
         }
 
+        // Queue the message and process sequentially
+        _messageQueue.push(text)
+        queuedCount.value = _messageQueue.length
+        if (!_processingQueue) {
+            _processingQueue = true
+            while (_messageQueue.length > 0) {
+                const next = _messageQueue.shift()!
+                queuedCount.value = _messageQueue.length
+                await _processMessage(next)
+            }
+            _processingQueue = false
+        }
+    }
+
+    async function _processMessage(text: string) {
         messages.value.push({ role: 'user', content: text })
         isLoading.value = true
 
@@ -140,6 +158,7 @@ export function useAiChat() {
     return {
         messages,
         isLoading,
+        queuedCount,
         modelReady,
         isModelLoading,
         modelProgress,

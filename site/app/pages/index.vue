@@ -75,7 +75,6 @@ const currentViewIcon = computed(() => {
 
             <!-- Right: utilities -->
             <div class="flex items-center gap-1">
-                <UColorModeButton size="sm" />
                 <UButton icon="i-simple-icons-github" variant="ghost" color="neutral" size="sm"
                     to="https://github.com/trevorflahardy/cnt_4419_class_notes" target="_blank"
                     aria-label="GitHub repository" />

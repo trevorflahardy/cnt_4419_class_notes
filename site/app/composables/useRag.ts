@@ -1,10 +1,17 @@
-import { cosineSimilarity } from '~/utils/cosine'
-
-interface Chunk {
+/** Shape of a chunk as it arrives from embeddings.json (no derived fields). */
+interface RawChunk {
     text: string
     page: number
     heading: string
     embedding: number[]
+}
+
+/** Internal chunk with pre-computed search acceleration fields. */
+interface Chunk extends RawChunk {
+    /** Pre-computed L2 norm of the embedding vector (set once at load time). */
+    norm: number
+    /** Lower-cased heading+text for fast text matching (set once at load time). */
+    haystack: string
 }
 
 interface EmbeddingsData {
@@ -18,6 +25,27 @@ interface SearchResult {
     score: number
 }
 
+/**
+ * Pre-compute the L2 (Euclidean) norm of a vector so cosine similarity
+ * only needs a dot product at query time.
+ */
+function vectorNorm(v: number[]): number {
+    let sum = 0
+    for (let i = 0; i < v.length; i++) sum += v[i]! * v[i]!
+    return Math.sqrt(sum)
+}
+
+/**
+ * Fast cosine similarity using a pre-computed norm for the document vector.
+ * Only the query norm is computed once per search call (see `search()`).
+ */
+function fastCosine(query: number[], queryNorm: number, doc: number[], docNorm: number): number {
+    if (queryNorm === 0 || docNorm === 0) return 0
+    let dot = 0
+    for (let i = 0; i < query.length; i++) dot += query[i]! * doc[i]!
+    return dot / (queryNorm * docNorm)
+}
+
 function tokenize(input: string): string[] {
     return input
         .toLowerCase()
@@ -25,6 +53,9 @@ function tokenize(input: string): string[] {
         .split(/\s+/)
         .filter(token => token.length > 2)
 }
+
+/** Maximum number of candidates to rank with cosine similarity. */
+const MAX_COSINE_CANDIDATES = 200
 
 /**
  * Detects intro / title page and table-of-contents chunks that add noise
@@ -119,27 +150,34 @@ export function useRag() {
             loadError.value = ''
             const baseURL = useRuntimeConfig().app.baseURL || '/'
             const url = `${baseURL.replace(/\/$/, '')}/embeddings.json`
-            const data = await $fetch<Partial<EmbeddingsData>>(url)
+            const data = await $fetch<{ chunks?: unknown[] }>(url)
 
-            const chunks = Array.isArray(data?.chunks)
-                ? data.chunks
-                      .filter((chunk): chunk is Chunk => {
+            const chunks: Chunk[] = Array.isArray(data?.chunks)
+                ? (data.chunks as unknown[])
+                      .filter((chunk): chunk is RawChunk => {
+                          const c = chunk as Partial<RawChunk> | undefined
                           return (
-                              typeof chunk?.text === 'string' &&
-                              typeof chunk?.page === 'number' &&
-                              typeof chunk?.heading === 'string' &&
-                              Array.isArray(chunk?.embedding)
+                              typeof c?.text === 'string' &&
+                              typeof c?.page === 'number' &&
+                              typeof c?.heading === 'string' &&
+                              Array.isArray(c?.embedding)
                           )
                       })
                       .filter(chunk => !isIntroOrTocChunk(chunk))
-                      .map(chunk => ({
-                          text: chunk.text,
-                          page: chunk.page,
-                          heading: isValidTopic(cleanHeading(chunk.heading))
+                      .map(chunk => {
+                          const heading = isValidTopic(cleanHeading(chunk.heading))
                               ? cleanHeading(chunk.heading)
-                              : inferHeadingFromText(chunk.text),
-                          embedding: chunk.embedding,
-                      }))
+                              : inferHeadingFromText(chunk.text)
+                          return {
+                              text: chunk.text,
+                              page: chunk.page,
+                              heading,
+                              embedding: chunk.embedding,
+                              // Pre-compute for O(1) cosine similarity at query time
+                              norm: vectorNorm(chunk.embedding),
+                              haystack: `${heading} ${chunk.text}`.toLowerCase(),
+                          }
+                      })
                 : []
 
             embeddings.value = { chunks }
@@ -159,17 +197,41 @@ export function useRag() {
         }
     }
 
-    function search(queryEmbedding: number[], topK = 5): SearchResult[] {
+    function search(queryEmbedding: number[], topK = 5, queryText?: string): SearchResult[] {
         const chunks = embeddings.value?.chunks ?? []
         if (!Array.isArray(queryEmbedding) || queryEmbedding.length === 0 || chunks.length === 0) {
             return []
         }
 
-        const scored = chunks.map(chunk => ({
+        const qNorm = vectorNorm(queryEmbedding)
+
+        // For large chunk sets, narrow candidates with a cheap text pre-filter
+        // before running cosine similarity. This avoids O(N) dot products.
+        let candidates = chunks
+        if (queryText && chunks.length > MAX_COSINE_CANDIDATES) {
+            const queryTokens = tokenize(queryText)
+            if (queryTokens.length > 0) {
+                const withHits = chunks
+                    .map(chunk => {
+                        let hits = 0
+                        for (const t of queryTokens) {
+                            if (chunk.haystack.includes(t)) hits++
+                        }
+                        return { chunk, hits }
+                    })
+                    .filter(c => c.hits > 0)
+                    .sort((a, b) => b.hits - a.hits)
+                    .slice(0, MAX_COSINE_CANDIDATES)
+                    .map(c => c.chunk)
+                if (withHits.length > 0) candidates = withHits
+            }
+        }
+
+        const scored = candidates.map(chunk => ({
             text: chunk.text,
             page: chunk.page,
             heading: chunk.heading,
-            score: cosineSimilarity(queryEmbedding, chunk.embedding),
+            score: fastCosine(queryEmbedding, qNorm, chunk.embedding, chunk.norm),
         }))
 
         scored.sort((a, b) => b.score - a.score)
@@ -185,11 +247,10 @@ export function useRag() {
 
         const scored = chunks
             .map(chunk => {
-                const haystack = `${chunk.heading} ${chunk.text}`.toLowerCase()
                 let tokenMatches = 0
 
                 for (const token of queryTokens) {
-                    if (haystack.includes(token)) tokenMatches++
+                    if (chunk.haystack.includes(token)) tokenMatches++
                 }
 
                 const score = tokenMatches / queryTokens.size

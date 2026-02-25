@@ -2,12 +2,12 @@
     <div class="flex flex-col h-full">
         <!-- Toolbar -->
         <div
-            class="sticky top-0 z-10 flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+            class="sticky top-0 z-10 flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-200 bg-white/80 backdrop-blur-md">
             <!-- Page Navigation -->
             <div class="flex items-center gap-1">
                 <UButton icon="i-lucide-chevron-left" variant="ghost" size="xs" :disabled="currentPage <= 1"
                     @click="prevPage" aria-label="Previous page" />
-                <span class="text-xs tabular-nums whitespace-nowrap text-gray-600 dark:text-gray-300">
+                <span class="text-xs tabular-nums whitespace-nowrap text-gray-600">
                     Page {{ currentPage }} of {{ totalPages }}
                 </span>
                 <UButton icon="i-lucide-chevron-right" variant="ghost" size="xs" :disabled="currentPage >= totalPages"
@@ -18,7 +18,7 @@
             <div class="flex items-center gap-1">
                 <UButton icon="i-lucide-minus" variant="ghost" size="xs" :disabled="scale <= 0.5" @click="zoomOut"
                     aria-label="Zoom out" />
-                <span class="text-xs tabular-nums w-12 text-center text-gray-600 dark:text-gray-300">
+                <span class="text-xs tabular-nums w-12 text-center text-gray-600">
                     {{ Math.round(scale * 100) }}%
                 </span>
                 <UButton icon="i-lucide-plus" variant="ghost" size="xs" :disabled="scale >= 3" @click="zoomIn"
@@ -56,7 +56,7 @@
         <!-- Error State -->
         <div v-else-if="loadError" class="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
             <UIcon name="i-lucide-file-warning" class="w-8 h-8 text-amber-500" />
-            <p class="text-sm text-gray-600 dark:text-gray-300 max-w-md">
+            <p class="text-sm text-gray-600 max-w-md">
                 {{ loadError }}
             </p>
             <div class="flex items-center gap-2">
@@ -66,7 +66,7 @@
         </div>
 
         <!-- PDF Viewer -->
-        <div ref="viewerContainer" class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-gray-950"
+        <div ref="viewerContainer" class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50"
             @scroll="handleScroll">
             <div class="mx-auto py-4"
                 :style="{ width: `${scale * 100}%`, maxWidth: `${scale * 100}%`, minWidth: '300px' }">

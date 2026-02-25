@@ -374,6 +374,25 @@ Keep each front concise and each back accurate but short.`
         cards.value = [...cards.value, ...additions]
     }
 
+    function deleteCard(id: string) {
+        const idx = cards.value.findIndex(c => c.id === id)
+        if (idx < 0) return
+        cards.value.splice(idx, 1)
+        // If we deleted the current card or one before it, adjust index
+        if (currentIndex.value >= dueCards.value.length) {
+            currentIndex.value = Math.max(0, dueCards.value.length - 1)
+        }
+        showAnswer.value = false
+    }
+
+    function clearDeck() {
+        cards.value = []
+        currentIndex.value = 0
+        showAnswer.value = false
+        correctRatings.value = 0
+        answeredRatings.value = 0
+    }
+
     function toggleAnswer() {
         showAnswer.value = !showAnswer.value
     }
@@ -395,6 +414,8 @@ Keep each front concise and each back accurate but short.`
         generate,
         rateCurrent,
         restartDueSession,
+        deleteCard,
+        clearDeck,
         exportDeck,
         importDeck,
         toggleAnswer,

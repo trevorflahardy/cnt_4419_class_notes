@@ -160,7 +160,7 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-medium text-muted">
                         <span>Question {{ currentQuestionIndex + 1 }}<span class="text-muted/50"> / {{ questions.length
-                                }}</span></span>
+                        }}</span></span>
                         <span>{{ answeredCount }} answered</span>
                     </div>
                     <div class="h-1.5 w-full overflow-hidden rounded-full bg-default">
@@ -266,7 +266,7 @@
                             <div class="mb-1 flex items-center justify-between text-xs">
                                 <span class="max-w-[70%] truncate font-medium text-muted">{{ tb.topic }}</span>
                                 <span class="tabular-nums font-semibold" :class="tb.color">{{ tb.correct }}/{{ tb.total
-                                    }}</span>
+                                }}</span>
                             </div>
                             <div class="h-1.5 w-full overflow-hidden rounded-full bg-default">
                                 <div class="h-full rounded-full transition-all duration-700" :class="tb.barClass"

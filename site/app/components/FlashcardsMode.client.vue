@@ -92,12 +92,16 @@
 
             <!-- How it works info -->
             <details class="mt-3 text-xs text-muted">
-                <summary class="cursor-pointer hover:text-highlighted transition-colors font-medium">How spaced repetition works</summary>
+                <summary class="cursor-pointer hover:text-highlighted transition-colors font-medium">How spaced
+                    repetition works
+                </summary>
                 <div class="mt-2 space-y-1 pl-2 border-l-2 border-default">
                     <p><strong>Again</strong> — card resets to 1-day interval (you forgot it).</p>
                     <p><strong>Good</strong> — interval grows gradually (normal recall).</p>
                     <p><strong>Easy</strong> — interval jumps further (you knew it instantly).</p>
-                    <p>Cards are scheduled for review based on your ratings. Forgotten cards appear sooner; well-known cards are shown less often.</p>
+                    <p>Cards are scheduled for review based on your ratings. Forgotten cards appear sooner; well-known
+                        cards are
+                        shown less often.</p>
                 </div>
             </details>
         </UCard>
@@ -131,7 +135,8 @@
                         {{ showAnswer ? currentCard.back : currentCard.front }}
                     </p>
                     <p class="mt-3 text-xs text-muted pl-2">Topic: {{ currentCard.topic }}</p>
-                    <p v-if="!showAnswer" class="mt-2 text-[11px] text-muted/60 pl-2 group-hover:text-muted transition-colors">
+                    <p v-if="!showAnswer"
+                        class="mt-2 text-[11px] text-muted/60 pl-2 group-hover:text-muted transition-colors">
                         Click to reveal answer
                     </p>
                 </button>
@@ -156,7 +161,9 @@
             <div v-else class="rounded-xl border border-default bg-default/60 p-6 text-center space-y-2">
                 <UIcon name="i-heroicons-check-circle" class="h-8 w-8 text-green-500 mx-auto" />
                 <p class="text-sm font-medium text-highlighted">Session complete!</p>
-                <p class="text-xs text-muted">No more cards are due right now. Cards you rated "Again" will reappear sooner. Restart the session or generate more cards to keep studying.</p>
+                <p class="text-xs text-muted">No more cards are due right now. Cards you rated "Again" will reappear
+                    sooner.
+                    Restart the session or generate more cards to keep studying.</p>
             </div>
         </UCard>
     </div>

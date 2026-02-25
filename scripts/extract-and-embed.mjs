@@ -61,9 +61,18 @@ function isLikelyHeading(line) {
   if (dots > line.length * 0.3) return false;
   // Reject sentence fragments — headings rarely start with lowercase or common
   // conjunctive words if they aren't definitions / named concepts
-  const trimmedClean = line.replace(/^[\p{Emoji}\p{Emoji_Presentation}\s]+/u, "");
-  if (/^(for |the |a |an |if |but |so |or |and |it |this |that |is |are |was |were )/i.test(trimmedClean) &&
-      !/definition|principle|theorem|concept|rule|law|property/i.test(trimmedClean)) {
+  const trimmedClean = line.replace(
+    /^[\p{Emoji}\p{Emoji_Presentation}\s]+/u,
+    "",
+  );
+  if (
+    /^(for |the |a |an |if |but |so |or |and |it |this |that |is |are |was |were )/i.test(
+      trimmedClean,
+    ) &&
+    !/definition|principle|theorem|concept|rule|law|property/i.test(
+      trimmedClean,
+    )
+  ) {
     return false;
   }
   return true;
@@ -96,7 +105,8 @@ function chunkText(pages) {
           buffer = buffer.slice(-CHAR_OVERLAP);
         }
         // Strip trailing page fractions like " 2 / 12" from heading text
-        currentHeading = trimmed.replace(/\s+\d+\s*\/\s*\d+\s*$/, "").trim() || trimmed;
+        currentHeading =
+          trimmed.replace(/\s+\d+\s*\/\s*\d+\s*$/, "").trim() || trimmed;
       }
 
       buffer += " " + trimmed;

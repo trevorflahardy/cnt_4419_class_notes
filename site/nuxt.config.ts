@@ -22,7 +22,7 @@ export default defineNuxtConfig({
           content:
             'An interactive study tool for CNT 4419 Secure Software Development — AI-powered chat, quizzes, and annotated lecture notes.',
         },
-        { name: 'theme-color', content: '#111827' },
+        { name: 'theme-color', content: '#059669' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

@@ -1,23 +1,16 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* ── Custom body backgrounds ───────────────────── */
+/* Nuxt UI handles --ui-bg, --ui-bg-muted, etc. via its own @layer theme.
+   We only customize the page-level body background here. */
+
 :root {
-  color-scheme: light dark;
-}
-
-html:not(.dark),
-html.light {
-  --ui-bg: #ffffff;
-  --ui-bg-muted: #ffffff;
-  --ui-bg-elevated: #ffffff;
-}
-
-html {
-  color-scheme: light;
+  --app-bg: #ffffff;
 }
 
 html.dark {
-  color-scheme: dark;
+  --app-bg: #020617;
 }
 
 html,
@@ -27,22 +20,22 @@ body,
 }
 
 body {
-  background: #ffffff;
+  background: var(--app-bg);
 }
 
-.dark body {
+html.dark body {
   background:
     radial-gradient(
       circle at 10% 10%,
-      rgba(91, 33, 182, 0.26),
+      rgba(16, 185, 129, 0.14),
       transparent 40%
     ),
     radial-gradient(
       circle at 90% 15%,
-      rgba(30, 64, 175, 0.24),
+      rgba(30, 64, 175, 0.18),
       transparent 35%
     ),
-    #020617;
+    var(--app-bg);
 }
 
 /* Smooth transitions for theme switching */

@@ -26,6 +26,73 @@ function tokenize(input: string): string[] {
         .filter(token => token.length > 2)
 }
 
+/**
+ * Detects intro / title page and table-of-contents chunks that add noise
+ * (e.g. "Trevor Flahardy", pages of dots from the TOC). Page 1 is always
+ * the title page. For page 2+ we use a heuristic: if >40% of the text is
+ * dots/whitespace it's almost certainly a TOC page.
+ */
+/**
+ * Strips trailing page-fraction patterns like " 2 / 12" from headings
+ * and trims emoji prefixes.
+ */
+function cleanHeading(heading: string): string {
+    return heading
+        .replace(/\s+\d+\s*\/\s*\d+\s*$/, '') // strip "  2 / 12"
+        .replace(/^[\p{Emoji}\p{Emoji_Presentation}\s]+/u, '') // strip leading emoji
+        .trim()
+}
+
+/**
+ * Returns false for headings that are just page numbers, fractions,
+ * very short fragments, or author names from the title page.
+ */
+function isValidTopic(heading: string): boolean {
+    // Reject bare numbers or fractions: "11", "1 / 12"
+    if (/^\s*\d+\s*(\/\s*\d+)?\s*$/.test(heading)) return false
+    // Must have at least 4 alphabetic characters
+    const alpha = heading.replace(/[^a-zA-Z]/g, '')
+    if (alpha.length < 4) return false
+    // Reject known non-topic strings
+    const lower = heading.toLowerCase()
+    if (lower === 'general' || lower.includes('trevor flahardy')) return false
+    return true
+}
+
+/**
+ * When the original heading is unusable (e.g. author name), try to derive a
+ * reasonable topic from the chunk text itself. Looks for common Typst-style
+ * section markers like "Part 1: Mechanisms" or falls back to first meaningful
+ * phrase.
+ */
+function inferHeadingFromText(text: string): string {
+    // Match patterns like "Part 1: Mechanisms" or "1.3. Containment Mechanisms"
+    const sectionMatch = text.match(/(?:Part\s+\d+[:.]\s*)([A-Z][A-Za-z\s]+)/)
+        || text.match(/\d+\.\d+\.?\s+([A-Z][A-Za-z\s]{4,40})/)
+    if (sectionMatch?.[1]) return sectionMatch[1].trim()
+
+    // Extract leading capitalized phrase
+    const leadMatch = text.match(/^(?:.*?\s{2,})?([A-Z][A-Za-z\s]{4,50}?)(?:\s{2,}|[.!?])/)
+    if (leadMatch?.[1]) return leadMatch[1].trim()
+
+    return 'Course Notes'
+}
+
+function isIntroOrTocChunk(chunk: { text: string; page: number }): boolean {
+    // Page 1 is always the title / author page
+    if (chunk.page === 1) return true
+
+    // TOC pages are full of repeated dots used as leaders
+    const dotCount = (chunk.text.match(/\.{2,}/g) || []).reduce((sum, m) => sum + m.length, 0)
+    if (dotCount > chunk.text.length * 0.35) return true
+
+    // Very short chunks on early pages with no real content
+    const stripped = chunk.text.replace(/[.\s]/g, '')
+    if (chunk.page <= 3 && stripped.length < 60) return true
+
+    return false
+}
+
 export function useRag() {
     const embeddings = useState<EmbeddingsData | null>('rag-embeddings', () => null)
     const loadPromise = useState<Promise<void> | null>('rag-load-promise', () => null)
@@ -35,8 +102,8 @@ export function useRag() {
 
     const topics = computed(() => {
         const chunks = embeddings.value?.chunks ?? []
-        const headings = chunks.map(c => c.heading)
-        return [...new Set(headings)].filter(Boolean)
+        const headings = chunks.map(c => cleanHeading(c.heading))
+        return [...new Set(headings)].filter(h => h.length > 0 && isValidTopic(h))
     })
 
     async function load() {
@@ -64,10 +131,13 @@ export function useRag() {
                               Array.isArray(chunk?.embedding)
                           )
                       })
+                      .filter(chunk => !isIntroOrTocChunk(chunk))
                       .map(chunk => ({
                           text: chunk.text,
                           page: chunk.page,
-                          heading: chunk.heading,
+                          heading: isValidTopic(cleanHeading(chunk.heading))
+                              ? cleanHeading(chunk.heading)
+                              : inferHeadingFromText(chunk.text),
                           embedding: chunk.embedding,
                       }))
                 : []

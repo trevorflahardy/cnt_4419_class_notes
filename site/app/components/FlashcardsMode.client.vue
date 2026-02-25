@@ -89,6 +89,17 @@
             </div>
 
             <p v-if="generationError" class="mt-3 text-sm text-rose-500">{{ generationError }}</p>
+
+            <!-- How it works info -->
+            <details class="mt-3 text-xs text-muted">
+                <summary class="cursor-pointer hover:text-highlighted transition-colors font-medium">How spaced repetition works</summary>
+                <div class="mt-2 space-y-1 pl-2 border-l-2 border-default">
+                    <p><strong>Again</strong> — card resets to 1-day interval (you forgot it).</p>
+                    <p><strong>Good</strong> — interval grows gradually (normal recall).</p>
+                    <p><strong>Easy</strong> — interval jumps further (you knew it instantly).</p>
+                    <p>Cards are scheduled for review based on your ratings. Forgotten cards appear sooner; well-known cards are shown less often.</p>
+                </div>
+            </details>
         </UCard>
 
         <UCard v-if="hasDeck">
@@ -100,24 +111,41 @@
                 <UProgress :model-value="completion" class="mt-2" size="xs" color="primary" />
             </template>
 
+            <!-- Card position indicator -->
+            <div v-if="totalDue > 0" class="flex items-center justify-between text-xs text-muted mb-1">
+                <span>Card {{ Math.min(currentIndex + 1, totalDue) }} of {{ totalDue }}</span>
+                <span>Tap the card to reveal the answer</span>
+            </div>
+
             <div v-if="currentCard" class="space-y-4">
                 <button
-                    class="w-full rounded-xl border border-default bg-default/60 px-5 py-8 text-left transition hover:border-primary"
+                    class="group w-full rounded-xl border border-default bg-default/60 px-5 py-8 text-left transition hover:border-primary relative overflow-hidden"
                     @click="toggleAnswer">
-                    <p class="mb-2 text-xs uppercase tracking-wide text-muted">{{ showAnswer ? 'Answer' : 'Prompt' }}
+                    <!-- Side indicator -->
+                    <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-colors"
+                        :class="showAnswer ? 'bg-green-500' : 'bg-primary'" />
+                    <p class="mb-2 text-xs uppercase tracking-wide text-muted pl-2">
+                        {{ showAnswer ? '🔓 Answer' : '❓ Question' }}
                     </p>
-                    <p class="text-lg font-medium text-highlighted">
+                    <p class="text-lg font-medium text-highlighted pl-2">
                         {{ showAnswer ? currentCard.back : currentCard.front }}
                     </p>
-                    <p class="mt-3 text-xs text-muted">Topic: {{ currentCard.topic }}</p>
+                    <p class="mt-3 text-xs text-muted pl-2">Topic: {{ currentCard.topic }}</p>
+                    <p v-if="!showAnswer" class="mt-2 text-[11px] text-muted/60 pl-2 group-hover:text-muted transition-colors">
+                        Click to reveal answer
+                    </p>
                 </button>
 
                 <div class="flex flex-wrap gap-2">
-                    <UButton color="error" variant="soft" :disabled="!showAnswer" @click="rateCurrent('again')">Again
+                    <p class="w-full text-xs text-muted mb-0.5">Rate your recall:</p>
+                    <UButton color="error" variant="soft" :disabled="!showAnswer" @click="rateCurrent('again')">
+                        🔁 Again
                     </UButton>
-                    <UButton color="primary" variant="soft" :disabled="!showAnswer" @click="rateCurrent('good')">Good
+                    <UButton color="primary" variant="soft" :disabled="!showAnswer" @click="rateCurrent('good')">
+                        👍 Good
                     </UButton>
-                    <UButton color="info" variant="soft" :disabled="!showAnswer" @click="rateCurrent('easy')">Easy
+                    <UButton color="info" variant="soft" :disabled="!showAnswer" @click="rateCurrent('easy')">
+                        ⚡ Easy
                     </UButton>
                     <UButton color="neutral" variant="ghost" @click="toggleAnswer">
                         {{ showAnswer ? 'Hide Answer' : 'Show Answer' }}
@@ -125,8 +153,10 @@
                 </div>
             </div>
 
-            <div v-else class="rounded-xl border border-default bg-default/60 p-6 text-center">
-                <p class="text-sm text-muted">No due cards right now. Restart the session or generate more cards.</p>
+            <div v-else class="rounded-xl border border-default bg-default/60 p-6 text-center space-y-2">
+                <UIcon name="i-heroicons-check-circle" class="h-8 w-8 text-green-500 mx-auto" />
+                <p class="text-sm font-medium text-highlighted">Session complete!</p>
+                <p class="text-xs text-muted">No more cards are due right now. Cards you rated "Again" will reappear sooner. Restart the session or generate more cards to keep studying.</p>
             </div>
         </UCard>
     </div>

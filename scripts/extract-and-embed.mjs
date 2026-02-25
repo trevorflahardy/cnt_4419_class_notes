@@ -44,6 +44,31 @@ const CHUNK_OVERLAP = 50;
 const CHAR_CHUNK = CHUNK_SIZE * 4;
 const CHAR_OVERLAP = CHUNK_OVERLAP * 4;
 
+/**
+ * Returns true when a candidate line looks like a real section heading
+ * rather than a page number, page fraction, or small fragment.
+ */
+function isLikelyHeading(line) {
+  const stripped = line.replace(/[^a-zA-Z]/g, "");
+  // Must contain at least 4 alphabetic characters
+  if (stripped.length < 4) return false;
+  // Reject bare page fractions like "5 / 12"
+  if (/^\s*\d+\s*\/\s*\d+\s*$/.test(line)) return false;
+  // Reject if it's ONLY a number
+  if (/^\s*\d+\s*$/.test(line)) return false;
+  // Reject lines that are mostly dots (TOC leaders)
+  const dots = (line.match(/\.{2,}/g) || []).reduce((s, m) => s + m.length, 0);
+  if (dots > line.length * 0.3) return false;
+  // Reject sentence fragments — headings rarely start with lowercase or common
+  // conjunctive words if they aren't definitions / named concepts
+  const trimmedClean = line.replace(/^[\p{Emoji}\p{Emoji_Presentation}\s]+/u, "");
+  if (/^(for |the |a |an |if |but |so |or |and |it |this |that |is |are |was |were )/i.test(trimmedClean) &&
+      !/definition|principle|theorem|concept|rule|law|property/i.test(trimmedClean)) {
+    return false;
+  }
+  return true;
+}
+
 function chunkText(pages) {
   const chunks = [];
   let currentHeading = "General";
@@ -59,7 +84,8 @@ function chunkText(pages) {
       if (
         trimmed.length > 0 &&
         trimmed.length < 60 &&
-        !trimmed.match(/[.!?,;:]$/)
+        !trimmed.match(/[.!?,;:]$/) &&
+        isLikelyHeading(trimmed)
       ) {
         if (buffer.length > 0 && buffer.length > CHAR_CHUNK * 0.3) {
           chunks.push({
@@ -69,7 +95,8 @@ function chunkText(pages) {
           });
           buffer = buffer.slice(-CHAR_OVERLAP);
         }
-        currentHeading = trimmed;
+        // Strip trailing page fractions like " 2 / 12" from heading text
+        currentHeading = trimmed.replace(/\s+\d+\s*\/\s*\d+\s*$/, "").trim() || trimmed;
       }
 
       buffer += " " + trimmed;

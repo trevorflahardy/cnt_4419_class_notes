@@ -104,9 +104,11 @@ export function useAiChat() {
                 'You are a helpful study assistant for a Secure Coding course. Answer based on the provided notes context when available. If context is missing, say that notes embeddings are not loaded and provide a best-effort answer.'
 
             const contextText = results.length
-                ? results
-                      .map((r, i) => `[${i + 1}] (Page ${r.page}, ${r.heading}): ${r.text}`)
-                      .join('\n\n')
+                ? buildBudgetedContext(
+                      results,
+                      undefined,
+                      (r, i) => `[${i}] (Page ${r.page}, ${r.heading}): ${r.text}`,
+                  )
                 : rag.loadError.value
                 ? `No note context available. ${rag.loadError.value}`
                 : 'No note context available from embeddings.json.'

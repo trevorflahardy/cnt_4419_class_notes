@@ -119,9 +119,11 @@ export function useQuiz() {
     ): Promise<QuizQuestion[]> {
         const contextChunks = chunks.slice(0, Math.min(chunks.length, 12))
         const contextText = contextChunks.length
-            ? contextChunks
-                  .map((c, i) => `[${i + 1}] (${c.heading}, Page ${c.page}): ${c.text}`)
-                  .join('\n\n')
+            ? buildBudgetedContext(
+                  contextChunks,
+                  undefined,
+                  (c, i) => `[${i}] (${c.heading}, Page ${c.page}): ${c.text}`,
+              )
             : 'No extracted class-note chunks available. Generate questions based on secure coding course content.'
 
         const difficultyInstruction =

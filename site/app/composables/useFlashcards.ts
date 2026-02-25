@@ -245,7 +245,7 @@ export function useFlashcards() {
                 .slice(0, 12)
 
             const contextText = contextChunks.length
-                ? contextChunks.map((chunk, i) => `[${i + 1}] (${chunk.heading}, p.${chunk.page}) ${chunk.text}`).join('\n\n')
+                ? buildBudgetedContext(contextChunks)
                 : 'No note chunks available from embeddings.json. Generate from secure coding fundamentals.'
 
             const prompt = `Generate exactly ${config.count} study flashcards for secure coding.${focus ? ` Focus strongly on: ${focus}.` : ''}

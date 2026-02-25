@@ -1,0 +1,22 @@
+{
+  "name": "site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:pdf": "node ./scripts/sync-pdf.mjs",
+    "build": "bun run sync:pdf && nuxt build",
+    "dev": "bun run sync:pdf && nuxt dev",
+    "generate": "bun run sync:pdf && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "@mlc-ai/web-llm": "^0.2.81",
+    "@nuxt/ui": "^4.5.0",
+    "nuxt": "^4.0.0",
+    "tailwindcss": "^4.2.1",
+    "vue": "latest",
+    "vue-pdf-embed": "^2.1.3"
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "cnt-4419-build-scripts",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "extract": "node extract-and-embed.mjs"
+    },
+    "dependencies": {
+        "pdfjs-dist": "^4.0.0",
+        "@huggingface/transformers": "^3.0.0"
+    }
+}

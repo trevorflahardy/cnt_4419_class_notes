@@ -3,3 +3,19 @@
 
 # Custom settings
 .vscode/*
+
+# Nuxt build output
+site/.output/
+site/.nuxt/
+site/node_modules/
+site/.data/
+
+# Scripts
+scripts/node_modules/
+
+# Generated assets (built by CI)
+site/public/notes.pdf
+site/public/embeddings.json
+
+# OS files
+.DS_Store

@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "nuxt-ui-v4@claude-skills": true,
+    "shadcn-vue@claude-skills": true
+  }
+}

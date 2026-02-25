@@ -55,9 +55,6 @@
 
                 <!-- Chat messages -->
                 <ChatMessage v-for="(msg, i) in messages" :key="i" :message="msg" />
-
-                <!-- Typing indicator -->
-                <TypingIndicator v-if="isLoading" />
             </div>
 
             <!-- Input -->
@@ -119,9 +116,9 @@ function sendSuggestion(text: string) {
     sendMessage(text)
 }
 
-// Auto-scroll on new messages
+// Auto-scroll on new messages and streaming updates
 watch(
-    () => messages.value.length,
+    () => messages.value.map(m => `${m.role}:${m.content.length}:${m.pending ? 1 : 0}`).join('|'),
     () => {
         nextTick(() => {
             const el = messagesContainer.value

@@ -3,6 +3,7 @@ import { useAiModel } from './useAiModel';
 interface ChatMessage {
     role: 'user' | 'assistant' | 'system'
     content: string
+    pending?: boolean
     sources?: Array<{ text: string; page: number; heading?: string }>
 }
 
@@ -95,6 +96,7 @@ export function useAiChat() {
             const assistantMessage: ChatMessage = {
                 role: 'assistant',
                 content: '',
+                pending: true,
             }
             messages.value.push(assistantMessage)
             const assistantIndex = messages.value.length - 1
@@ -105,6 +107,7 @@ export function useAiChat() {
                 if (!current) continue
                 messages.value[assistantIndex] = {
                     ...current,
+                    pending: false,
                     content: current.content + token,
                 }
             }
@@ -113,6 +116,7 @@ export function useAiChat() {
             if (completed) {
                 messages.value[assistantIndex] = {
                     ...completed,
+                    pending: false,
                     sources,
                 }
             }

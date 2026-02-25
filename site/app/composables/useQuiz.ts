@@ -25,6 +25,8 @@ export function useQuiz() {
     const userAnswers = ref<(number | null)[]>([])
     const isGenerating = ref(false)
     const generationError = ref('')
+    const generationProgress = ref(0)
+    const generationStatus = ref('')
 
     const score = computed(() => {
         const total = questions.value.length
@@ -47,24 +49,38 @@ export function useQuiz() {
         quizState.value = 'loading'
         isGenerating.value = true
         generationError.value = ''
+        generationProgress.value = 0
+        generationStatus.value = 'Loading note embeddings...'
 
         try {
+            generationProgress.value = 12
             await rag.load()
+
+            generationStatus.value = 'Loading AI model...'
+            generationProgress.value = 28
             await model.init()
 
             // Gather relevant chunks
+            generationStatus.value = 'Preparing question context...'
+            generationProgress.value = 42
             const allChunks = gatherChunks(config)
 
+            generationStatus.value = 'Generating quiz questions...'
+            generationProgress.value = 55
             const generatedQuestions = await generateWithLLM(allChunks, config)
 
             if (generatedQuestions.length === 0) {
                 throw new Error('Unable to generate quiz questions from the current notes.')
             }
 
+            generationStatus.value = 'Finalizing quiz...'
+            generationProgress.value = 95
             questions.value = generatedQuestions
             userAnswers.value = new Array(generatedQuestions.length).fill(null)
             currentQuestionIndex.value = 0
             quizState.value = 'active'
+            generationProgress.value = 100
+            generationStatus.value = 'Quiz ready'
         } catch (err) {
             console.error('[useQuiz] Failed to generate quiz:', err)
             generationError.value =
@@ -72,6 +88,8 @@ export function useQuiz() {
                     ? err.message
                     : 'Quiz generation failed. Please try again.'
             quizState.value = 'setup'
+            generationStatus.value = ''
+            generationProgress.value = 0
         } finally {
             isGenerating.value = false
         }
@@ -136,8 +154,11 @@ ${contextText}`
 
         let response = ''
         const stream = model.chat(chatMessages)
+        let tokenCount = 0
         for await (const token of stream) {
             response += token
+            tokenCount++
+            generationProgress.value = Math.min(88, 55 + Math.floor(tokenCount / 6))
         }
 
         try {
@@ -145,13 +166,16 @@ ${contextText}`
             const jsonMatch = response.match(/\[[\s\S]*\]/)
             if (jsonMatch) {
                 const parsed = JSON.parse(jsonMatch[0]) as QuizQuestion[]
+                generationProgress.value = 92
                 return parsed.slice(0, config.numQuestions)
             }
         } catch (parseErr) {
             console.warn('[useQuiz] Failed to parse LLM response:', parseErr)
         }
 
-        throw new Error('The AI response was invalid. Please try generating again.')
+        generationStatus.value = 'AI format was invalid, using deterministic fallback...'
+        generationProgress.value = 90
+        return generateFallback(chunks, config)
     }
 
     function generateFallback(
@@ -367,6 +391,8 @@ ${contextText}`
         currentQuestionIndex.value = 0
         userAnswers.value = []
         isGenerating.value = false
+        generationProgress.value = 0
+        generationStatus.value = ''
     }
 
     return {
@@ -378,6 +404,8 @@ ${contextText}`
         availableTopics,
         isGenerating,
         generationError,
+        generationProgress,
+        generationStatus,
         generateQuiz,
         submitAnswer,
         nextQuestion,

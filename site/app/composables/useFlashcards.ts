@@ -22,15 +22,122 @@ interface FlashcardRating {
 }
 
 function safeJsonArray<T>(text: string): T[] {
-    const match = text.match(/\[[\s\S]*\]/)
-    if (!match) return []
+    const trimmed = text.trim()
 
-    try {
-        const parsed = JSON.parse(match[0]) as T[]
-        return Array.isArray(parsed) ? parsed : []
-    } catch {
-        return []
+    const tryParseArray = (input: string): T[] => {
+        try {
+            const parsed = JSON.parse(input) as unknown
+            if (Array.isArray(parsed)) return parsed as T[]
+            if (parsed && typeof parsed === 'object' && Array.isArray((parsed as any).cards)) {
+                return (parsed as any).cards as T[]
+            }
+            return []
+        } catch {
+            return []
+        }
     }
+
+    const direct = tryParseArray(trimmed)
+    if (direct.length) return direct
+
+    const withoutCodeFence = trimmed
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+
+    const fenceParsed = tryParseArray(withoutCodeFence)
+    if (fenceParsed.length) return fenceParsed
+
+    const arrayMatch = withoutCodeFence.match(/\[[\s\S]*\]/)
+    if (arrayMatch) {
+        const matched = tryParseArray(arrayMatch[0])
+        if (matched.length) return matched
+    }
+
+    const objectMatch = withoutCodeFence.match(/\{[\s\S]*\}/)
+    if (objectMatch) {
+        const objMatched = tryParseArray(objectMatch[0])
+        if (objMatched.length) return objMatched
+    }
+
+    return []
+}
+
+function extractSummarySentence(text: string): string {
+    const sentence = text
+        .split(/[.!?]+/)
+        .map(s => s.trim())
+        .find(s => s.length > 24)
+
+    if (!sentence) return text.slice(0, 180).trim()
+    return sentence.slice(0, 200).trim()
+}
+
+function buildFallbackCards(
+    chunks: Array<{ text: string; page: number; heading: string }>,
+    count: number,
+    focus: string
+): Array<{ front: string; back: string; topic?: string; tags?: string[] }> {
+    const fallback: Array<{ front: string; back: string; topic?: string; tags?: string[] }> = []
+    const target = Math.max(1, count)
+
+    const focusLower = focus.toLowerCase()
+    const selectedChunks = chunks.filter(chunk => {
+        if (!focusLower) return true
+        return (
+            chunk.heading.toLowerCase().includes(focusLower) ||
+            chunk.text.toLowerCase().includes(focusLower)
+        )
+    })
+
+    const sourceChunks = selectedChunks.length ? selectedChunks : chunks
+
+    for (let i = 0; i < sourceChunks.length && fallback.length < target; i++) {
+        const chunk = sourceChunks[i]!
+        const summary = extractSummarySentence(chunk.text)
+        if (!summary) continue
+
+        fallback.push({
+            front: `What is the key idea in ${chunk.heading}?`,
+            back: summary,
+            topic: chunk.heading,
+            tags: ['notes', `page-${chunk.page}`],
+        })
+    }
+
+    const generic = [
+        {
+            front: 'Why is input validation important in secure coding?',
+            back: 'Input validation reduces malformed or malicious data entering the system and helps prevent common vulnerabilities.',
+            topic: 'Input Validation',
+            tags: ['secure-coding'],
+        },
+        {
+            front: 'What is the difference between authentication and authorization?',
+            back: 'Authentication verifies identity, while authorization determines what an authenticated user is allowed to do.',
+            topic: 'AuthN/AuthZ',
+            tags: ['secure-coding'],
+        },
+        {
+            front: 'Why should sensitive data be encrypted at rest and in transit?',
+            back: 'Encryption protects confidentiality if storage media or network traffic is exposed to unauthorized parties.',
+            topic: 'Data Protection',
+            tags: ['secure-coding'],
+        },
+        {
+            front: 'What is least privilege?',
+            back: 'Least privilege grants only the minimum access necessary, reducing blast radius if an account or process is compromised.',
+            topic: 'Access Control',
+            tags: ['secure-coding'],
+        },
+    ]
+
+    let genericIndex = 0
+    while (fallback.length < target) {
+        fallback.push(generic[genericIndex % generic.length]!)
+        genericIndex++
+    }
+
+    return fallback.slice(0, target)
 }
 
 const STORAGE_KEY = 'cnt4419-flashcards-v1'
@@ -64,6 +171,8 @@ export function useFlashcards() {
     const cards = useState<Flashcard[]>('flashcards-cards', () => loadFromStorage())
     const isGenerating = useState<boolean>('flashcards-is-generating', () => false)
     const generationError = useState<string>('flashcards-generation-error', () => '')
+    const generationProgress = useState<number>('flashcards-generation-progress', () => 0)
+    const generationStatus = useState<string>('flashcards-generation-status', () => '')
     const currentIndex = useState<number>('flashcards-current-index', () => 0)
     const showAnswer = useState<boolean>('flashcards-show-answer', () => false)
     const correctRatings = useState<number>('flashcards-correct-ratings', () => 0)
@@ -115,9 +224,14 @@ export function useFlashcards() {
     async function generate(config: GenerateFlashcardsConfig, append = false) {
         isGenerating.value = true
         generationError.value = ''
+        generationProgress.value = 0
+        generationStatus.value = 'Loading note embeddings...'
 
         try {
+            generationProgress.value = 12
             await ensureReady()
+            generationStatus.value = 'Preparing flashcard context...'
+            generationProgress.value = 35
             const chunks = rag.embeddings.value?.chunks ?? []
             const focus = config.focus.trim()
             const contextChunks = chunks
@@ -148,23 +262,36 @@ Keep each front concise and each back accurate but short.`
             ])
 
             let response = ''
+            let tokenCount = 0
+            generationStatus.value = 'Generating flashcards with AI...'
+            generationProgress.value = 55
             for await (const token of stream) {
                 response += token
+                tokenCount++
+                generationProgress.value = Math.min(88, 55 + Math.floor(tokenCount / 6))
             }
 
             const parsed = safeJsonArray<{ front: string; back: string; topic?: string; tags?: string[] }>(response)
-            const next = normalizeCards(parsed).slice(0, config.count)
+            let next = normalizeCards(parsed).slice(0, config.count)
             if (next.length === 0) {
-                throw new Error('AI returned invalid flashcards. Please try again.')
+                generationStatus.value = 'AI output was malformed, building deterministic fallback cards...'
+                generationProgress.value = 92
+                next = normalizeCards(buildFallbackCards(chunks, config.count, focus)).slice(0, config.count)
             }
 
+            generationStatus.value = 'Finalizing deck...'
+            generationProgress.value = 98
             cards.value = append ? [...cards.value, ...next] : next
             currentIndex.value = 0
             showAnswer.value = false
             correctRatings.value = 0
             answeredRatings.value = 0
+            generationStatus.value = 'Flashcards ready'
+            generationProgress.value = 100
         } catch (err) {
             generationError.value = err instanceof Error ? err.message : 'Failed to generate flashcards.'
+            generationStatus.value = ''
+            generationProgress.value = 0
         } finally {
             isGenerating.value = false
         }
@@ -257,6 +384,8 @@ Keep each front concise and each back accurate but short.`
         hasDeck,
         isGenerating,
         generationError,
+        generationProgress,
+        generationStatus,
         dueCards,
         totalDue,
         currentCard,

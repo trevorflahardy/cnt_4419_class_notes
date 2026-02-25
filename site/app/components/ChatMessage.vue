@@ -1,7 +1,7 @@
 <template>
     <div class="flex gap-2 message-enter" :class="isUser ? 'justify-end' : 'justify-start'">
         <!-- Assistant avatar -->
-        <div v-if="!isUser" class="flex-shrink-0 mt-1">
+        <div v-if="!isUser" class="shrink-0 mt-1">
             <div class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
                 <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-primary-500" />
             </div>
@@ -10,7 +10,15 @@
         <div class="max-w-[80%] space-y-1">
             <!-- Message bubble -->
             <div class="px-3.5 py-2.5 text-sm leading-relaxed" :class="bubbleClasses">
-                <div v-html="renderedContent" class="prose-chat" />
+                <div v-if="showPending" class="flex items-center gap-1.5 py-1">
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                        style="animation-delay: 0ms" />
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                        style="animation-delay: 150ms" />
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 inline-block"
+                        style="animation-delay: 300ms" />
+                </div>
+                <div v-else v-html="renderedContent" class="prose-chat" />
             </div>
 
             <!-- Sources -->
@@ -31,7 +39,7 @@
         </div>
 
         <!-- User avatar -->
-        <div v-if="isUser" class="flex-shrink-0 mt-1">
+        <div v-if="isUser" class="shrink-0 mt-1">
             <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                 <UIcon name="i-lucide-user" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </div>
@@ -49,6 +57,7 @@ interface Source {
 interface Message {
     role: 'user' | 'assistant' | 'system'
     content: string
+    pending?: boolean
     sources?: Source[]
 }
 
@@ -69,6 +78,10 @@ const bubbleClasses = computed(() => {
         return 'bg-primary-500/10 dark:bg-primary-500/20 text-gray-900 dark:text-gray-100 rounded-2xl rounded-br-md'
     }
     return 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-bl-md'
+})
+
+const showPending = computed(() => {
+    return props.message.role === 'assistant' && !!props.message.pending && !props.message.content.trim()
 })
 
 const renderedContent = computed(() => {
@@ -127,5 +140,24 @@ const renderedContent = computed(() => {
 
 .prose-chat :deep(li + li) {
     margin-top: 0.125rem;
+}
+
+.typing-dot {
+    animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes typing-bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
 }
 </style>

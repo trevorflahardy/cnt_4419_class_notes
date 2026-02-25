@@ -80,6 +80,14 @@
                 </UButton>
             </div>
 
+            <div v-if="isGenerating" class="mt-3 rounded-lg border border-default bg-default/60 px-3 py-2">
+                <div class="mb-1 flex items-center justify-between text-xs text-muted">
+                    <span>{{ generationStatus || 'Generating flashcards...' }}</span>
+                    <span class="tabular-nums">{{ generationProgress }}%</span>
+                </div>
+                <UProgress :model-value="generationProgress" size="xs" color="primary" />
+            </div>
+
             <p v-if="generationError" class="mt-3 text-sm text-rose-500">{{ generationError }}</p>
         </UCard>
 
@@ -130,6 +138,8 @@ const {
     hasDeck,
     isGenerating,
     generationError,
+    generationProgress,
+    generationStatus,
     totalDue,
     currentCard,
     showAnswer,

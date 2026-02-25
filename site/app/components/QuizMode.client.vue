@@ -109,6 +109,13 @@
                         <UIcon name="i-lucide-sparkles" class="h-4 w-4" />
                         {{ isGenerating ? 'Generating...' : 'Generate Quiz' }}
                     </button>
+                    <div v-if="isGenerating" class="rounded-lg border border-default bg-default/60 px-3 py-2">
+                        <div class="mb-1 flex items-center justify-between text-xs text-muted">
+                            <span>{{ generationStatus || 'Generating quiz...' }}</span>
+                            <span class="tabular-nums">{{ generationProgress }}%</span>
+                        </div>
+                        <UProgress :model-value="generationProgress" size="xs" color="primary" />
+                    </div>
                     <p v-if="generationError"
                         class="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-400">
                         <UIcon name="i-heroicons-exclamation-circle" class="h-3.5 w-3.5 shrink-0" />
@@ -129,8 +136,17 @@
                 <div class="text-center space-y-2 max-w-xs">
                     <h3 class="text-lg font-bold text-highlighted">Generating your quiz…</h3>
                     <Transition name="fade" mode="out-in">
-                        <p :key="currentLoadingMessage" class="text-sm text-muted">{{ currentLoadingMessage }}</p>
+                        <p :key="generationStatus || currentLoadingMessage" class="text-sm text-muted">
+                            {{ generationStatus || currentLoadingMessage }}
+                        </p>
                     </Transition>
+                </div>
+                <div class="w-full max-w-xs space-y-1">
+                    <div class="flex items-center justify-between text-xs text-muted">
+                        <span>Progress</span>
+                        <span class="tabular-nums">{{ generationProgress }}%</span>
+                    </div>
+                    <UProgress :model-value="generationProgress" size="sm" color="primary" />
                 </div>
                 <div class="flex gap-1.5">
                     <div v-for="i in 3" :key="i" class="h-1.5 w-1.5 rounded-full bg-primary/40 animate-bounce"
@@ -144,7 +160,7 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-medium text-muted">
                         <span>Question {{ currentQuestionIndex + 1 }}<span class="text-muted/50"> / {{ questions.length
-                        }}</span></span>
+                                }}</span></span>
                         <span>{{ answeredCount }} answered</span>
                     </div>
                     <div class="h-1.5 w-full overflow-hidden rounded-full bg-default">
@@ -189,7 +205,7 @@
                         </div>
                         <Transition name="fade">
                             <div v-if="userAnswers[currentQuestionIndex] !== null && currentQuestion?.explanation"
-                                class="flex gap-2.5 rounded-xl border border-amber-400/20 bg-amber-500/[0.08] px-4 py-3">
+                                class="flex gap-2.5 rounded-xl border border-amber-400/20 bg-amber-500/8 px-4 py-3">
                                 <UIcon name="i-heroicons-light-bulb" class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
                                 <p class="text-sm leading-relaxed text-muted">{{ currentQuestion?.explanation }}</p>
                             </div>
@@ -228,7 +244,7 @@
             <div v-else-if="quizState === 'review'" key="review" class="space-y-6">
                 <div class="overflow-hidden rounded-2xl border border-default">
                     <div
-                        class="flex flex-col items-center gap-4 bg-gradient-to-br from-primary/10 via-transparent to-transparent px-6 py-8">
+                        class="flex flex-col items-center gap-4 bg-linear-to-br from-primary/10 via-transparent to-transparent px-6 py-8">
                         <ScoreDisplay :score="score.correct" :total="score.total" :percentage="score.percentage" />
                         <p class="max-w-sm text-center text-sm text-muted">
                             {{ score.percentage >= 80 ? '🎉 Excellent work — you nailed it!'
@@ -250,7 +266,7 @@
                             <div class="mb-1 flex items-center justify-between text-xs">
                                 <span class="max-w-[70%] truncate font-medium text-muted">{{ tb.topic }}</span>
                                 <span class="tabular-nums font-semibold" :class="tb.color">{{ tb.correct }}/{{ tb.total
-                                }}</span>
+                                    }}</span>
                             </div>
                             <div class="h-1.5 w-full overflow-hidden rounded-full bg-default">
                                 <div class="h-full rounded-full transition-all duration-700" :class="tb.barClass"
@@ -289,7 +305,7 @@
                                 </div>
                             </div>
                             <div v-if="userAnswers[qi] !== q.correctIndex && q.explanation"
-                                class="ml-9 flex gap-2 rounded-lg border border-amber-400/20 bg-amber-500/[0.08] px-3 py-2">
+                                class="ml-9 flex gap-2 rounded-lg border border-amber-400/20 bg-amber-500/8 px-3 py-2">
                                 <UIcon name="i-heroicons-light-bulb"
                                     class="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
                                 <p class="text-xs leading-relaxed text-muted">{{ q.explanation }}</p>
@@ -333,6 +349,8 @@ const {
     resetQuiz,
     isGenerating,
     generationError,
+    generationProgress,
+    generationStatus,
     availableTopics,
 } = useQuiz()
 const model = useAiModel()

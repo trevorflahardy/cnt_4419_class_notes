@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-start gap-2">
         <!-- Avatar -->
-        <div class="flex-shrink-0 mt-1">
+        <div class="shrink-0 mt-1">
             <div class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
                 <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-primary-500" />
             </div>

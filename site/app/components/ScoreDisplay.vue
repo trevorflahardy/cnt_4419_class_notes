@@ -17,7 +17,7 @@
                 <span class="text-4xl font-bold tabular-nums" :style="{ color: progressColor }">
                     {{ displayPercentage }}%
                 </span>
-                <span class="text-xs font-medium text-(--ui-text-muted) mt-0.5">
+                <span class="text-xs font-medium text-muted mt-0.5">
                     {{ letterGrade }}
                 </span>
             </div>
@@ -25,7 +25,7 @@
 
         <!-- Score text -->
         <div class="text-center space-y-1">
-            <p class="text-lg font-semibold text-(--ui-text-highlighted)">
+            <p class="text-lg font-semibold text-highlighted">
                 {{ displayCorrect }} out of {{ total }} correct
             </p>
             <UBadge :color="badgeColor" variant="subtle" size="lg">

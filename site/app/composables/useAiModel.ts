@@ -71,7 +71,7 @@ export function useAiModel() {
             isLoading.value = true
             progressText.value = 'Loading AI model...'
 
-            const { CreateMLCEngine } = await import('@mlc-ai/web-llm/lib/index.js')
+            const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
 
             // Store engine at module level — NOT in Vue reactive state — to
             // prevent Proxy wrapping that causes BindingError in WASM bindings.

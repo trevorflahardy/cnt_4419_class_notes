@@ -3,8 +3,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
 
   colorMode: {
-    preference: 'dark',
-    fallback: 'dark',
+    preference: 'system',
+    fallback: 'light',
     classSuffix: '',
   },
 
@@ -46,7 +46,7 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      exclude: ['@huggingface/transformers', '@mlc-ai/web-llm', '@mlc-ai/web-llm/lib/index.js'],
+      exclude: ['@huggingface/transformers', '@mlc-ai/web-llm'],
     },
     worker: {
       format: 'es',

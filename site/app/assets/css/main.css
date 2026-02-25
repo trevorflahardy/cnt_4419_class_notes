@@ -5,6 +5,13 @@
   color-scheme: light dark;
 }
 
+html:not(.dark),
+html.light {
+  --ui-bg: #ffffff;
+  --ui-bg-muted: #ffffff;
+  --ui-bg-elevated: #ffffff;
+}
+
 html {
   color-scheme: light;
 }
@@ -20,18 +27,7 @@ body,
 }
 
 body {
-  background:
-    radial-gradient(
-      circle at 10% 10%,
-      rgba(124, 58, 237, 0.08),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 90% 15%,
-      rgba(56, 189, 248, 0.1),
-      transparent 35%
-    ),
-    #f8fafc;
+  background: #ffffff;
 }
 
 .dark body {

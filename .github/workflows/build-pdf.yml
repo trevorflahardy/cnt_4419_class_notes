@@ -1,0 +1,43 @@
+name: Build PDF from Typst
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**.typ"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v4
+
+      - name: Compile Typst to PDF
+        run: typst compile cnt_4419_typed_notes.typ cnt_4419_typed_notes.pdf
+
+      - name: Upload PDF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cnt_4419_typed_notes
+          path: cnt_4419_typed_notes.pdf
+
+      - name: Update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest PDF Build"
+          body: |
+            Auto-built PDF from the latest push to `master`.
+
+            Last updated: ${{ github.event.head_commit.timestamp }}
+          files: cnt_4419_typed_notes.pdf
+          make_latest: true

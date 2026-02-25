@@ -1,12 +1,13 @@
-import { useAiModel } from '../composables/useAiModel';
-
+/** A single flashcard with spaced-repetition scheduling metadata. */
 interface Flashcard {
     id: string
     front: string
     back: string
     topic: string
     tags: string[]
+    /** Current review interval in days. */
     intervalDays: number
+    /** SM-2-style ease factor (higher = longer intervals). */
     ease: number
     dueAt: number
     seen: number
@@ -17,9 +18,8 @@ interface GenerateFlashcardsConfig {
     focus: string
 }
 
-interface FlashcardRating {
-    quality: 'again' | 'good' | 'easy'
-}
+/** User's self-assessment rating for a flashcard review. */
+type FlashcardRating = 'again' | 'good' | 'easy'
 
 function safeJsonArray<T>(text: string): T[] {
     const trimmed = text.trim()
@@ -163,6 +163,12 @@ function saveToStorage(cards: Flashcard[]) {
     }
 }
 
+/**
+ * Composable for AI-generated flashcards with spaced-repetition scheduling.
+ *
+ * Cards are persisted to localStorage and scheduled using a simplified SM-2
+ * algorithm. Supports AI generation, import/export, and manual deck management.
+ */
 export function useFlashcards() {
     const rag = useRag()
     const model = useAiModel()
@@ -297,7 +303,7 @@ Keep each front concise and each back accurate but short.`
         }
     }
 
-    function rateCurrent(rating: FlashcardRating['quality']) {
+    function rateCurrent(rating: FlashcardRating) {
         const card = currentCard.value
         if (!card) return
 

@@ -1,3 +1,7 @@
+/**
+ * Composable for triggering a confetti celebration overlay.
+ * Used when the user achieves a high score on quizzes or flashcards.
+ */
 export function useConfetti() {
     const isActive = useState<boolean>('confetti-active', () => false)
     const seed = useState<number>('confetti-seed', () => 0)

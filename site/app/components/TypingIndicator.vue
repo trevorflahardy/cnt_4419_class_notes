@@ -1,3 +1,7 @@
+<!--
+  Standalone typing indicator bubble (three bouncing dots).
+  Currently unused — ChatMessage handles its own pending state inline.
+-->
 <template>
     <div class="flex justify-start gap-2">
         <!-- Avatar -->

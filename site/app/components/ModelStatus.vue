@@ -1,3 +1,7 @@
+<!--
+  Compact model status badge with upgrade prompt.
+  Designed for inline use in headers or toolbars.
+-->
 <template>
     <div class="flex items-center gap-2">
         <!-- Tier badge -->

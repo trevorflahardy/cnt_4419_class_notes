@@ -43,11 +43,6 @@ onBeforeUnmount(() => {
     window.removeEventListener('mousemove', onMouseMove)
     window.removeEventListener('mouseup', stopResize)
 })
-
-const currentViewIcon = computed(() => {
-    const next = views.find((v) => v.key !== activeView.value)
-    return next?.icon ?? 'i-heroicons-squares-2x2'
-})
 </script>
 
 <template>

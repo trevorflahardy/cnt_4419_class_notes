@@ -1,8 +1,16 @@
 type MLCEngine = any
+
+/** WebLLM model used for on-device inference. */
 const MODEL_ID = 'Llama-3.2-3B-Instruct-q4f16_1-MLC'
+
+/**
+ * Module-level engine reference — intentionally kept outside Vue reactive
+ * state to prevent Proxy wrapping that causes BindingError in WASM bindings.
+ */
 let _engine: MLCEngine | null = null
 let initPromise: Promise<void> | null = null
 
+/** Extract the text content from a WebLLM streaming or non-streaming chunk. */
 function extractChunkText(chunk: any): string {
     const choice = chunk?.choices?.[0]
     const deltaContent = choice?.delta?.content
@@ -37,6 +45,12 @@ function extractChunkText(chunk: any): string {
     return ''
 }
 
+/**
+ * Composable for managing the on-device LLM via WebLLM.
+ *
+ * Handles WebGPU availability detection, model download with progress
+ * tracking, and streaming chat completions.
+ */
 export function useAiModel() {
     const isAvailable = useState<boolean>('tier2-is-available', () => false)
     const isLoading = useState<boolean>('tier2-is-loading', () => false)
@@ -144,7 +158,6 @@ export function useAiModel() {
         }
     }
 
-    // Check availability on client side
     if (import.meta.client) {
         checkAvailability()
     }

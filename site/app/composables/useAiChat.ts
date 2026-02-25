@@ -1,5 +1,6 @@
-import { useAiModel } from './useAiModel';
-
+/**
+ * Chat message exchanged between the user and the AI assistant.
+ */
 interface ChatMessage {
     role: 'user' | 'assistant' | 'system'
     content: string
@@ -9,6 +10,13 @@ interface ChatMessage {
 
 let initializePromise: Promise<void> | null = null
 
+/**
+ * Composable for the AI chat sidebar. Manages the conversation history,
+ * message queue, and streaming responses from the on-device LLM.
+ *
+ * Messages are processed sequentially — if the user sends multiple messages
+ * while the model is responding, they are queued and handled one at a time.
+ */
 export function useAiChat() {
     const rag = useRag()
     const model = useAiModel()
@@ -150,7 +158,6 @@ export function useAiChat() {
         }
     }
 
-    // Auto-initialize on client side
     if (import.meta.client) {
         initialize()
     }

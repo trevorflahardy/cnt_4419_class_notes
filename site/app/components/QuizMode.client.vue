@@ -333,8 +333,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAiModel } from '../composables/useAiModel';
-
 const {
     quizState,
     questions,
@@ -361,15 +359,17 @@ const modelProgress = computed(() => model.progress.value)
 const modelProgressText = computed(() => model.progressText.value)
 const webGpuAvailable = computed(() => model.isAvailable.value)
 
+type Difficulty = 'easy' | 'medium' | 'hard' | 'mixed'
+
 // ─── Setup state ───
 const questionCounts = [5, 10, 15, 20]
 const numQuestions = ref(10)
-const selectedDifficulty = ref<'easy' | 'medium' | 'hard' | 'mixed'>('mixed')
+const selectedDifficulty = ref<Difficulty>('mixed')
 const selectedTopics = ref<string[]>([])
 
 const letters = ['A', 'B', 'C', 'D']
 
-const difficulties = [
+const difficulties: { value: Difficulty; label: string; activeClass: string }[] = [
     { value: 'easy', label: 'Easy', activeClass: 'border-green-500 bg-green-500/10 text-green-600' },
     { value: 'medium', label: 'Medium', activeClass: 'border-amber-500 bg-amber-500/10 text-amber-600' },
     { value: 'hard', label: 'Hard', activeClass: 'border-red-500 bg-red-500/10 text-red-600' },
@@ -397,9 +397,7 @@ function handleGenerate() {
 async function downloadModel() {
     try {
         await model.init()
-    } catch {
-        // handled by model state
-    }
+    } catch { /* model state handles errors */ }
 }
 
 // ─── Loading messages ───
@@ -504,7 +502,6 @@ function reviewOptionClass(qi: number, oi: number) {
 
 function handleNewQuiz() {
     resetQuiz()
-    // quizState resets to 'setup' via composable
 }
 </script>
 

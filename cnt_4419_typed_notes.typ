@@ -206,7 +206,7 @@ For example, recall the textbook example of the Java app vulnerabilities. That e
 
 == Make judicious use of existing/AI-generated code or algorithms
 Don't reinvent the wheel!
-In practice, usually, you can't do everything yourself. So if you are building a "real system" you are using someone else's code there. it's important to think through what you are using and if that code you are using has vulneraviliies.
+In practice, usually, you can't do everything yourself. So if you are building a "real system" you are using someone else's code there. it's important to think through what you are using and if that code you are using has vulnerabilities.
 
 On Stack Overflow for example, there are many code snippets that are not secure. Sure, you can trust answers that have more "up-votes", but you should take this with a grain of salt. The professor notes a paper that came out last year that tested copilot. They asked it to generate some security relevant code and 40% of the modules that copilot created had security vulnerabilities in it. So the TLDR here is that you have to be careful about using AI generated code as well.
 
@@ -252,13 +252,13 @@ You want to minimize the gap between when you check the security state and when 
 
 The professor notes that all the above security design principles are not exhaustive but cover all the ones he can think of. Next, he wishes to focus on "how are we going to protect certain resources against attacks?"
 
-We are moving towards more and more concrete examples of attacks on SW (software). We talked about the compiler with the confused deuputy attack.
+We are moving towards more and more concrete examples of attacks on SW (software). We talked about the compiler with the confused deputy attack.
 
 #question[
   *What kinds of resources do attackers like to go after? What kinds of standard resources on a machine would the attacker have a chance of hitting?*
 
   - Processor time is a good example. This would be a late stage in an attack; you can do a lot of things with processor time, such as creating botnets and mining cryptocurrency. So this is a very valuable resource for attackers.
-  - Memory usage. Memory is usually one of the first things an attacker can get. This is a super important resource for attackers. So many of these atatcks below are something that attackers will go for.
+  - Memory usage. Memory is usually one of the first things an attacker can get. This is a super important resource for attackers. So many of these attacks below are something that attackers will go for.
     - The professor notes we have to understand memory very well for this.
 ]
 

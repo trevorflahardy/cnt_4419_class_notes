@@ -46,7 +46,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="flex h-screen flex-col overflow-hidden bg-default">
+    <div class="flex h-screen flex-col overflow-hidden bg-default pb-[env(safe-area-inset-bottom, 0px)]">
         <ClientOnly>
             <CelebrationOverlay />
         </ClientOnly>

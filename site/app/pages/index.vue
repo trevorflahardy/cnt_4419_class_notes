@@ -46,7 +46,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="flex h-screen flex-col overflow-hidden bg-default pb-[env(safe-area-inset-bottom, 0px)]">
+    <div class="flex h-screen flex-col overflow-hidden bg-default">
         <ClientOnly>
             <CelebrationOverlay />
         </ClientOnly>
@@ -138,7 +138,8 @@ onBeforeUnmount(() => {
         </main>
 
         <!-- ===== Mobile Bottom Navigation ===== -->
-        <nav class="flex items-center justify-around border-t border-default bg-default px-2 py-1.5 md:hidden">
+        <nav
+            class="flex items-center justify-around border-t border-default bg-default px-2 py-1.5 md:hidden pb-[calc(env(safe-area-inset-bottom)+6px)]">
             <button v-for="v in views" :key="v.key"
                 class="flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1 text-xs transition-colors" :class="activeView === v.key
                     ? 'text-primary font-semibold'

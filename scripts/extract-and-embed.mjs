@@ -250,4 +250,53 @@ console.log(
   `  Wrote ${embeddedChunks.length} chunks with embeddings (${(Buffer.byteLength(JSON.stringify(output)) / 1024 / 1024).toFixed(2)} MB)`,
 );
 
+// --- Copy transcript files to site/public/transcripts/ ---
+console.log("\n📂 Writing public transcript files...");
+const PUBLIC_TRANSCRIPTS_DIR = join(OUTPUT_DIR, "transcripts");
+mkdirSync(PUBLIC_TRANSCRIPTS_DIR, { recursive: true });
+
+const indexEntries = [];
+
+if (existsSync(TRANSCRIPTS_ROOT)) {
+  const transcriptFiles = readdirSync(TRANSCRIPTS_ROOT)
+    .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .sort()
+    .reverse(); // newest-first
+
+  for (const file of transcriptFiles) {
+    const date = file.replace(".json", "");
+    let data;
+    try {
+      data = JSON.parse(readFileSync(join(TRANSCRIPTS_ROOT, file), "utf8"));
+    } catch (err) {
+      console.warn(`  Warning: could not parse ${file}: ${err.message}`);
+      continue;
+    }
+
+    // Write full copy (all fields kept — transcript text needed by chat)
+    const destPath = join(PUBLIC_TRANSCRIPTS_DIR, file);
+    writeFileSync(destPath, JSON.stringify(data));
+    console.log(`  Wrote ${file}`);
+
+    // Build index entry
+    const segments = Array.isArray(data.segments) ? data.segments : [];
+    indexEntries.push({
+      date: data.date || date,
+      recordings: Array.isArray(data.recordings) ? data.recordings : [],
+      segment_count: segments.length,
+    });
+  }
+}
+
+// Write index.json (already sorted newest-first from the loop above)
+const indexData = {
+  generated_at: new Date().toISOString(),
+  dates: indexEntries,
+};
+writeFileSync(
+  join(PUBLIC_TRANSCRIPTS_DIR, "index.json"),
+  JSON.stringify(indexData, null, 2),
+);
+console.log(`  Wrote index.json with ${indexEntries.length} date(s)`);
+
 console.log("✅ Done!");

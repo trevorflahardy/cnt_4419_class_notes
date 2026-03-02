@@ -13,8 +13,8 @@
  * the rest of the pipeline continues so `nuxt dev` still starts.
  */
 
-import { execSync, spawnSync } from "child_process";
-import { existsSync, readdirSync } from "fs";
+import { spawnSync } from "child_process";
+import { existsSync, readdirSync, copyFileSync, mkdirSync, statSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -160,6 +160,60 @@ async function main() {
     run("Generate embeddings", "node", ["extract-and-embed.mjs"]);
   } else {
     log("No new transcripts — skipping embedding step.");
+  }
+
+  // ── Step 5: Copy recordings to site/public/recordings/ for dev server ───
+  log("Copying recordings to site/public/recordings/...");
+  try {
+    const PUBLIC_RECORDINGS = join(ROOT, "site", "public", "recordings");
+    mkdirSync(PUBLIC_RECORDINGS, { recursive: true });
+
+    if (existsSync(RECORDINGS_ROOT)) {
+      const dateDirs = readdirSync(RECORDINGS_ROOT, { withFileTypes: true })
+        .filter(
+          (d) =>
+            d.isDirectory() &&
+            /^\d{4}-\d{2}-\d{2}$/.test(d.name)
+        );
+
+      for (const dateDir of dateDirs) {
+        const srcDateDir = join(RECORDINGS_ROOT, dateDir.name);
+        const dstDateDir = join(PUBLIC_RECORDINGS, dateDir.name);
+        mkdirSync(dstDateDir, { recursive: true });
+
+        const audioFiles = readdirSync(srcDateDir).filter((f) =>
+          SUPPORTED_EXTENSIONS.has(f.slice(f.lastIndexOf(".")))
+        );
+
+        for (const audioFile of audioFiles) {
+          const src = join(srcDateDir, audioFile);
+          const dst = join(dstDateDir, audioFile);
+
+          // Only copy if destination doesn't exist or source is newer
+          let shouldCopy = !existsSync(dst);
+          if (!shouldCopy) {
+            try {
+              const srcMtime = statSync(src).mtimeMs;
+              const dstMtime = statSync(dst).mtimeMs;
+              shouldCopy = srcMtime > dstMtime;
+            } catch {
+              shouldCopy = true;
+            }
+          }
+
+          if (shouldCopy) {
+            copyFileSync(src, dst);
+            log(`  Copied ${dateDir.name}/${audioFile}`);
+          } else {
+            log(`  Skipped ${dateDir.name}/${audioFile} (up to date)`);
+          }
+        }
+      }
+    } else {
+      log("  No recordings/ directory found — nothing to copy.");
+    }
+  } catch (err) {
+    warn(`Failed to copy recordings: ${err.message}`);
   }
 
   log("Pipeline done.");

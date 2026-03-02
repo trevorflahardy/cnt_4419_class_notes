@@ -22,3 +22,7 @@ logs
 .env
 .env.*
 !.env.example
+
+# Generated at pipeline/dev time — never committed
+public/recordings/
+public/transcripts/

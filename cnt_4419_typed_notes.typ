@@ -595,3 +595,213 @@ After all of this, if `g` invokes another function `h`, the same operations repe
 #markbox[
   *Key Takeaway*: The stack is a critical resource for program execution, and understanding its layout is essential for understanding how attackers can corrupt memory. If an attacker can overwrite the *return address* stored on the stack, they can redirect program execution to arbitrary code --- this is the foundation of *buffer overflow* attacks.
 ]
+
+#markbox[
+  _Notes hereon taken on Mon Mar 2nd, 2026_
+]
+
+#task[
+  At the start of the class the professor took a Quiz on what gets stored onto the stack when you have a function call.
+
+  The prof was looking for was: the caller FP, caller RA, local vars of callee, and args of callee
+]
+
+== Buffer Overflows
+
+#question[
+  *What does it mean for a type checker to enforce type safety?*
+
+  These are in *strongly typed programming languages* (PL = programming languages).
+
+  The professor then goes on to define *type safety* as seen below
+
+  In some languages, you can "add strings" (perform concatenation), and in others you can't. The type system of a language defines what is "appropriate" for each type.
+
+  *Examples of Strong vs Weakly Typed*
+  - *Strongly Typed*: Java, Python, Haskell, Rust, etc. These languages have strict type systems that prevent you from performing operations on incompatible types without explicit conversion.
+  - *Weakly Typed*: C, C++, JavaScript, etc. These languages allow more implicit conversions between types, which can lead to type-related errors and vulnerabilities if not used carefully.
+    - Some but not all language level values will only be used in appropriate ways. For example, in C, you can treat an integer as a pointer and vice versa, which can lead to type-related vulnerabilities if not used carefully.
+  - *Untyped Languages*: Assembly language, machine code, etc. These languages do not have a type system and allow you to manipulate memory directly without any type safety guarantees.
+
+
+  *Dynamically vs Statically Typed Languages*
+  - *Dynamically Typed* languages are ones that perform type checking at runtime. Examples include Python and JavaScript. In these languages, you can assign a value of one type to a variable and then later assign a value of a different type to the same variable without any compile-time errors. This flexibility can lead to runtime errors if you try to perform operations that are not valid for the current type of the variable.
+    - In this method of type checking, type information is stored with the values at runtime, and the language checks types as the program executes. This can lead to more flexibility in coding but can also result in type-related errors that only manifest during execution.
+    - Dynamically typed languages are often strongly typed.
+  - *Statically Typed* languages perform type checking at compile time. Examples include Java, C++, and Rust. In these languages, you must declare the type of a variable when you create it, and the compiler will enforce that you only assign values of that type to the variable. This can help catch type-related errors early in the development process and can also improve performance because the compiler can optimize code based on known types.
+]
+
+#definition()[
+  *Type Safety*: _All_ language level values will only be used in appropriate ways.
+
+  For example, if you have an integer variable, the type system ensures that you cannot treat it as a pointer or a string. This prevents certain types of programming errors and can also help prevent security vulnerabilities, such as buffer overflows, because the type system can enforce bounds checking and prevent you from writing past the end of an array.
+
+  Most modern programming languages are *type safe / strongly typed*.
+]
+
+#question[
+  *If C and C++ have this type weakness why are they still so widely used?*
+
+  *Performance*, legacy codebases, and the fact that they provide *low-level access to memory and hardware*, which can be necessary for certain applications (like operating systems, embedded systems, game development, etc).
+
+  Additionally, many developers are familiar with C and C++, and there is a large ecosystem of libraries and tools available for these languages. However, it is important to note that the lack of type safety in C and C++ can lead to security vulnerabilities if not used carefully, so developers need to be vigilant when writing code in these languages.
+]
+
+
+The professor notes to look at Page 94 in the textbook, which denotes C/C++ buffer overflows.
+
+```cpp
+#include <stdio.h>
+
+// - Reads a line of input from stdin
+// - Stops at \n or EOF
+// - Null-terminates the string that it is reading into (the buffer)
+// - A part of standard-io C library but included as a stub here,
+char* gets(char*);
+
+void get_input() {
+  char buf[1024];
+  gets(buf); // unsafe function that can lead to buffer overflow
+}
+
+void main(int argc, char* argv) {
+  get_input();
+}
+```
+
+#tipbox[
+  If you ever see a `gets()` in *any exam* in this course you can imediately say "this is a buffer overflow vulnerability" and explain how it can be exploited by an attacker to overwrite the return address on the stack and redirect execution to arbitrary code.
+
+  Some compilers will allow this function today, others will err out.
+
+  A lot of the time, when people are making standard libraries, developers are not thinking about security in favor of developing quickly. As something becomes popular and widely-used, you have an issue on your hand. The professor links this to the websocket example discussed previously. Let's say it was temporary but over time other people started using it - now many other people are using our server but it's got large vulnerabilities in it.
+]
+
+Let's draw the stack for this example.
+
+#figure(
+  table(
+    columns: 3,
+    align: (center, left),
+    stroke: 1pt,
+    table.header([*Stack Frame*], [*Contents*], [*Address*]),
+    [`main`], [`argc`, `argv`], [],
+    [`get_input`],
+    [`RA` \ `buf[1023]` \ $dots.v$ \ `buf[0]` \ `oldFP` ($<-$ points to the frame of `main`)],
+    [$1024 dots 1031$ \ $arrow.t$ \ $dots.v$ \ $arrow.b$ \ $0$],
+  ),
+  caption: [Stack addresses while `get_input()` runs. When `main` runs, you don't need to keep track of the return address because `main` is the entry point. For this course, assume the last item in the buffer is stored at the highest address.],
+)
+
+#question()[
+  *What could the user/attacker do here?*
+
+  Consider if the user enters 1024 characters and some extra ones. The code will gladly fill up the buffer and continue, overflowing the buffer and *overwriting* the RA on the stack (very bad!).
+
+  So, `gets()` will null-terminate the string. And as we finish the `get_input()` frame, we are going to try and return to `main` using the RA. But if the RA has been overwritten by the user input, we will instead jump to an arbitrary address that the attacker has chosen. This is the essence of a buffer overflow attack: by overflowing the buffer, the attacker can overwrite critical data on the stack (like the return address) and redirect program execution to malicious code.
+
+  The *buffer overflow* is known to be one of the most severe attacks possible.
+]
+
+So, the attacker could fill this buffer up with *malware*, so the `RA` could be overwritten by the beginning of the malware. When `get_input()` tries to return, it will jump to the address of the malware instead of returning to `main`. This allows the attacker to execute arbitrary code on the victim's machine, which can lead to a wide range of malicious activities, such as stealing sensitive information, installing backdoors, or taking control of the system.
+
+
+#definition()[
+  *Stack smashing attack*
+
+  An attack where the attacker exploits a buffer overflow vulnerability to overwrite the return address on the stack, *allowing them to redirect program execution to arbitrary code* (often malicious). This type of attack is particularly dangerous because it can give the attacker control over the victim's machine, leading to data theft, system compromise, and other malicious activities.
+]
+
+#question[
+  *How many bits is the return address?*
+
+  Well, it depends! The system may be 32 or 64 bits, depending. The professor notes that he *will specify on questions in a test* whether to assume a 32-bit or 64-bit system, so you should pay attention to that detail when answering questions about buffer overflows and return addresses.
+
+  So, let's say that we have a 64 bit system:
+  - 1 byte = 8 bits
+  - One RA = 8 bytes = 64 bits
+  - One word = 8 bytes = 64 bits
+  - One `char` = 1 byte = 8 bits
+
+  So how many bytes would the user want to overwrite in the buffer to overwrite the RA? The buffer is 1024 bytes, and the RA is 8 bytes, so the user would need to input at least $1024 + 8 = 1032$ bytes to overflow the buffer and overwrite the RA.
+
+  These are the things attackers are thinking through. The professor notes that most students are have preexisting knowledge on these subjects of byte-bit conversions.
+]
+
+There is a common trick where an attacker may have trouble determining the exact address to set the return address to (to make it jump). They can use a technique called *NOP sledding* to increase the chances of success. A NOP sled is a sequence of "No Operation" (NOP) instructions that do nothing and simply slide execution down to the malicious code. By filling the buffer with NOPs before the actual malware, the attacker can make it more likely that when the return address is overwritten, it will land somewhere in the NOP sled and eventually execute the malicious code.
+
+#definition()[
+  *Nop Sledding/Sliding/Ramping*
+
+  A technique used by attackers to increase the chances of successfully exploiting a buffer overflow vulnerability. It involves filling the buffer with a sequence of "No Operation" (NOP) instructions, which do nothing and simply slide execution down to the malicious code. This way, even if the attacker cannot determine the exact address to set the return address to, they can still have a high probability of landing somewhere in the NOP sled and eventually executing the malicious code.
+]
+
+With using NOP sledding, the attacker has a much larger "landing area" for the return address, which increases the likelihood of successfully executing the malicious code. This technique is particularly useful when the attacker does not have precise knowledge of the memory layout or when there are variations in the target system's memory addresses. The professor notes this as increasing the "range" of addresses that the attacker can target with the return address, making the attack more robust against uncertainties in the memory layout.
+
+So, attackers historically started using buffer overflows, then moved to NOP sledding. Defenders started looking for NOPs. Attackers started injecting arbitrary code into the buffer instead of just NOPs. The professor classifies this as the "cat and mouse" game, where attackers and defenders are constantly evolving their techniques to outsmart each other. As defenders develop new ways to detect and prevent attacks, attackers come up with new methods to bypass those defenses, leading to an ongoing cycle of innovation in cybersecurity. This takes us back to why computer security is more challenging than medicine; medicine does not have these problems to _this degree_ of adversaries evolving very quickly.
+
+== Disallowing the Stack from Being Executed
+
+One of the most effective defenses against stack-based buffer overflow attacks is to mark the stack as *non-executable*. This means that even if an attacker manages to overwrite the return address and redirect execution to the stack, they will not be able to execute any code that resides there. This defense mechanism is commonly implemented using a feature called *Data Execution Prevention (DEP)*, which is supported by modern operating systems and hardware.
+
+This is an *access control* mechanism, because it prevents execution of code in a certain region of memory (the stack). By marking the stack as non-executable, we are enforcing an access control policy that prohibits execution of code from that region, which helps to mitigate the risk of buffer overflow attacks. It's a type of *safety property*.
+
+Modern machines have something called the *No Execute* (NX bit), which can be set on memory pages to indicate that they should not be executable. When the NX bit is set on the stack, it prevents any code residing on the stack from being executed, which is a critical defense against stack-based buffer overflow attacks.
+
+#question()[
+  *Which types of segments would you want to mark as non-executable to prevent buffer overflow attacks?*
+
+  The stack and the heap are the primary segments that should be marked as non-executable to prevent buffer overflow attacks. The stack is a common target for attackers because it often contains return addresses and local variables that can be overwritten, while the heap is also a target because it is used for dynamic memory allocation and can contain user-controlled data. By marking these segments as non-executable, we can significantly reduce the risk of successful buffer overflow attacks.
+
+  Additionally, the data segment (which contains global variables) can also be marked as non-executable to further enhance security, although the stack and heap are typically the main focus for this type of defense. The code segment (program text) is usually already marked as executable, so it does not need to be marked as non-executable. The professor notes this as the "globals".
+]
+
+
+This is a *hardware mechanism* where memory segments are marked by the operating system as either executable or non-executable. The CPU enforces this by checking the NX bit before executing any code. If the NX bit is set for a memory page, the CPU will raise an exception if an attempt is made to execute code from that page, effectively preventing execution of code on the stack and mitigating buffer overflow attacks.
+
+Each manufacturer has their own name (aka "generic name") for this feature:
+- Intel: *Execute Disable Bit (XD)*
+- ARM: *Execute Never (XN)*
+- AMD: *Enhanced Virus Protection (EVP)*
+- PowerPC: *Execute Permission (XP)*
+- Apple Silicon: *Execute Disable (XD)*
+
+In this class, we'll use the generic term *No Execute (NX) bit* to refer to this hardware feature that allows marking memory pages as non-executable.
+
+So, the operating systems use the NX bits to implement executable space protection ($<-$ a generic name for all the following):
+- Windows: *Data Execution Prevention (DEP)*
+- Linux: *Executable Space Protection (ESP)*
+- OpenBSD: *W^X (Write XOR Execute)*
+
+#tipbox()[
+  You don't have to memorize the above names for different manufacturers and operating systems, but you should be familiar with the idea.
+]
+
+#question()[
+  *How is it that attackers can still exploit buffer overflows in the presence of NX bits?*
+
+  When the stack is marked as non-executable, attackers can no longer execute code that resides on the stack. However, they can still exploit buffer overflows by using a technique called *Return-Oriented Programming (ROP)*. In ROP, instead of injecting their own code into the stack, attackers reuse existing code snippets (called "gadgets") that are already present in the executable memory of the program. These gadgets typically end with a `ret` instruction, allowing the attacker to chain them together to perform arbitrary operations without executing code on the stack.
+]
+
+With properly used NX bits, *the attacker can still*:
+- Change the Return Address (RA) to point to existing code in the program
+  1. The attacker can circumvent security checks by passing the RA to after a function that performs some security check, so that the check is performed but then execution continues to the attacker's code instead of returning to the caller.
+    - The textbook discusses this in pages 94-96.
+  2. Begin the `exec()` system call (executes a script or new program, given as an argument) and pass the script on the stack to be executed as an argument. This allows the attacker to execute arbitrary commands on the system without needing to execute code on the stack.
+    - So an example of this could be `cmd.exe` (or `/bin/sh`), where the script is something that does something malicious, like deleting files or stealing data. The attacker can use the `exec()` system call to execute this script without needing to execute code on the stack, which is protected by the NX bit.
+    - IE, there is a way to *launder data as code*. Because, in our example, `cmd.exe` is an _argument_ to the `exec()` system call, it is not being flagged as code by the NX bit, even though it is being executed as code by the `exec()` system call. This called a *return to libc attack*, because the attacker is returning to a function in the C standard library (libc) that performs the `exec()` system call, and passing their malicious script as an argument to that function.
+  3. Find an expressive set of "gadgets" (small snippets of existing code that usually end with a `ret` instruction) in the program's executable memory and chain them together to perform complex operations without executing code on the stack. This technique is known as *Return-Oriented Programming (ROP)*, and it allows attackers to bypass NX protections by reusing code that is already marked as executable.
+    - The chaining is called a "rop chain", and it can be used to perform arbitrary computations by chaining together existing code snippets in the program's executable memory. This is a powerful technique that allows attackers to execute complex payloads even in the presence of NX protections.
+    - So where are you going to return to? It depends what is on the stack. Researcher shave shown that on a standard machine with standard programs, there is always a *turing complete* set of gadgets running on a machine to perform arbitrary computations. So, even if the stack is non-executable, the attacker can still find a way to execute their malicious code by chaining together existing code snippets in the program's executable memory.
+
+#definition()[
+  *Return to libc attack*
+
+  An attack where the attacker exploits a buffer overflow vulnerability to overwrite the return address on the stack and redirect execution to a function in the C standard library (libc) that performs a system call (like `exec()`). The attacker then passes their malicious script as an argument to that function, allowing them to execute arbitrary commands on the system without needing to execute code on the stack, which is protected by the NX bit.
+]
+
+#definition()[
+  *Return-Oriented Programming (ROP)*
+
+  A technique used by attackers to bypass non-executable stack protections (like NX bits) by reusing existing code snippets (called "gadgets") that are already present in the executable memory of the program. These gadgets typically end with a `ret` instruction, allowing the attacker to chain them together to perform arbitrary operations without executing code on the stack.
+]

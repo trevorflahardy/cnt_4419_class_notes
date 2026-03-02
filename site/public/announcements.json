@@ -1,6 +1,24 @@
 {
-  "generated_at": "2026-03-02T19:27:06.928Z",
+  "generated_at": "2026-03-02T19:42:23.079Z",
   "announcements": [
+    {
+      "date": "2026-02-25",
+      "type": "exam",
+      "quote": "And before we realize that it's a lot more flexible and practical to abstract into policies.",
+      "context": "...d the early days people were trying to hard-code what does it mean for a system to be secure? And before we realize that it's a lot more flexible and practical to abstract into policies. So, like software security is here to a policy interest. Instead, now we're going back into the 1970s. Like the mid 1970s...",
+      "keywords": [
+        "practical"
+      ]
+    },
+    {
+      "date": "2026-02-25",
+      "type": "assignment",
+      "quote": "So, this is not a key for the due business.",
+      "context": "...ess control. I'm using space on this board, but we're actually talking about MAC, mandatory access control models here. So, this is not a key for the due business. Discretionary access control will completely you all understand that, because I hope you all have experience with Windows or Linux systems...",
+      "keywords": [
+        "due"
+      ]
+    },
     {
       "date": "2026-01-15",
       "type": "exam",

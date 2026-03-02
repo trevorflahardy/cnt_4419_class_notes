@@ -2,7 +2,7 @@
 import { useAnnouncements, type AnnouncementType, type Announcement } from '~/composables/useAnnouncements'
 
 const { announcements, isLoading, error, loadAnnouncements } = useAnnouncements()
-const { isReady, chat } = useAiModel()
+const { isAvailable, isLoading: modelLoading, isReady, progress: modelProgress, progressText: modelProgressText, init: downloadModel, chat } = useAiModel()
 
 onMounted(() => {
     loadAnnouncements()
@@ -200,6 +200,39 @@ function contextKey(date: string, index: number): string {
         </div>
 
         <template v-else>
+            <!-- WebGPU unavailable -->
+            <div v-if="!isAvailable"
+                class="mb-5 flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40 px-4 py-3">
+                <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                <div>
+                    <p class="text-sm font-semibold text-red-700 dark:text-red-400">WebGPU not available</p>
+                    <p class="mt-0.5 text-xs text-red-600/80 dark:text-red-400/70">
+                        AI-powered relevance filtering requires WebGPU. Try Chrome 113+ or Edge 113+.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Model not downloaded -->
+            <div v-else-if="!isReady"
+                class="mb-5 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/40 px-4 py-3">
+                <UIcon name="i-heroicons-cpu-chip" class="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-amber-700 dark:text-amber-400">AI model not downloaded</p>
+                    <p class="mt-0.5 text-xs text-amber-600/80 dark:text-amber-400/70">
+                        Download the on-device AI model to filter out keyword false positives and
+                        surface only genuinely important announcements.
+                    </p>
+                    <div v-if="modelLoading" class="mt-2 space-y-1">
+                        <UProgress :model-value="modelProgress" size="xs" color="warning" />
+                        <p class="text-xs text-amber-600/70 dark:text-amber-400/60">{{ modelProgressText }}</p>
+                    </div>
+                    <UButton v-else size="xs" color="warning" variant="soft" class="mt-2"
+                        icon="i-lucide-download" @click="downloadModel">
+                        Download AI Model
+                    </UButton>
+                </div>
+            </div>
+
             <!-- Filter bar -->
             <div class="mb-4 flex flex-wrap gap-1.5">
                 <UButton v-for="f in filters" :key="f.key" size="xs"

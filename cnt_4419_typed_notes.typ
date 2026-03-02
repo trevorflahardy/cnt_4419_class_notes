@@ -55,7 +55,6 @@ The professor notes that another way to recover is to "file an insurance claim".
 *Aside Note*
 
 So how we do we know if some software is malicious (aka malware)? It turns out that attackers have a lot of sophisticated tricks too make their software look "legit" (or safe). So once some malware is discovered and people want to start preventing it, malware writers circumvent this by adapting how the malware looks or behaves. This is known as *polymorphic*.
-So how we do we know if some software is malicious (aka malware)? It turns out that attackers have a lot of sophisticated tricks too make their software look "legit" (or safe). So once some malware is discovered and people want to start preventing it, malware writers circumvent this by adapting how the malware looks or behaves. This is known as *polymorphic*.
 
 #definition[
   *Polymorphic malware*: Malware that can take many shapes or forms.
@@ -99,10 +98,39 @@ There exists a more modern variation on ransomware, though. The ransomware may n
 = Secure Software Design Principles
 
 == 1. Sanitize Inputs
-== 2. Try to handle errors securely
-== 3. Use layers of heterogeneous mechanisms
+
+Validate or sanitize all inputs. Be *precise*, *creative*, and *thorough* about it.
+
+#definition()[
+  *Attack Surface*
+
+  A measurement of how much untrusted input a program accepts. In general, fewer inputs means more security (less opportunity for an attacker to inject malicious data). However, there is no universally agreed-upon way to measure an attack surface precisely; it remains a useful conceptual tool for reasoning about how exposed a system is.
+]
+
+The goal is to reduce the attack surface as much as possible. Every piece of untrusted input that your program accepts is a potential vector for attack. So you want to validate and sanitize every input that comes into your system, whether it is from a user, from a file, from a network, or from any other source.
+
+== 2. Try to Handle Errors Securely
+
+When something goes wrong in your program, you want to handle the error in a secure manner. This means two things:
+
+- *Do not leak confidential information* in error data or metadata. For example, if a database query fails, you should not return the full SQL error message to the user because that may reveal internal details about your database schema or configuration.
+- *Do not enter an insecure state.* When an error occurs, the system should fail to a secure default rather than falling into a state where security checks are bypassed.
+
+A classic example: consider an admin login page. If a user enters a bad username/password combination, the system should *not* grant access to that admin section. An insecure error-handling path might accidentally let the user through to an admin section because the error was not handled properly.
+
+== 3. Use Layers of Heterogeneous Mechanisms
+
+This principle is commonly known as *"Defense in Depth"*: do not rely on a single security mechanism. Instead, layer multiple different mechanisms so that if one fails, others are still in place.
+
+This comes at a cost, however: more maintenance, more human resources, and more system complexity. But the tradeoff is usually worth it because a single point of failure is far more dangerous.
+
+The types of mechanisms (prevent, detect, contain, recover) discussed earlier are all complementary layers. For example, you might use a firewall (prevent), an intrusion detection system (detect), replication (contain), and backups (recover) all together.
 
 == 4. Adhere to Principle of Least Privilege (PoLP)
+
+Give users (and employees) only the *minimum* information and access they need to do their job --- nothing more. If someone only needs read access to a database, do not give them write access. If someone only needs access to one file, do not give them access to the entire filesystem.
+
+This limits the damage that can be done if any single user account is compromised, and it also reduces the risk of insider threats.
 
 == 5. "Avoid Security by Obscurity"
 This is the idea that you should not rely on secrecy of your design or implementation as the main method of providing security. So for example, if you have some software that has a vulnerability, and you try to hide that vulnerability by not disclosing it, this is not a good security practice. This is because attackers can still find the vulnerability through other means, such as reverse engineering or fuzzing.
@@ -112,7 +140,7 @@ Typically, *we want to try and encapsulate any secrets being relied on into cryp
 == 6. Be careful about when and where/how keys are stored
 - So we ant to isolate these secure things into "keys", and then we want to be really careful about where we store these keys. We want to make sure that they are not stored in a way that is easily accessible to attackers, such as in plain text on a hard drive or in a configuration file.
 - Most hardware, now, has *special hardware that helps us protect these keys*. Processors or modules are specifically created for this purpose
-  - Called the *TTM Trusted Platform Module* (at least, on Windows)
+  - Called the *TPM (Trusted Platform Module)* (at least, on Windows)
   - The OS often has APIs for using this part of the machine. Your code can call the APIs and make use of this hardware.
 
 
@@ -183,7 +211,7 @@ Ideally, *you keep your code and its design as simple as you can*.
   - This ties into *secure defaults* (see below), where you want to have secure defaults that do not require users to make decisions that could lead to vulnerabilities.
 - *Default Settings*: You want to have secure defaults that do not require users to make decisions that could lead to vulnerabilities. For example, you should not have a default password that is the same for all users, because this is a major security vulnerability in practice. Instead, you should require users to create their own unique passwords, or use some other secure authentication mechanism.
 
-== Secure the "weakest link"
+== 8. Secure the "Weakest Link"
 
 In many cases, this is the users (or the professor notes that "we" are the weakest links).
 
@@ -359,3 +387,211 @@ There are engineering tradeoffs between ACLs and capabilities. In theory they ar
 == RBAC: Role Based Access Control
 
 This is where the role determines permissions. So instead of assigning permissions to individual users, you assign permissions to roles, and then you assign users to those roles. For example, you might have a role called "admin" that has permissions to read, write, and execute all files, and then you would assign users to that role based on their job function or responsibilities. This can make it easier to manage permissions in large systems because you can simply assign users to roles rather than having to manage permissions for each individual user.
+
+== Mandatory Access Control (MAC)
+
+Mandatory Access Control (MAC) is an access control model traditionally used in *military* and government contexts. In MAC, the *system* determines authorization --- not the users. Users cannot affect authorization decisions; the rules are hardcoded into the system itself.
+
+MAC is traditionally used with *Multi-Level Security (MLS)*, which organizes information into hierarchical classification levels:
+
+#figure(
+  table(
+    columns: 1,
+    align: center,
+    stroke: 1pt,
+    [*Top Secret*],
+    [*Secret*],
+    [*Public / Unclassified*],
+  ),
+  caption: [Multi-Level Security (MLS) hierarchy. Information flows from lower to higher classification levels, and each user is granted a clearance level by the system.],
+)
+
+Each user may be granted permission to a certain clearance level, and the *operating system* will determine who has access based on their level of clearance. The key property is that users have no ability to change or override these authorization decisions.
+
+#definition()[
+  *Mandatory Access Control (MAC)*
+
+  An access control model where the system enforces authorization policies that users cannot modify. Access decisions are based on fixed security labels (classification levels) assigned to both subjects and objects, and are determined entirely by the system.
+]
+
+== Discretionary Access Control (DAC)
+
+In contrast to MAC, *Discretionary Access Control (DAC)* allows users to affect authorization decisions. This is the model used in most consumer operating systems such as Linux, Windows, and macOS.
+
+In DAC, users who own a resource can choose to grant or revoke access to that resource for other users. For example, on Linux, a file owner can use `chmod` to set read, write, and execute permissions for themselves, their group, and all other users.
+
+#definition()[
+  *Discretionary Access Control (DAC)*
+
+  An access control model where users (specifically, resource owners) can affect authorization decisions. Users can grant or revoke access to resources they own, giving them discretion over who can access what.
+]
+
+== MAC Models
+
+Two foundational MAC models define how information can flow between classification levels. Each model addresses a different security property.
+
+=== Bell-LaPadula Model (Confidentiality)
+
+The Bell-LaPadula model is designed to enforce *confidentiality*. It defines two key rules:
+
+- *No read up*: No subject is allowed to read data at a *higher* classification level than their own clearance. A user with "Secret" clearance cannot read "Top Secret" documents.
+- *No write down*: No subject is allowed to write data to a *lower* classification level. A user with "Top Secret" clearance cannot write information into a "Public" document (which would leak classified information downward).
+
+The safety property enforced by Bell-LaPadula is *confidentiality* --- preventing unauthorized disclosure of information to lower clearance levels.
+
+#definition()[
+  *Bell-LaPadula Model*
+
+  A MAC security model that enforces confidentiality through two rules: (1) no read up --- subjects cannot read objects at a higher classification level, and (2) no write down --- subjects cannot write to objects at a lower classification level. This prevents classified information from leaking to unauthorized parties.
+]
+
+=== Biba Integrity Model
+
+The Biba model was created because "one size does not fit all" --- you cannot hardcode a single model for every situation. While Bell-LaPadula focuses on confidentiality, the Biba model focuses on *integrity*. Its rules are the *reverse* of Bell-LaPadula:
+
+- *No write up*: No subject is allowed to write data to a *higher* classification level. A lower-clearance user should not be able to create or modify "Top Secret" documents (which could corrupt their integrity).
+- *No read down*: No subject is allowed to read data at a *lower* classification level. A "Top Secret" user should not read "Unclassified" documents, because that lower-integrity information could "contaminate" their understanding or decisions.
+
+The safety property enforced by Biba is *integrity* --- preventing unauthorized modification or corruption of higher-classification information.
+
+#definition()[
+  *Biba Integrity Model*
+
+  A MAC security model that enforces integrity through two rules: (1) no write up --- subjects cannot write to objects at a higher classification level, and (2) no read down --- subjects cannot read objects at a lower classification level. This prevents lower-integrity information from corrupting higher-integrity data.
+]
+
+=== Combining Both Models
+
+If we want to enforce *both* confidentiality (Bell-LaPadula) and integrity (Biba) simultaneously, the combined constraints become very restrictive: *you can only read and write at your own classification level*. No reading up or down, no writing up or down --- only lateral access.
+
+#figure(
+  table(
+    columns: 5,
+    align: center,
+    stroke: 1pt,
+    table.header([], [*Read Up*], [*Read Down*], [*Write Up*], [*Write Down*]),
+    [*Bell-LaPadula*], [No], [Yes], [Yes], [No],
+    [*Biba*], [Yes], [No], [No], [Yes],
+    [*Both Combined*], [No], [No], [No], [No],
+  ),
+  caption: [Comparison of Bell-LaPadula and Biba access rules. When both are enforced simultaneously, users can only read and write at their own clearance level.],
+)
+
+= Memory Corruption
+
+How can attackers corrupt memory, and what can they do with it? To answer this, we first need to understand how the compiler segments memory and how the stack operates during function calls.
+
+== Program Memory Segmentation
+
+When a program is compiled and loaded into memory, the compiler organizes it into distinct *segments*. Sometimes these segments are not contiguous in physical memory, but conceptually they follow a standard layout.
+
+#figure(
+  table(
+    columns: 2,
+    align: (right, left),
+    stroke: 1pt,
+    [*Address 0* (high)], [*Stack* #h(1em) _(grows $arrow.b$)_],
+    [], [#h(3em) $arrow.t.b$],
+    [], [*Heap* #h(1em) _(grows $arrow.t$)_],
+    [], [*Data / Globals / Statics*],
+    [*Address max* (low)], [*Code (Program Text)*],
+  ),
+  caption: [Simplified program memory segmentation model. The stack grows downward toward lower addresses and the heap grows upward toward higher addresses. *Assume this model for all exams.*],
+)
+
+- *Code (Program Text)*: The compiled machine instructions of the program. This segment is typically read-only at runtime.
+- *Data / Globals / Statics*: Stores global variables, static variables, and other data that persists for the lifetime of the program.
+- *Heap*: Stores *dynamically allocated data* --- memory allocated at runtime using functions like `malloc()` and `calloc()` in C. The heap grows upward (toward higher addresses).
+- *Stack*: Stores local variables, function arguments, return addresses, and other data relevant to function calls. The stack grows *downward* (toward lower addresses).
+
+#markbox[
+  *Important*: Assume this memory segmentation model for all exams in this course.
+]
+
+== The Stack: Frames and Activation Records
+
+The stack is organized as a *stack of frames* (also called *activation records*). Each frame is a collection of data that is locally relevant to a single function, method, or procedure. The frame for the `main` function sits at the top of the stack (highest address), and as new functions are called, their frames are pushed below.
+
+Two critical pointers manage the stack:
+
+- *Frame Pointer (FP)*: Points to the beginning of the currently executing frame. In x86 architecture, this is the *Extended Base Pointer (EBP)*.
+- *Stack Pointer (SP)*: Points to the next available location for stack use (the end / bottom of the current frame). In x86 architecture, this is the *Extended Stack Pointer (ESP)*.
+
+== What Happens During a Function Call?
+
+Consider the following scenario: function `f` (the *caller*) invokes function `g` (the *callee*):
+
+```c
+void f() {
+  // ...
+  g(args);
+  // ...
+}
+
+void g(args) {
+  int i = 0; // local variable in g
+  // ...
+}
+```
+
+The process unfolds in several steps:
+
+=== Step 1: Initial State
+
+Before `f` calls `g`, the stack contains the frame for `main` at the top and the current frame for `f` below it. The FP points to the beginning of `f`'s frame, and the SP points to the end of `f`'s frame.
+
+=== Step 2: Caller Prepares the Stack
+
+Code in `f` for the `g(args)` call prepares the stack. The caller (`f`) pushes information that the callee (`g`) does not know:
+- The *return address (RA)*: the address in `f`'s code where execution should resume after `g` finishes.
+- The *arguments* to `g`.
+
+After this, the SP has moved down past the RA and args.
+
+=== Step 3: Prologue for `g`
+
+Execution jumps to the prologue code for `g`, which sets up `g`'s frame:
+- The *old frame pointer* (the current FP, which points to `f`'s frame) is saved onto the stack. We need to remember this so we can restore it after `g` finishes.
+- The FP is updated to point to the beginning of `g`'s frame.
+- Space is allocated for `g`'s *local variables* (such as `int i = 0`).
+
+At this point, the stack looks like this (growing downward):
+
+#figure(
+  table(
+    columns: 1,
+    align: left,
+    stroke: 1pt,
+    [#h(1em) `f`'s frame: code relevant to `f` #h(2em) $arrow.l$ old FP],
+    [#h(1em) Return Address (RA)],
+    [#h(1em) Arguments to `g`],
+    [#h(1em) Old Frame Pointer (saved FP from `f`) #h(2em) $arrow.l$ FP],
+    [#h(1em) Locals for `g` #h(2em) $arrow.l$ SP],
+  ),
+  caption: [Stack layout after `g`'s prologue completes. The old FP is saved so execution can return to `f`'s frame later.],
+)
+
+=== Step 4: Full Stack with Nested Calls
+
+In x86 architecture, the FP is called the *Extended Base Pointer (EBP)* and the SP is called the *Extended Stack Pointer (ESP)*. If `g` were to call another function `h`, the same sequence of steps would repeat: push the return address and arguments, save the old FP, update FP and SP, and allocate space for locals.
+
+#figure(
+  table(
+    columns: 2,
+    align: (left, left),
+    stroke: 1pt,
+    table.header([*Stack Contents*], [*Pointers*]),
+    [`f` frame: RA, locals, old FP], [],
+    [`g` frame: RA, args, locals, old FP], [$arrow.l$ FP],
+    [\[return value\]], [$arrow.l$ SP],
+  ),
+  caption: [Generalized stack layout showing `f`'s frame and `g`'s frame. Each frame contains its return address, arguments, local variables, and the saved old frame pointer.],
+)
+
+=== Step 5: Repeating for Further Calls
+
+After all of this, if `g` invokes another function `h`, the same operations repeat: `g` becomes the caller and `h` becomes the callee. The return address within `g`, arguments to `h`, old FP, and locals for `h` are all pushed onto the stack in the same pattern.
+
+#markbox[
+  *Key Takeaway*: The stack is a critical resource for program execution, and understanding its layout is essential for understanding how attackers can corrupt memory. If an attacker can overwrite the *return address* stored on the stack, they can redirect program execution to arbitrary code --- this is the foundation of *buffer overflow* attacks.
+]

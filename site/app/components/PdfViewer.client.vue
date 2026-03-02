@@ -1,36 +1,50 @@
 <template>
     <div class="flex flex-col h-full">
-        <!-- Toolbar -->
+        <!-- Toolbar:
+             mobile  → two stacked rows (controls | search)
+             sm+     → single flex row                         -->
         <div
-            class="sticky top-0 z-10 flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-200 bg-white/80 backdrop-blur-md">
-            <!-- Page Navigation -->
-            <div class="flex items-center gap-1">
-                <UButton icon="i-lucide-chevron-left" variant="ghost" size="xs" :disabled="currentPage <= 1"
-                    @click="prevPage" aria-label="Previous page" />
-                <span class="text-xs tabular-nums whitespace-nowrap text-gray-600">
-                    Page {{ currentPage }} of {{ totalPages }}
-                </span>
-                <UButton icon="i-lucide-chevron-right" variant="ghost" size="xs" :disabled="currentPage >= totalPages"
-                    @click="nextPage" aria-label="Next page" />
+            class="sticky top-0 z-10 flex flex-col gap-1 px-3 py-1.5 border-b border-gray-200 bg-white/80 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:py-2">
+
+            <!-- Row 1 (mobile) / left group (sm+): page nav · zoom · download+refresh -->
+            <div class="flex items-center justify-between gap-1 sm:justify-start sm:gap-2">
+                <!-- Page Navigation -->
+                <div class="flex items-center gap-1">
+                    <UButton icon="i-lucide-chevron-left" variant="ghost" size="xs" :disabled="currentPage <= 1"
+                        @click="prevPage" aria-label="Previous page" />
+                    <span class="text-xs tabular-nums whitespace-nowrap text-gray-600">
+                        {{ currentPage }} / {{ totalPages }}
+                    </span>
+                    <UButton icon="i-lucide-chevron-right" variant="ghost" size="xs"
+                        :disabled="currentPage >= totalPages" @click="nextPage" aria-label="Next page" />
+                </div>
+
+                <!-- Zoom Controls -->
+                <div class="flex items-center gap-1">
+                    <UButton icon="i-lucide-minus" variant="ghost" size="xs" :disabled="scale <= 0.5"
+                        @click="zoomOut" aria-label="Zoom out" />
+                    <span class="text-xs tabular-nums w-10 text-center text-gray-600">
+                        {{ Math.round(scale * 100) }}%
+                    </span>
+                    <UButton icon="i-lucide-plus" variant="ghost" size="xs" :disabled="scale >= 3"
+                        @click="zoomIn" aria-label="Zoom in" />
+                    <UButton icon="i-lucide-maximize-2" variant="ghost" size="xs" @click="fitWidth"
+                        aria-label="Fit width" class="hidden sm:inline-flex" />
+                </div>
+
+                <!-- Download + Refresh — mobile only (hidden on sm+, shown there in row 2) -->
+                <div class="flex items-center gap-1 sm:hidden">
+                    <UButton icon="i-lucide-download" variant="ghost" size="xs" @click="downloadPdf"
+                        aria-label="Download PDF" />
+                    <UButton icon="i-lucide-refresh-cw" variant="ghost" size="xs" @click="refreshPdf"
+                        aria-label="Force refresh PDF" />
+                </div>
             </div>
 
-            <!-- Zoom Controls -->
+            <!-- Row 2 (mobile) / right group (sm+): search + match nav + download+refresh -->
             <div class="flex items-center gap-1">
-                <UButton icon="i-lucide-minus" variant="ghost" size="xs" :disabled="scale <= 0.5" @click="zoomOut"
-                    aria-label="Zoom out" />
-                <span class="text-xs tabular-nums w-12 text-center text-gray-600">
-                    {{ Math.round(scale * 100) }}%
-                </span>
-                <UButton icon="i-lucide-plus" variant="ghost" size="xs" :disabled="scale >= 3" @click="zoomIn"
-                    aria-label="Zoom in" />
-                <UButton icon="i-lucide-maximize-2" variant="ghost" size="xs" @click="fitWidth" aria-label="Fit width"
-                    class="hidden sm:inline-flex" />
-            </div>
-
-            <!-- Download / Refresh -->
-            <div class="flex items-center gap-1">
-                <UInput v-model="searchQuery" size="xs" class="w-40 sm:w-56" placeholder="Search PDF text"
-                    @keydown.enter.prevent="nextMatch" />
+                <UInput v-model="searchQuery" size="xs" class="flex-1 sm:w-44 sm:flex-none"
+                    placeholder="Search…" @keydown.enter.prevent="nextMatch" />
                 <span class="hidden sm:inline text-xs text-gray-500 tabular-nums">
                     {{ totalMatches > 0 ? `${activeMatchIndex + 1}/${totalMatches}` : '0/0' }}
                 </span>
@@ -38,10 +52,11 @@
                     @click="prevMatch" aria-label="Previous match" />
                 <UButton icon="i-lucide-chevron-down" variant="ghost" size="xs" :disabled="totalMatches === 0"
                     @click="nextMatch" aria-label="Next match" />
+                <!-- Download + Refresh — sm+ only (hidden on mobile, shown there in row 1) -->
                 <UButton icon="i-lucide-download" variant="ghost" size="xs" @click="downloadPdf"
-                    aria-label="Download PDF" />
+                    aria-label="Download PDF" class="hidden sm:inline-flex" />
                 <UButton icon="i-lucide-refresh-cw" variant="ghost" size="xs" @click="refreshPdf"
-                    aria-label="Force refresh PDF" />
+                    aria-label="Force refresh PDF" class="hidden sm:inline-flex" />
             </div>
         </div>
 

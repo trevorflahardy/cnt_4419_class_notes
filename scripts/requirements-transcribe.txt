@@ -1,0 +1,7 @@
+# Python dependencies for scripts/transcribe.py
+# Install with: pip install -r requirements-transcribe.txt
+
+openai-whisper>=20231117
+torch>=2.0.0
+# soundfile is optional (used to determine audio duration before transcribing)
+soundfile>=0.12.0

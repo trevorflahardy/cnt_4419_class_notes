@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-03-02T19:27:06.928Z",
+  "announcements": [
+    {
+      "date": "2026-01-15",
+      "type": "exam",
+      "quote": "The midterm exam will cover chapters 1 through 5.",
+      "context": "The midterm exam will cover chapters 1 through 5. There will be a quiz next Wednesday on access control. The homework assignment is due Friday.",
+      "keywords": [
+        "midterm",
+        "exam"
+      ]
+    },
+    {
+      "date": "2026-01-15",
+      "type": "quiz",
+      "quote": "There will be a quiz next Wednesday on access control.",
+      "context": "The midterm exam will cover chapters 1 through 5. There will be a quiz next Wednesday on access control. The homework assignment is due Friday.",
+      "keywords": [
+        "quiz"
+      ]
+    },
+    {
+      "date": "2026-01-15",
+      "type": "assignment",
+      "quote": "The homework assignment is due Friday.",
+      "context": "The midterm exam will cover chapters 1 through 5. There will be a quiz next Wednesday on access control. The homework assignment is due Friday.",
+      "keywords": [
+        "assignment",
+        "homework",
+        "due"
+      ]
+    }
+  ]
+}

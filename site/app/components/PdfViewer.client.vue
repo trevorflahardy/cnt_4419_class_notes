@@ -27,7 +27,7 @@
                     class="hidden sm:inline-flex" />
             </div>
 
-            <!-- Download -->
+            <!-- Download / Refresh -->
             <div class="flex items-center gap-1">
                 <UInput v-model="searchQuery" size="xs" class="w-40 sm:w-56" placeholder="Search PDF text"
                     @keydown.enter.prevent="nextMatch" />
@@ -40,6 +40,8 @@
                     @click="nextMatch" aria-label="Next match" />
                 <UButton icon="i-lucide-download" variant="ghost" size="xs" @click="downloadPdf"
                     aria-label="Download PDF" />
+                <UButton icon="i-lucide-refresh-cw" variant="ghost" size="xs" @click="refreshPdf"
+                    aria-label="Force refresh PDF" />
             </div>
         </div>
 
@@ -88,10 +90,11 @@ const props = defineProps<{
 
 const runtimeConfig = useRuntimeConfig()
 
+const cacheBuster = ref<number | null>(null)
+
 const resolvedSource = computed(() => {
-    if (props.source) return props.source
-    const base = runtimeConfig.app.baseURL || '/'
-    return `${base.replace(/\/$/, '')}/notes.pdf`
+    const base = props.source ?? `${(runtimeConfig.app.baseURL || '/').replace(/\/$/, '')}/notes.pdf`
+    return cacheBuster.value !== null ? `${base}?v=${cacheBuster.value}` : base
 })
 
 const currentPage = ref(1)
@@ -129,7 +132,8 @@ async function loadPdf() {
     loadError.value = ''
 
     try {
-        const response = await fetch(resolvedSource.value, { cache: 'force-cache' })
+        const fetchCache = cacheBuster.value !== null ? 'no-cache' : 'force-cache'
+        const response = await fetch(resolvedSource.value, { cache: fetchCache })
         if (!response.ok) {
             throw new Error(`PDF not found at ${resolvedSource.value}`)
         }
@@ -262,6 +266,19 @@ function fitWidth() {
 
 function downloadPdf() {
     window.open(resolvedSource.value, '_blank')
+}
+
+function refreshPdf() {
+    // Bust the module-level cache
+    sharedObjectUrl = null
+    sharedSourceKey = null
+    // Revoke the current object URL so the old blob is freed
+    if (objectUrl) {
+        URL.revokeObjectURL(objectUrl)
+        objectUrl = null
+    }
+    // Changing cacheBuster triggers the watch(resolvedSource) → loadPdf()
+    cacheBuster.value = Date.now()
 }
 
 function clearHighlights() {

@@ -4,6 +4,10 @@ interface RawChunk {
     page: number
     heading: string
     embedding: number[]
+    /** Optional: 'pdf' for PDF-sourced chunks, 'transcript' for lecture recording chunks. */
+    source?: 'pdf' | 'transcript'
+    /** Optional: ISO date string for transcript chunks (e.g. '2026-01-15'). */
+    date?: string
 }
 
 /** Internal chunk with pre-computed search acceleration fields. */

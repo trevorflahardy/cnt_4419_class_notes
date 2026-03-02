@@ -1,0 +1,6 @@
+# Git LFS tracking for class audio recordings
+recordings/**/*.m4a filter=lfs diff=lfs merge=lfs -text
+recordings/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+recordings/**/*.wav filter=lfs diff=lfs merge=lfs -text
+recordings/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+recordings/**/*.mp4 filter=lfs diff=lfs merge=lfs -text

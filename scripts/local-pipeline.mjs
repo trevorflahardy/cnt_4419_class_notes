@@ -14,7 +14,7 @@
  */
 
 import { spawnSync } from "child_process";
-import { existsSync, readdirSync, copyFileSync, mkdirSync, statSync } from "fs";
+import { existsSync, readdirSync, copyFileSync, mkdirSync, statSync, readFileSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -160,6 +160,65 @@ async function main() {
     run("Generate embeddings", "node", ["extract-and-embed.mjs"]);
   } else {
     log("No new transcripts — skipping embedding step.");
+  }
+
+  // ── Step 4b: Sync transcripts to site/public/transcripts/ (always runs) ─
+  // This is fast JSON I/O — no model needed. Runs unconditionally so the
+  // Transcripts tab always has data even when the embed step was skipped.
+  log("Syncing transcripts to site/public/transcripts/...");
+  try {
+    const PUBLIC_TRANSCRIPTS = join(ROOT, "site", "public", "transcripts");
+    mkdirSync(PUBLIC_TRANSCRIPTS, { recursive: true });
+
+    const transcriptFiles = existsSync(TRANSCRIPTS_ROOT)
+      ? readdirSync(TRANSCRIPTS_ROOT)
+          .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+          .sort()
+          .reverse() // newest-first
+      : [];
+
+    const indexEntries = [];
+
+    for (const file of transcriptFiles) {
+      const src = join(TRANSCRIPTS_ROOT, file);
+      const dst = join(PUBLIC_TRANSCRIPTS, file);
+
+      // Copy if destination is missing or older than source
+      let shouldCopy = !existsSync(dst);
+      if (!shouldCopy) {
+        try {
+          shouldCopy = statSync(src).mtimeMs > statSync(dst).mtimeMs;
+        } catch {
+          shouldCopy = true;
+        }
+      }
+
+      if (shouldCopy) {
+        copyFileSync(src, dst);
+        log(`  Copied ${file}`);
+      }
+
+      // Build index entry (parse only to get metadata, not full transcript)
+      try {
+        const data = JSON.parse(readFileSync(src, "utf8"));
+        const segments = Array.isArray(data.segments) ? data.segments : [];
+        indexEntries.push({
+          date: data.date || file.replace(".json", ""),
+          recordings: Array.isArray(data.recordings) ? data.recordings : [],
+          segment_count: segments.length,
+        });
+      } catch {
+        // skip malformed files
+      }
+    }
+
+    writeFileSync(
+      join(PUBLIC_TRANSCRIPTS, "index.json"),
+      JSON.stringify({ generated_at: new Date().toISOString(), dates: indexEntries }, null, 2)
+    );
+    log(`  index.json: ${indexEntries.length} date(s)`);
+  } catch (err) {
+    warn(`Failed to sync transcripts: ${err.message}`);
   }
 
   // ── Step 5: Copy recordings to site/public/recordings/ for dev server ───

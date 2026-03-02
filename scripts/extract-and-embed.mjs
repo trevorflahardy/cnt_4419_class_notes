@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, copyFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -157,9 +157,89 @@ for (let i = 0; i < chunks.length; i++) {
     text: chunk.text,
     page: chunk.page,
     heading: chunk.heading,
+    source: "pdf",
     embedding,
   });
   console.log(`  Embedded chunk ${i + 1}/${chunks.length}`);
+}
+
+// --- Embed transcript chunks ---
+const TRANSCRIPTS_ROOT = join(ROOT, "transcripts");
+if (existsSync(TRANSCRIPTS_ROOT)) {
+  const transcriptFiles = readdirSync(TRANSCRIPTS_ROOT)
+    .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .sort();
+
+  if (transcriptFiles.length > 0) {
+    console.log(`\n📼 Embedding ${transcriptFiles.length} transcript file(s)...`);
+
+    for (const file of transcriptFiles) {
+      const date = file.replace(".json", "");
+      let data;
+      try {
+        data = JSON.parse(readFileSync(join(TRANSCRIPTS_ROOT, file), "utf8"));
+      } catch (err) {
+        console.warn(`  Warning: could not parse ${file}: ${err.message}`);
+        continue;
+      }
+
+      const transcriptText = (data.transcript || "").trim();
+      if (!transcriptText) continue;
+
+      // Chunk transcript by accumulating segments up to CHAR_CHUNK chars
+      const transcriptChunks = [];
+      let buffer = "";
+      const segments = Array.isArray(data.segments) ? data.segments : [];
+
+      for (const seg of segments) {
+        const segText = (seg.text || "").trim();
+        if (!segText) continue;
+        buffer += (buffer ? " " : "") + segText;
+        if (buffer.length >= CHAR_CHUNK) {
+          transcriptChunks.push(buffer.trim());
+          buffer = buffer.slice(-CHAR_OVERLAP);
+        }
+      }
+
+      // If no segments or remaining buffer, fall back to chunking full text directly
+      if (transcriptChunks.length === 0 || buffer.trim().length > 50) {
+        if (buffer.trim().length > 50) {
+          transcriptChunks.push(buffer.trim());
+        } else if (transcriptChunks.length === 0) {
+          // No segments — chunk the full transcript text directly
+          let pos = 0;
+          while (pos < transcriptText.length) {
+            const end = Math.min(pos + CHAR_CHUNK, transcriptText.length);
+            const chunk = transcriptText.slice(pos, end).trim();
+            if (chunk.length > 50) transcriptChunks.push(chunk);
+            pos += CHAR_CHUNK - CHAR_OVERLAP;
+          }
+        }
+      }
+
+      const heading = `Class Recording - ${date}`;
+      console.log(`  ${date}: ${transcriptChunks.length} chunk(s)`);
+
+      for (let i = 0; i < transcriptChunks.length; i++) {
+        const chunkText = transcriptChunks[i];
+        const embOutput = await extractor(chunkText, {
+          pooling: "mean",
+          normalize: true,
+        });
+        embeddedChunks.push({
+          text: chunkText,
+          page: 0,
+          heading,
+          source: "transcript",
+          date,
+          embedding: Array.from(embOutput.data),
+        });
+        console.log(`    Embedded transcript chunk ${i + 1}/${transcriptChunks.length}`);
+      }
+    }
+  }
+} else {
+  console.log("\nNo transcripts/ directory found — skipping transcript embedding.");
 }
 
 // Write output
@@ -169,5 +249,54 @@ writeFileSync(EMBEDDINGS_PATH, JSON.stringify(output));
 console.log(
   `  Wrote ${embeddedChunks.length} chunks with embeddings (${(Buffer.byteLength(JSON.stringify(output)) / 1024 / 1024).toFixed(2)} MB)`,
 );
+
+// --- Copy transcript files to site/public/transcripts/ ---
+console.log("\n📂 Writing public transcript files...");
+const PUBLIC_TRANSCRIPTS_DIR = join(OUTPUT_DIR, "transcripts");
+mkdirSync(PUBLIC_TRANSCRIPTS_DIR, { recursive: true });
+
+const indexEntries = [];
+
+if (existsSync(TRANSCRIPTS_ROOT)) {
+  const transcriptFiles = readdirSync(TRANSCRIPTS_ROOT)
+    .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .sort()
+    .reverse(); // newest-first
+
+  for (const file of transcriptFiles) {
+    const date = file.replace(".json", "");
+    let data;
+    try {
+      data = JSON.parse(readFileSync(join(TRANSCRIPTS_ROOT, file), "utf8"));
+    } catch (err) {
+      console.warn(`  Warning: could not parse ${file}: ${err.message}`);
+      continue;
+    }
+
+    // Write full copy (all fields kept — transcript text needed by chat)
+    const destPath = join(PUBLIC_TRANSCRIPTS_DIR, file);
+    writeFileSync(destPath, JSON.stringify(data));
+    console.log(`  Wrote ${file}`);
+
+    // Build index entry
+    const segments = Array.isArray(data.segments) ? data.segments : [];
+    indexEntries.push({
+      date: data.date || date,
+      recordings: Array.isArray(data.recordings) ? data.recordings : [],
+      segment_count: segments.length,
+    });
+  }
+}
+
+// Write index.json (already sorted newest-first from the loop above)
+const indexData = {
+  generated_at: new Date().toISOString(),
+  dates: indexEntries,
+};
+writeFileSync(
+  join(PUBLIC_TRANSCRIPTS_DIR, "index.json"),
+  JSON.stringify(indexData, null, 2),
+);
+console.log(`  Wrote index.json with ${indexEntries.length} date(s)`);
 
 console.log("✅ Done!");

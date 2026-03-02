@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "sync:pdf": "node ./scripts/sync-pdf.mjs",
-    "build": "bun run sync:pdf && nuxt build",
-    "dev": "bun run sync:pdf && nuxt dev",
+    "build": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && nuxt build",
+    "dev": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && nuxt dev",
     "generate": "bun run sync:pdf && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

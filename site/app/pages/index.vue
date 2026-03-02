@@ -1,5 +1,5 @@
 <script setup lang="ts">
-type View = 'notes' | 'quiz' | 'flashcards' | 'chat'
+type View = 'notes' | 'quiz' | 'flashcards' | 'chat' | 'announcements' | 'transcripts'
 
 const activeView = ref<View>('notes')
 const chatPanelWidth = ref(420)
@@ -10,6 +10,8 @@ const views: { key: View; label: string; icon: string }[] = [
     { key: 'quiz', label: 'Quiz', icon: 'i-heroicons-academic-cap' },
     { key: 'flashcards', label: 'Flashcards', icon: 'i-heroicons-rectangle-stack' },
     { key: 'chat', label: 'Chat', icon: 'i-heroicons-chat-bubble-left-right' },
+    { key: 'announcements', label: 'Professor Says', icon: 'i-heroicons-megaphone' },
+    { key: 'transcripts', label: 'Transcripts', icon: 'i-heroicons-microphone' },
 ]
 
 function setView(view: View) {
@@ -132,6 +134,34 @@ onBeforeUnmount(() => {
                 <div v-if="activeView === 'chat'" class="h-full">
                     <ClientOnly>
                         <ChatSidebar />
+                    </ClientOnly>
+                </div>
+            </Transition>
+
+            <!-- Professor Says -->
+            <Transition name="fade" mode="out-in">
+                <div v-if="activeView === 'announcements'" class="h-full overflow-y-auto">
+                    <ClientOnly>
+                        <AnnouncementsMode />
+                        <template #fallback>
+                            <div class="flex h-full items-center justify-center">
+                                <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-muted" />
+                            </div>
+                        </template>
+                    </ClientOnly>
+                </div>
+            </Transition>
+
+            <!-- Transcripts -->
+            <Transition name="fade" mode="out-in">
+                <div v-if="activeView === 'transcripts'" class="h-full overflow-hidden">
+                    <ClientOnly>
+                        <TranscriptsMode />
+                        <template #fallback>
+                            <div class="flex h-full items-center justify-center">
+                                <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-muted" />
+                            </div>
+                        </template>
                     </ClientOnly>
                 </div>
             </Transition>

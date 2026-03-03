@@ -36,7 +36,6 @@ export function useTranscripts() {
     const transcriptLoadingDates = useState<Record<string, boolean>>('transcripts-loading-dates', () => ({}))
 
     async function loadIndex() {
-        if (index.value.length > 0) return
         if (indexLoadPromise.value) return indexLoadPromise.value
 
         indexLoadPromise.value = _loadIndex()
@@ -46,11 +45,12 @@ export function useTranscripts() {
     async function _loadIndex() {
         isIndexLoading.value = true
         indexError.value = ''
+        loadedTranscripts.value = {}
 
         try {
             const baseURL = useRuntimeConfig().app.baseURL || '/'
             const url = `${baseURL.replace(/\/$/, '')}/transcripts/index.json`
-            const data = await $fetch<{ generated_at?: string; dates?: unknown[] }>(url)
+            const data = await $fetch<{ generated_at?: string; dates?: unknown[] }>(url, { cache: 'no-store' })
 
             const raw = Array.isArray(data?.dates) ? data.dates : []
             index.value = raw.filter(
@@ -85,7 +85,7 @@ export function useTranscripts() {
         try {
             const baseURL = useRuntimeConfig().app.baseURL || '/'
             const url = `${baseURL.replace(/\/$/, '')}/transcripts/${date}.json`
-            const data = await $fetch<TranscriptEntry>(url)
+            const data = await $fetch<TranscriptEntry>(url, { cache: 'no-store' })
 
             if (
                 data &&

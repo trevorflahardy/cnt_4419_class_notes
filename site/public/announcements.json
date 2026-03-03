@@ -1,6 +1,42 @@
 {
-  "generated_at": "2026-03-03T14:16:20.197Z",
+  "generated_at": "2026-03-03T16:18:05.729Z",
   "announcements": [
+    {
+      "date": "2026-03-02",
+      "type": "exam",
+      "quote": "I mean, this, I'd like to go through this, many of you already know that get-s is deprecated now, so most compilers now will reject it, and one will just give you warning still, but any time you see this, you see on the test, if you see this call, just know a radius of buffer overflow vulnerability.",
+      "context": "...at get-s is deprecated now, so most compilers now will reject it, and one will just give you warning still, but any time you see this, you see on the test, if you see this call, just know a radius of buffer overflow vulnerability. Code is guaranteed to be vulnerable if it uses this function. And again,...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-02",
+      "type": "exam",
+      "quote": "On the test, though, we're not going to require you to get into more detail than this.",
+      "context": "...e... Or RC might be stored on the stack itself, breaking the array of the arguments to make. Okay. So, that'll just depend on the environment. On the test, though, we're not going to require you to get into more detail than this. So, anyway, somehow RC and RC will be on the stack for me. And any locals,...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-02",
+      "type": "exam",
+      "quote": "On a test, I do expect you all to be able to draw these pictures to think through how an attack can proceed.",
+      "context": "...ay. Okay. So, we have the mainframe, and then what would people look at? So, and by the way, this is the first stack. Yeah. We get input. Input. On a test, I do expect you all to be able to draw these pictures to think through how an attack can proceed. And attackers would be thinking this way also. So,...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-02",
+      "type": "exam",
+      "quote": "So, on the test, test in this course, you'll see things like, oh, assume a 64-bit machine, or assume a 32-bit or a 16-bit or whatever machine.",
+      "context": "...ponsibility as well. Okay. How big would this return address be? Well, that depends on the machine. The return address is a pointer. Okay. So, on the test, test in this course, you'll see things like, oh, assume a 64-bit machine, or assume a 32-bit or a 16-bit or whatever machine. Okay. So, when I tell...",
+      "keywords": [
+        "test"
+      ]
+    },
     {
       "date": "2026-02-25",
       "type": "exam",

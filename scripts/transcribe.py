@@ -30,10 +30,12 @@ MIN_DURATION_SECS = 5.0
 
 SUPPORTED_EXTENSIONS = {".m4a", ".mp3", ".wav", ".ogg"}
 
+
 def get_audio_duration(audio_path: str) -> float:
     """Return audio duration in seconds using soundfile or ffprobe fallback."""
     try:
         import soundfile as sf
+
         info = sf.info(audio_path)
         return info.duration
     except Exception:
@@ -42,11 +44,16 @@ def get_audio_duration(audio_path: str) -> float:
     # Fallback: use ffprobe if available
     try:
         import subprocess
+
         result = subprocess.run(
             [
-                "ffprobe", "-v", "error",
-                "-show_entries", "format=duration",
-                "-of", "default=noprint_wrappers=1:nokey=1",
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
                 audio_path,
             ],
             capture_output=True,
@@ -86,9 +93,13 @@ def main():
 
     # Discover all date directories (YYYY-MM-DD)
     date_dirs = sorted(
-        d for d in recordings_root.iterdir()
-        if d.is_dir() and d.name not in {"__pycache__", ".git"}
-        and len(d.name) == 10 and d.name[4] == "-" and d.name[7] == "-"
+        d
+        for d in recordings_root.iterdir()
+        if d.is_dir()
+        and d.name not in {"__pycache__", ".git"}
+        and len(d.name) == 10
+        and d.name[4] == "-"
+        and d.name[7] == "-"
     )
 
     if not date_dirs:
@@ -96,10 +107,11 @@ def main():
         return
 
     # Filter to only dates that have audio files and lack an existing raw output dir
-    dates_to_process = []
+    dates_to_process: list[tuple[Path, list[Path]]] = []
     for date_dir in date_dirs:
         audio_files = [
-            f for f in date_dir.iterdir()
+            f
+            for f in date_dir.iterdir()
             if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
         ]
         if not audio_files:
@@ -117,6 +129,7 @@ def main():
     # Load Whisper model once
     print(f"Loading Whisper model '{WHISPER_MODEL}'...")
     import whisper  # noqa: E402  (import here so --check still works)
+
     model = whisper.load_model(WHISPER_MODEL)
     print("Model loaded.")
 
@@ -136,13 +149,17 @@ def main():
             try:
                 duration = get_audio_duration(str(audio_file))
                 if duration < MIN_DURATION_SECS:
-                    print(f"  Skipping {audio_file.name} — too short ({duration:.1f}s < {MIN_DURATION_SECS}s).")
+                    print(
+                        f"  Skipping {audio_file.name} — too short ({duration:.1f}s < {MIN_DURATION_SECS}s)."
+                    )
                     continue
 
                 print(f"  Transcribing {audio_file.name}...")
                 raw = transcribe_file(model, str(audio_file))
                 out_path.write_text(json.dumps(raw, indent=2, ensure_ascii=False))
-                print(f"  Wrote {out_path.name} ({len(raw['segments'])} segments, {len(raw['full_text'])} chars)")
+                print(
+                    f"  Wrote {out_path.name} ({len(raw['segments'])} segments, {len(raw['full_text'])} chars)"
+                )
 
             except Exception:
                 err_msg = traceback.format_exc()
@@ -151,7 +168,10 @@ def main():
                 error_file.write_text(
                     existing + f"\n--- Error for {audio_file.name} ---\n{err_msg}\n"
                 )
-                print(f"  ERROR transcribing {audio_file.name} — see {error_file}", file=sys.stderr)
+                print(
+                    f"  ERROR transcribing {audio_file.name} — see {error_file}",
+                    file=sys.stderr,
+                )
 
     print("\n✅ Transcription complete.")
 

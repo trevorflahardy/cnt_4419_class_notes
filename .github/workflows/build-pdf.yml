@@ -1,17 +1,22 @@
-name: Build PDF & Deploy Study Hub
+name: Build & Deploy
 
 on:
   push:
     branches: [master]
     paths:
+      - "recordings/**"
       - "**.typ"
       - "site/**"
       - "scripts/**"
       - "transcripts/**"
       - "site/public/announcements.json"
-      - ".github/workflows/**"
-
+      - ".github/workflows/build-pdf.yml"
   workflow_dispatch:
+    inputs:
+      force_transcribe:
+        description: "Force re-transcribe all audio recordings"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -23,13 +28,106 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  # ── 1. Detect which paths changed ────────────────────────────────────────────
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      has_audio: ${{ steps.result.outputs.has_audio }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect audio file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name == 'push'
+        with:
+          filters: |
+            audio:
+              - "recordings/**"
+
+      - name: Set has_audio output
+        id: result
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "has_audio=${{ inputs.force_transcribe }}" >> $GITHUB_OUTPUT
+          else
+            echo "has_audio=${{ steps.filter.outputs.audio }}" >> $GITHUB_OUTPUT
+          fi
+
+  # ── 2. Transcribe (only when new audio was pushed) ───────────────────────────
+  transcribe:
+    needs: detect
+    if: needs.detect.outputs.has_audio == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository (with LFS)
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python transcription dependencies
+        run: pip install -r scripts/requirements-transcribe.txt
+
+      - name: Transcribe audio recordings
+        run: python scripts/transcribe.py
+        env:
+          WHISPER_MODEL: ${{ vars.WHISPER_MODEL != '' && vars.WHISPER_MODEL || 'base' }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install script dependencies
+        working-directory: scripts
+        run: npm install
+
+      - name: Merge transcripts (Claude API)
+        working-directory: scripts
+        run: node merge-transcripts.mjs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Extract announcements
+        working-directory: scripts
+        run: node extract-announcements.mjs
+
+      - name: Commit transcript outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add transcripts/ site/public/announcements.json
+          if git diff --cached --quiet; then
+            echo "Nothing to commit — transcripts are up to date."
+          else
+            git commit -m "chore: add transcripts and announcements [skip ci]"
+            git push
+          fi
+
+  # ── 3. Build PDF + site, deploy, release (always runs after detect/transcribe) ─
+  build:
+    needs: [detect, transcribe]
+    # Run when transcribe succeeded OR was skipped (no audio); skip if it failed
+    if: >
+      always() &&
+      needs.detect.result == 'success' &&
+      (needs.transcribe.result == 'success' || needs.transcribe.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      # Fresh checkout so we pick up any transcripts just committed by the transcribe job
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
+          ref: master
 
       # --- Compile Typst to PDF ---
       - name: Setup Typst
@@ -70,7 +168,7 @@ jobs:
         working-directory: site
         run: NUXT_APP_BASE_URL=/cnt_4419_class_notes/ bunx nuxt build --preset github_pages
 
-      # --- Deploy to GitHub Pages ---
+      # --- Stage for Pages deploy ---
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -86,7 +184,7 @@ jobs:
           name: cnt_4419_typed_notes
           path: cnt_4419_typed_notes.pdf
 
-      # --- Update GitHub Release ---
+      # --- Update rolling GitHub Release ---
       - name: Update latest release
         uses: softprops/action-gh-release@v2
         with:
@@ -100,7 +198,9 @@ jobs:
             📖 **[View Study Hub](https://trevorflahardy.github.io/cnt_4419_class_notes/)**
           files: cnt_4419_typed_notes.pdf
           make_latest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
+  # ── 4. Deploy to GitHub Pages ─────────────────────────────────────────────────
   deploy:
     needs: build
     permissions:

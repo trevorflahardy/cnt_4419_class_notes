@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       # --- Compile Typst to PDF ---
       - name: Setup Typst
@@ -49,6 +51,12 @@ jobs:
       - name: Extract text and generate embeddings
         working-directory: scripts
         run: node extract-and-embed.mjs
+
+      # --- Copy recordings into site/public so they are served as static assets ---
+      - name: Copy recordings to site public
+        run: |
+          mkdir -p site/public/recordings
+          cp -r recordings/. site/public/recordings/
 
       # --- Build Nuxt static site ---
       - name: Setup Bun

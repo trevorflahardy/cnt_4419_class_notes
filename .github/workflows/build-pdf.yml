@@ -203,6 +203,7 @@ jobs:
   # ── 4. Deploy to GitHub Pages ─────────────────────────────────────────────────
   deploy:
     needs: build
+    if: always() && needs.build.result == 'success'
     permissions:
       pages: write
       id-token: write

@@ -20,7 +20,6 @@ export function useAnnouncements() {
     const loadPromise = useState<Promise<void> | null>('announcements-load-promise', () => null)
 
     async function loadAnnouncements() {
-        if (announcements.value.length > 0) return
         if (loadPromise.value) return loadPromise.value
 
         loadPromise.value = _load()
@@ -34,7 +33,7 @@ export function useAnnouncements() {
         try {
             const baseURL = useRuntimeConfig().app.baseURL || '/'
             const url = `${baseURL.replace(/\/$/, '')}/announcements.json`
-            const data = await $fetch<AnnouncementsData>(url)
+            const data = await $fetch<AnnouncementsData>(url, { cache: 'no-store' })
 
             const raw = Array.isArray(data?.announcements) ? data.announcements : []
             announcements.value = raw.filter(

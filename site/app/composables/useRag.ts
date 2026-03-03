@@ -154,7 +154,7 @@ export function useRag() {
             loadError.value = ''
             const baseURL = useRuntimeConfig().app.baseURL || '/'
             const url = `${baseURL.replace(/\/$/, '')}/embeddings.json`
-            const data = await $fetch<{ chunks?: unknown[] }>(url)
+            const data = await $fetch<{ chunks?: unknown[] }>(url, { cache: 'no-store' })
 
             const chunks: Chunk[] = Array.isArray(data?.chunks)
                 ? (data.chunks as unknown[])

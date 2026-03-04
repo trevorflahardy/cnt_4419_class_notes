@@ -55,7 +55,9 @@ We break *programs* down into *traces*. A *trace* is a sequence of security-rele
 
 $ "input"(a) ; "output"(a) #h(3em) arrow.l.r #h(1em) mono("echo a") $
 
-$ "input"(a) ; "output"(a) ; "input"("SIGTERM") ; "exit" #h(3em) arrow.l.r #h(1em) mono("echo a") "followed by a SIGTERM" $
+$
+  "input"(a) ; "output"(a) ; "input"("SIGTERM") ; "exit" #h(3em) arrow.l.r #h(1em) mono("echo a") "followed by a SIGTERM"
+$
 
 $ "input"(a) ; "output"(a) ; "input"(a) ; "output"(a) ; dots #h(3em) arrow.l.r #h(1em) "a divergent trace" $
 

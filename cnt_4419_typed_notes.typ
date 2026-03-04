@@ -1239,3 +1239,333 @@ With properly used NX bits, *the attacker can still*:
 
   A technique used by attackers to bypass non-executable stack protections (like NX bits) by reusing existing code snippets (called "gadgets") that are already present in the executable memory of the program. These gadgets typically end with a `ret` instruction, allowing the attacker to chain them together to perform arbitrary operations without executing code on the stack.
 ]
+
+#markbox[
+  Notes hereon taken on Wed Mar 4th, 2026.
+
+  Professor started class with summary of the topics covered last class (the ways that attackers circumvent protections and perform attacks). They noted that the most popular method of attack is return oriented programming and ROP chaining.
+]
+
+Professor wanted to briefly discuss why there is such an expressive set of gadgets in code memory (such that you can implement any algorithm). This is because in `x86` machines, instructions are variable length.
+
+
+So, you can have like an `add` or `jump` instruction in `x86`, and on a lost of `CISC` machines (Complex Instruction Set Computing), and many `RISC` machines, and the number of bits (or bytes) will change depending on the instruction.
+
+On a lot of CISC machines, if an attacker gets control of the return address, the attacker can point the `RA` to the middle of an instruction, which will cause the CPU to interpret the bytes starting from that point as a different instruction. This is known as *instruction misalignment*, and it can lead to a wide variety of unintended instructions being executed, which can be exploited by attackers to perform malicious actions.
+
+// Diagram of instruction misalignment:
+#align(center)[
+  #block(width: 95%, inset: 12pt, stroke: 0.75pt + luma(120), radius: 4pt)[
+    #set text(size: 9pt)
+    #align(center, text(weight: "bold")[Instruction Misalignment in x86 (Variable-Length Encoding)])
+    #v(8pt)
+
+    #align(center)[
+      #text(size: 8pt, fill: luma(100))[Memory (raw bytes at address `0x4000`):]
+      #v(4pt)
+      #grid(
+        columns: (1.1fr,) * 8,
+        gutter: 0pt,
+        ..(
+          (
+            (`B8`, rgb("#dce6f5")),
+            (`01`, rgb("#dce6f5")),
+            (`00`, rgb("#dce6f5")),
+            (`00`, rgb("#dce6f5")),
+            (`00`, rgb("#dce6f5")),
+            (`C3`, rgb("#e8f5e9")),
+            (`90`, rgb("#fff9c4")),
+            (`CC`, rgb("#fce4ec")),
+          ).map(((byte, color)) => box(
+            width: 100%,
+            fill: color,
+            stroke: 0.5pt + luma(160),
+            inset: (x: 2pt, y: 5pt),
+            align(center, raw("byte")),
+          ))
+        )
+      )
+      #v(2pt)
+      #grid(
+        columns: (1.1fr,) * 8,
+        gutter: 0pt,
+        ..("+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7").map(off => align(center, text(
+          size: 7pt,
+          fill: luma(140),
+          off,
+        )))
+      )
+    ]
+
+    #v(12pt)
+
+    #block(width: 100%, inset: 8pt, fill: rgb("#f0f4ff"), radius: 3pt, stroke: 0.5pt + rgb("#90b0e0"))[
+      #text(weight: "bold", size: 8.5pt)[Intended decoding (start at `0x4000 + 0`):] #v(4pt)
+      #grid(
+        columns: (5fr, 1fr, 1fr, 1fr),
+        gutter: 2pt,
+        box(fill: rgb("#dce6f5"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`B8 01 00 00 00` #linebreak() #text(size: 7.5pt)[`mov eax, 1` _(5 bytes)_]]),
+        box(fill: rgb("#e8f5e9"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`C3` #linebreak() #text(size: 7.5pt)[`ret` _(1B)_]]),
+        box(fill: rgb("#fff9c4"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`90` #linebreak() #text(size: 7.5pt)[`nop` _(1B)_]]),
+        box(fill: rgb("#fce4ec"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`CC` #linebreak() #text(size: 7.5pt)[`int3` _(1B)_]]),
+      )
+    ]
+
+    #v(6pt)
+
+    #block(width: 100%, inset: 8pt, fill: rgb("#fff5f5"), radius: 3pt, stroke: 0.5pt + rgb("#e08080"))[
+      #text(weight: "bold", fill: rgb("#b71c1c"), size: 8.5pt)[Attacker's decoding (RA points to `0x4000 + 2`):] #v(4pt)
+      #grid(
+        columns: (3fr, 2fr, 1fr, 1fr),
+        gutter: 2pt,
+        box(fill: rgb("#ffcdd2"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`00 00 00` #linebreak() #text(size: 7.5pt)[`add [eax], al` _(3 bytes)_ #linebreak() #text(size: 7pt, fill: rgb("#b71c1c"))[(completely different!)]]]),
+        box(fill: rgb("#ffcdd2"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`C3 90` #linebreak() #text(size: 7.5pt)[Decoded as: `ret` then `nop` #linebreak() #text(size: 7pt, fill: rgb("#b71c1c"))[(useful gadget!)]]]),
+        box(fill: rgb("#fce4ec"), stroke: 0.5pt + luma(160), inset: 5pt, width: 100%, align(
+          center,
+        )[`CC` #linebreak() #text(size: 7.5pt)[`int3` _(1B)_]]),
+        [],
+      )
+    ]
+
+    #v(8pt)
+    #align(center)[
+      #block(inset: 6pt, fill: rgb("#fff8e1"), radius: 3pt, stroke: 0.5pt + rgb("#f9a825"))[
+        #text(size: 8pt)[
+          *Key insight*: The same bytes produce _entirely different instructions_ depending on the starting offset. \
+          An attacker jumping to `+2` finds an `add` gadget followed by `ret` --- a usable ROP gadget \
+          that _does not exist_ in the intended instruction stream.
+        ]
+      ]
+    ]
+  ]
+]
+
+== Other things attackers can do
+
+Recall the stack layout for our example program:
+
+#figure(
+  table(
+    columns: 3,
+    align: (center, left),
+    stroke: 1pt,
+    table.header([*Stack Frame*], [*Contents*], [*Address*]),
+    [`main`], [`argc`, `argv`], [],
+    [`get_input`],
+    [`RA` \ `buf[1023]` \ $dots.v$ \ `buf[0]` \ `oldFP` ($<-$ points to the frame of `main`)],
+    [$1024 dots 1031$ \ $arrow.t$ \ $dots.v$ \ $arrow.b$ \ $0$],
+  ),
+)
+
+And recall the code example that created this (some function `f()` declaring a buffer of size 1024).
+
+Let's say `f()` has arguments now, then the stack would look like this:
+
+#figure(
+  table(
+    columns: 3,
+    align: (center, left),
+    stroke: 1pt,
+    table.header([*Stack Frame*], [*Contents*], [*Address*]),
+    [`main`], [`argc`, `argv`], [],
+    [`f`],
+    [`RA` \ `argN` \ $dots.v$ \ `arg1` \ `buf[1023]` \ $dots.v$ \ `buf[0]` \ `oldFP` ($<-$ points to the frame of `main`)],
+  ),
+)
+
+What can an attacker still do? By overflowing the buffer, the attacker has control over local variables and our arguments to the function. The attacker can do lots of things with this. What if `args` was some cryptographic key or something important? Well, they could overwrite the arguments to the function and cause it to do something different than what it was intended to do. For example, if the function is supposed to check a password against a stored hash, the attacker could overwrite the argument with a value that causes the function to always return true, effectively bypassing authentication.
+
+What about just a simple loop variable, overwriting it with some large value could cause a denial of service (DoS) attack by making the program run indefinitely or consume excessive resources. The attacker could also overwrite a flag variable that controls access to certain functionality, allowing them to gain unauthorized access to sensitive features of the program.
+
+The attacker could overwrite the boundary between the heap and the stack, which could lead to a *heap overflow attack*. By overflowing the buffer, the attacker could overwrite the metadata of a heap-allocated object, allowing them to manipulate the heap's behavior and potentially execute arbitrary code.
+
+With the `gets()` function (_which was discussed previously_), you are giving an attacker control of everything all the way up the memory.
+
+#definition()[
+  *Heap-based buffer overflows*: An attack where the attacker exploits a buffer overflow vulnerability in the heap segment of memory. By overflowing a buffer allocated on the heap, the attacker can overwrite adjacent memory, which may include critical data structures or function pointers. This can lead to arbitrary code execution, data corruption, or other malicious activities, similar to stack-based buffer overflows but targeting the heap instead.
+]
+
+== How do attackers find/discover these vulnerabilities?
+
+As you can imagine, there are lots of techniques that attackers have developed.
+
+#markbox[
+  Each of the methods discussed in class is listed here as a sub-section, with expansion provided if given during the class session.
+]
+
+=== Examine source code, if it is available
+=== Reverse engineer/decompile the program, if source code is not available
+=== Fuzzing: fuzz-test the program
+#definition()[
+  *Fuzzing*: Use software to provide a program many kinds of inputs and *monitor* for unexpected behavior.
+
+  This is the idea of finding vulnerabilities by automatically generating a large number of random inputs and feeding them to the program to see if any of them cause crashes or unexpected behavior.
+
+  Fuzzing can be an effective way to discover buffer overflow vulnerabilities, as it can quickly test a wide range of input values and identify cases where the program fails to handle them properly.
+
+  Think of this as giving the program a lot of _corner case_ inputs to a program.
+
+  For example:
+  - Common corner cases
+  - Very long inputs (to test for buffer overflows)
+  - Inputs with special characters (to test for injection vulnerabilities)
+]
+
+==== White Box vs Black Box vs Gray Box fuzzing.
+
+*White box fuzzing* is when the fuzzer has access to the source code of the program being tested. This allows the fuzzer to analyze the code and generate inputs that are more likely to trigger vulnerabilities, as it can understand the program's logic and structure.
+
+*Black box fuzzing* is when the fuzzer does not have access to the source code and treats the program as a "black box". The fuzzer generates random inputs without any knowledge of the program's internals, which can be less efficient but still effective in finding vulnerabilities.
+
+*Gray box fuzzing* is a hybrid approach where the fuzzer has some limited access to the program's internals, such as code coverage information or feedback on which inputs are causing crashes. This allows the fuzzer to generate inputs that are more likely to explore different paths in the program and find vulnerabilities more efficiently than black box fuzzing, while still not requiring full access to the source code like white box fuzzing.
+
+
+==== Symbolic execution
+
+#definition()[
+  *Symbolic execution*: Program analysis that determines:
+  $
+    forall "program blocks" B, "the inputs that cause" B "to execute",
+  $
+  or, in plain English, symbolic execution is a technique used in software testing and analysis to determine the inputs that will cause specific blocks of code to execute.
+
+  It involves treating program inputs as symbolic variables rather than concrete values, allowing the analysis to explore all possible execution paths through the program. By doing this, symbolic execution can identify the conditions under which certain code blocks are executed, which is particularly useful for finding vulnerabilities and ensuring comprehensive test coverage.
+]
+
+The idea of this symbolic execution is to attempt to explore all possible execution paths (blocks) of a program to achieve 100% code coverage with this idea of fuzzing. By determining the inputs that cause each block of code to execute, we can systematically test the program for vulnerabilities and ensure that all code paths are exercised.
+
+So for example, consider this block:
+```python
+x = 2
+x += y
+if x > 4:
+  # [... some guarded code item function call]
+```
+
+The *"guard"* is the condition `x > 4`, which controls whether the code inside the `if` statement executes. The symbolic execution engine would analyze this block and determine that for the guarded code to execute, the input `y` must be greater than 2 (since `x` starts at 2 and we need `x + y > 4`).
+
+#definition()[
+  *Guard*: A condition that controls whether a certain block of code executes. In the context of symbolic execution, guards are used to determine the inputs that will lead to the execution of specific code blocks, which is crucial for achieving high code coverage and identifying potential vulnerabilities.
+]
+
+From the code block above, we know that $x >4 and y > 2$ must hold true.
+
+Some of this can be done statically (without running the program) by analyzing the code, but some of it requires dynamic analysis (running the program with different inputs and observing the behavior). Symbolic execution can be used to automate this process and systematically explore all possible execution paths to find vulnerabilities.
+
+Some smart people have figured out how to run the program and perform this symbolic execution at the same time, which is called *concolic execution* (concrete + symbolic). This allows for more efficient exploration of the program's execution paths and can help identify vulnerabilities that may not be easily discovered through static analysis alone.
+
+#definition()[
+  *Concolic execution*: combine symbolic execution with choosing specific inputs.
+
+  This is a hybrid testing technique that *combines concrete execution* (running the program with specific inputs) and *symbolic execution* (treating inputs as symbolic variables). Concolic execution allows for *systematic exploration of a program's execution paths* by using concrete inputs to guide the symbolic analysis, making it more efficient in finding vulnerabilities and achieving high code coverage.
+
+  This is an extension of symbolic execution that allows for more efficient exploration of a program's execution paths by using concrete inputs to guide the symbolic analysis.
+]
+
+Concrete just means that the analysis can be guided by concrete inputs. So it be that the attacker is like "Well, I really care about when input Y is 3", as an input of interest. So, you can tell the symbolic execution that Y is a particular element of interest which can greatly aid in the analysis.
+
+There can be a *very large set of possible values* of `x` (in our code example, hypothetically), so the concolic execution can help focus the analysis on specific inputs that are more likely to trigger vulnerabilities, rather than trying to explore every possible input value, which may be infeasible (as normally, the size of the input space can be astronomically large and exponentially).
+
+== History of Buffer Overflows
+
+The first widespread buffer overflow attack was the *Morris Worm* in 1988, which exploited a buffer overflow vulnerability in the `finger` *daemon* on Unix systems. The worm spread rapidly across the internet, causing significant disruption and highlighting the dangers of buffer overflow vulnerabilities. The professor notes this attack as one of the most important ones to know.
+
+As an aside, `finger` was a program that allowed users to query information about other users on the same system or across the network.
+
+#definition()[
+  *Daemon*: A background process that runs on a computer system and performs specific tasks or services without direct user interaction. Daemons are typically started at boot time and run continuously, waiting for requests or events to trigger their execution. Examples of daemons include web servers, database servers, and various system services.
+
+  In this case, `finger` was running as a daemon, waiting for incoming requests to provide user information. The buffer overflow vulnerability in the `finger` daemon allowed the Morris Worm to execute arbitrary code on affected systems, leading to widespread infection and disruption.
+]
+
+Robert Morris created a buffer overflow in a `512B` buffer, creating a worm. The professor does not go into detail of the effects of the Morris Worm, but as a side note, it known to have caused significant disruption to the early internet, infecting around 6,000 computers (which was a large portion of the internet at the time) and causing an estimated \$10 million in damages. The worm spread rapidly due to its ability to self-replicate and propagate across networks, exploiting the buffer overflow vulnerability in the `finger` daemon to execute malicious code on affected systems.
+
+#definition()[
+  *Worm*: A type of malware that can self-replicate and spread across computer networks without the need for user interaction. Worms are a type of virus,
+  $
+    "worm" subset "virus",
+  $
+  with the condition that they have to involve a network.
+]
+
+#task[
+  Professor stopped the class to take a quiz asking the same question as last time: When a function call happens, what is stored on the stack?
+
+  The professor was looking for the following four key items:
+  1. The return address (RA)
+  2. The old frame pointer (oldFP)
+  3. The function's arguments (if any)
+  4. The function's local variables (if any)
+]
+
+== Writing secure code against buffer overflows
+
+=== Avoid or use extreme caution with: `gets()`, `scanf()`, `strcpy()`, `strcat()`,`sprintf()`, `scanf()`, `fscanf()` etc $dots$
+
+The goal is for developers, aka you (reading this note PDF), to avoid using `gets()` in your code, as well as similar unsafe functions like `scanf()` without proper bounds checking. Instead, you should use safer alternatives that allow you to specify the size of the buffer, such as `fgets()` for reading input or `snprintf()` for formatted output. These functions help prevent buffer overflow vulnerabilities by ensuring that you do not write more data than the allocated buffer can hold.
+
+```cpp
+// unsafe, a way to implement gets() that is still allowed
+// but is not recommended to use.
+gets(buf) = scanf("%s", buf)
+```
+
+Today, `strcpy()` is one of the most common source of buffer overflows in practice.
+
+==== Checking bounds
+In general, you should be checking the boundaries of arrays that you are writing to. You should be doing this on all arrays that you are writing or indexing into, unless you have a *really* good reason not to.
+
+This ties back into the usage of `strcpy()`, which does not check the bounds of the destination buffer, making it a common source of buffer overflow vulnerabilities. So, you should be using safer functions or by manually doing bounds checks.
+
+The professor notes that using a programming language that has built-in bounds checking (like Python or Java) can help prevent buffer overflow vulnerabilities, as these languages automatically check array bounds and raise exceptions if an attempt is made to access out-of-bounds memory. However, in low-level programming languages like C and C++, it is the responsibility of the developer to ensure that they are properly checking bounds to prevent buffer overflows.
+
+=== Replace unsafe functions with safer alternatives
+
+- Instead of `gets()`, use `fgets()`, which allows you to specify the size of the buffer and prevents buffer overflows by ensuring that you do not write more data than the allocated buffer can hold.
+```cpp
+// size: The max # of bytes you can read in
+// stream: the file stream to read from (e.g., stdin)
+char* fgets(char* buf, int size, FILE* stream);
+```
+- Instead of `gets()`, you can use `gets_s()`, which is a safer alternative that also allows you to specify the size of the buffer.
+```cpp
+// size: the max # of bytes you can read in
+// (where rsize_t is a restricted version of size_t that is used for bounds checking)
+char* gets_s(char* buf, rsize_t size);
+```
+Why would the professor not necessarily call these a "safer" version? Can you misuse these things? Now, the programmer can specify the max number of bytes to read in, but if they specify a size that is larger than the actual buffer size, then you can still have a buffer overflow. So, while these functions provide a way to prevent buffer overflows, they still require the programmer to use them correctly and ensure that the specified size does not exceed the actual buffer size. Therefore, they are safer alternatives but still require careful usage to avoid vulnerabilities.
+
+The fault is laid onto the programmer here. The professor notes "*off by one*" errors here, which is a common mistake where the programmer specifies a size that is one byte larger than the actual buffer size, leading to a potential buffer overflow. For example, if you have a buffer of size 1024 bytes, and you specify a size of 1025 bytes when using `fgets()`, you could still have a buffer overflow vulnerability. This is why it's important for programmers to be diligent and careful when using these functions to ensure that they are specifying the correct size for the buffer.
+```cpp
+char buf[1024];
+fgets(buf, 1025, stdin); // This is an off-by-one error that can lead to a buffer overflow vulnerability.
+```
+What if you had an off by one? So what if you can overwrite by just one to the `RA`? Yuo can't overwrite the entire `RA` but you can overwrite the least significant byte (LSB) of the `RA`, which can still be enough to redirect execution to a different location in memory. This is because the `RA` is typically stored as a multi-byte value (e.g., 4 bytes on a 32-bit system or 8 bytes on a 64-bit system), and overwriting just one byte can change the address that the `RA` points to, potentially allowing an attacker to redirect execution to a malicious payload or gadget. Therefore, even an off-by-one error can still lead to a significant security vulnerability if it allows an attacker to manipulate the return address.
+
+#definition()[
+  *N-ary function*: A function that takes N arguments, where N can be any non-negative integer. In the context of buffer overflows, if a function takes a large number of arguments, it can increase the complexity of the stack frame and make it more difficult for developers to properly manage the stack and ensure that they are checking bounds correctly. This can potentially lead to more opportunities for buffer overflow vulnerabilities if not handled carefully.
+
+  In the context of our class, a lot of the unsafe C-library functions have N-ary replacements, such as `strncpy()` (which is a safer alternative to `strcpy()`). These functions allow you to specify the size of the destination buffer, which can help prevent buffer overflow vulnerabilities by ensuring that you do not write more data than the allocated buffer can hold. However, as with any function, it is still important for developers to use these functions correctly and ensure that they are specifying the correct size for the buffer to avoid vulnerabilities.
+]
+
+== High level ideas for preventing buffer overflows
+All this information boils down to *a few high level ideas*:
+1. Find and use a safer library function that performs the same task but with built-in bounds checking, or
+2. Perform boundary checks yourself manually on array operations.
+3. Use a type-safe programming language ($<-$ a side note; the professor notes that this is not always an option due to performance).
+
+== Protections modern machines give us against buffer overflow attacks
+
+1. Compiler errors/warnings.

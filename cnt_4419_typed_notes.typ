@@ -7,6 +7,314 @@
   bibliography-style: "ieee",
 )
 
+= What Does It Mean for Software to Be Secure?
+
+We abstract software security into two components: a *policy* and a *mechanism*.
+
+#definition()[
+  *Policy*
+
+  A specification of good (secure) or bad (insecure) software behavior. The "law" the software must adhere to.
+]
+
+#definition()[
+  *Mechanism*
+
+  A concrete implementation ensuring that software adheres to a policy. The thing that enforces the "law". Also known as an *enforcer*.
+]
+
+When a mechanism $M$ ensures software obeys policy $P$, we say that $M$ *enforces* $P$.
+
+Two-word summaries of software security:
+- *Minimize trust*
+- *Validate inputs*
+
+#markbox[
+  The _gap_ between *high-level* and *low-level* policies is the biggest problem in security in computer science.
+]
+
+= Programs and Traces
+
+We break *programs* down into *traces*. A *trace* is a sequence of security-relevant actions (events), delimited by semicolons. A *program* can be defined as the *set* of all possible traces it may exhibit.
+
+== Vocabulary
+
+- *Diverging*: a non-terminating program (infinite trace)
+- *Converging*: a terminating program (finite trace)
+- *Prefix*: $t_1 <= t_1 ; t_2$
+- $epsilon$: the *empty trace*
+  - An empty trace does not represent a program doing nothing; it represents a program doing no *security-relevant* action
+  - $epsilon <= t$ for all traces $t$
+  - $a <= a$ (a trace is a prefix of itself)
+
+#markbox[
+  You cannot use $lambda$ (lambda) for the empty trace in this course; doing so will result in a grade deduction. Use $epsilon$ instead.
+]
+
+== Example: The `echo` Program
+
+$ "input"(a) ; "output"(a) #h(3em) arrow.l.r #h(1em) mono("echo a") $
+
+$ "input"(a) ; "output"(a) ; "input"("SIGTERM") ; "exit" #h(3em) arrow.l.r #h(1em) mono("echo a") "followed by a SIGTERM" $
+
+$ "input"(a) ; "output"(a) ; "input"(a) ; "output"(a) ; dots #h(3em) arrow.l.r #h(1em) "a divergent trace" $
+
+The `echo` program can be represented as the set of all possible traces:
+
+$ p_("echo") = {epsilon, "in"(a) ; "out"(a), dots} $
+
+= Policy
+
+A *policy* can be defined in several equivalent ways:
+- As a *function* that returns true or false (is this program secure?)
+- As a *function* that returns a number indicating *how satisfactory* a program is
+- As a *set* of *programs* (the set of "good" or "satisfactory" programs)
+
+Since *programs* can be defined as a *set* of *traces*, a *policy* can be defined as a *set of sets of traces*.
+
+== Properties
+
+#definition()[
+  *Property*
+
+  A *property* is a type of policy that, instead of allowing specific programs (sets of traces), allows individual *traces* from all programs. A policy $P$ is a _property_ if and only if there exists a precise set of "good" traces $G$ such that for all programs $p$:
+
+  $ p in P <==> p subset.eq G $
+]
+
+Properties have important consequences:
+- Properties *cannot* have a relationship *between* traces to describe a good program. Each trace is evaluated independently.
+- Properties must allow programs to do *nothing*: $forall G, emptyset subset.eq G$.
+- Properties are best enforced with dynamic mechanisms.
+
+=== CIA Classification
+
+The CIA classification of properties is used in information security. CIA does not consider non-property policies.
+
+#definition()[
+  *Subjects* (principals): Active entities --- e.g., actors, users, processes, threads, devices, methods.
+]
+
+#definition()[
+  *Objects* (resources): Passive things that can be accessed --- e.g., data, values in memory, files, devices.
+]
+
+- *Confidentiality*: Some subjects may not *read* some objects.
+- *Integrity*: Some subjects may not *write* some objects.
+- *Availability*: Some subjects may *access* some objects when needed.
+
+You can consider *Confidentiality + Integrity* as *access control properties* --- "some subjects may not access some objects in certain ways."
+
+=== Safety and Liveness
+
+#markbox[
+  The _only_ case of a property being *both* safety and liveness is the trivial "allow all" property.
+]
+
+==== Safety
+
+#definition()[
+  *Safety*
+
+  A property $P$ with a good set $G$ is *safety* if and only if:
+
+  $ forall t : t in G <==> "prefixes"(t) subset.eq G $
+]
+
+In safety, insecure traces are *not remediable* --- once a bad action has occurred, no future actions can fix it. All access control properties are safety properties.
+
+The idea is that prevention-focused systems tend to enforce safety properties, because a proactive approach is needed: once the bad event happens, it cannot be undone.
+
+==== Liveness
+
+#definition()[
+  *Liveness*
+
+  A property $P$ with a good set $G$ is *liveness* if and only if:
+
+  $ forall "finite" t_1 exists t_2 : t_1 ; t_2 in G $
+
+  All finite bad traces can be extended (fixed) into good traces.
+]
+
+In liveness, insecure traces *are remediable*. Liveness is desirable for *availability*.
+
+Detection-focused systems tend to enforce liveness properties, because a reactive approach works: detect the problem, then fix it.
+
+#markbox[
+  *Core Idea*: It is harder to enforce good behavior (liveness) than it is to prevent bad behavior (safety).
+]
+
+==== Examples
+
+$ G'_1 = {t | "read"(0) in t} $
+$ G_3 = {t | "req"(i) in t arrow.r "send"(i) in t} $
+$ P_4 = {{t_1, t_2, dots} forall_i : t_i "is finite"} $
+$ G_4 = {t | t "is finite"} $
+
+$G_4$ is the *termination property*.
+
+==== Joining Safety and Liveness
+
+Every property can be defined as the intersection of its constituent safety and liveness properties.
+
+Consider:
+$ G_1 = {t | "read"(0) in.not t} $
+$ G_4 = {t | t "is finite"} $
+$ G_5 = G_1 inter G_4 $
+
+$G_5$ is *not liveness*: a trace containing `read(0)` can never be fixed (the bad action is irremediable).
+
+$G_5$ is *not safety*: the trace $r(1) ; r(1) ; r(1) ; dots$ is infinite and not in $G$, yet all of its finite prefixes are in $G$ (they contain no `read(0)` and are finite). This contradicts the safety definition.
+
+#line(length: 100%)
+
+*Theorem*: $forall G exists G_S, G_L | G = G_S inter G_L$ where $G_S$ is safety and $G_L$ is liveness.
+
+*Proof*:
+
+Let $G_S$ be the set of traces $t$ such that any of the following hold:
++ $t in G$, or
++ $t$ is finite and $t$ is fixable according to $G$ (there exists some extension that puts it in $G$), or
++ $t$ is infinite and all of $t$'s prefixes have already been included in $G_S$.
+
+Let $G_L$ be the set of traces $t$ such that any of the following hold:
++ $t in G$, or
++ $t$ is finite and $t$ is unfixable according to $G$ (no extension can put it in $G$).
+
+We define our sets this way because $G$ is the intersection of $G_L$ and $G_S$, but any traces that do not satisfy liveness or safety respectively must be "coerced" into the respective sets. These coerced traces do not really exist within $G$ --- they "disappear" after the intersection.
+
+== Policy Examples
+
+=== Example 1: $P_1$ is a Property
+
+$ P_1 = {{t_1, t_2, dots} | forall_i : "read"(0) in.not t_i} $
+
+$P_1$ is a *property*.
+
+*Proof by construction*: Let $G_1 = {t | "read"(0) in.not t}$.
+
+Consider any $p in P_1$. By definition of $P_1$, $forall t in p$, $"read"(0) in.not t$. So $p subset.eq G_1$.
+
+Consider any $p subset.eq G_1$. By definition of $G_1$, $forall t in p$, $"read"(0) in.not t$. So $p in P_1$.
+
+Both directions hold, so $p in P_1 <==> p subset.eq G_1$, confirming $P_1$ is a property. $square$
+
+$P_1$ is also *safety*:
+
+Consider $G_1 = {t | "read"(0) in.not t}$. If a trace $t in G_1$, then $"read"(0) in.not t$, so $"read"(0)$ is absent from all prefixes of $t$ as well. Thus $"prefixes"(t) subset.eq G_1$. This uniquely identifies $P_1$ as safety.
+
+==== What If We Reverse It?
+
+What if we only allow programs where every trace *contains* `read(0)`?
+
+$ P'_1 = {{t_1, t_2, dots} | forall_i : "read"(0) in t_i} $
+$ G'_1 = {t | "read"(0) in t} $
+
+Consider the trace $t = r(1) ; r(2) ; r(3) ; r(0)$. Many prefixes of $t$ do not contain `read(0)` (e.g., $r(1)$ alone), so the prefixes are not all in $G'_1$, even though the full trace is. This means $P'_1$ is a *property* but *not safety* --- it is *liveness*.
+
+=== Example 2: $P_2$ is Not a Property
+
+$ P_2 = {{t^1 ; "out"(k_1), t^2 ; "out"(k_2), dots} | {k_1, k_2, dots} = {00 dots 00, 00 dots 01, dots}} $
+
+In plain terms: $P_2$ requires that a program output *all* possible cryptographic keys. This is a relationship *between* traces (collectively they must cover all keys), so we suspect it is not a property.
+
+$P_2$ is *not a property*.
+
+*Proof by contradiction*: Assume $P_2$ is a property with a set of good traces $G_2$ such that $forall p : p in P_2 <==> p subset.eq G_2$.
+
+Let $t_0 = "out"(0 dots 0)$.
+
+*Case 1*: $t_0 in G_2$. Let $p = {t_0}$. Then $p subset.eq G_2$, but $p in.not P_2$ (a single trace does not output all keys). Contradiction. $bot$
+
+*Case 2*: $t_0 in.not G_2$. Let $p = {t_0, "out"(00 dots 01), "out"(00 dots 10), dots}$ (the set of traces outputting every key). Then $p in P_2$ but $p subset.eq.not G_2$ since $t_0 in.not G_2$. Contradiction. $bot$
+
+*Case 3* (simpler): Let $p = emptyset$. Then $p subset.eq G_2$ (trivially), but $p in.not P_2$ (the empty program outputs no keys). Contradiction. $bot$
+
+In all cases a contradiction occurs, so $P_2$ is not a property. $square$
+
+= Formal Mechanism Definition
+
+A concrete implementation ensuring that software adheres to a policy. Also known as an *enforcer*.
+
+A mechanism has four possible outcomes:
+
+#figure(
+  table(
+    columns: 3,
+    align: (center, left, left),
+    stroke: 1pt,
+    table.header([*Outcome*], [*Description*], [*Error Type*]),
+    [*True Positive*], [Mechanism signals a policy violation and is correct], [],
+    [*True Negative*], [Mechanism signals satisfaction and is correct], [],
+    [*False Positive*], [Mechanism signals a violation but is wrong (false alarm)], [Type I Error],
+    [*False Negative*], [Policy violation goes unnoticed by the mechanism], [Type II Error],
+  ),
+  caption: [The four possible outcomes of a security mechanism. False negatives (Type II) are generally the most dangerous, as a real attack goes undetected.],
+)
+
+There exists a *many-to-many* relationship between policies and mechanisms: one policy can be enforced by multiple mechanisms, and one mechanism can enforce multiple policies.
+
+== Static Mechanisms
+
+Also known as *white box* techniques. Static analysis mechanisms attempt to enforce a policy by analyzing the *source code* without running it.
+
+There exists *no perfect static mechanism* --- there will always be false positives or false negatives. This is a consequence of the *Halting Problem*: it is fundamentally undecidable to determine, in general, what an arbitrary program will do at runtime from its source code alone.
+
+=== Type Checkers
+
+Type checkers are an example of a mechanism to enforce the *type safety policy*, which states that values (types) can only be used with defined, allowed operations.
+
+Static type checkers produce *false positives* when violations will not occur at runtime (e.g., a type violation in an unreachable branch of code).
+
+#markbox[
+  A type safety policy is a kind of *memory access control policy*.
+]
+
+== Dynamic Mechanisms
+
+Also known as *black box* techniques. Dynamic mechanisms do not have access to the source code. They monitor attempted actions at runtime and only allow actions that follow the policy.
+
+Dynamic mechanisms are good at enforcing *properties* but bad at enforcing *non-properties*.
+
+=== Firewalls
+
+Firewalls deny traffic from specific hosts or ports. They are a classic example of a dynamic mechanism that enforces network access control policies.
+
+=== Intrusion Detection Systems (IDS)
+
+Intrusion detection mechanisms aim to block any host performing malicious reconnaissance (e.g., port scanning with tools like *nmap*).
+
+== Sound Enforcers
+
+*Never* exhibit false negatives; *may* have false positives.
+
+"I never miss, I might lie."
+
+#definition()[
+  *Sound Enforcer*
+
+  A mechanism that is guaranteed to detect every policy violation (no false negatives), but may occasionally flag non-violations as violations (false positives). Sound enforcers are conservative: they err on the side of caution.
+]
+
+== Complete Enforcers
+
+The converse of sound enforcers. *Never* exhibit false positives; *may* have false negatives.
+
+"I never lie, I may miss."
+
+#definition()[
+  *Complete Enforcer*
+
+  A mechanism that never raises a false alarm (no false positives), but may miss some actual violations (false negatives). Complete enforcers are precise: when they flag something, it is guaranteed to be a real violation.
+]
+
+#definition()[
+  *Precise Enforcer*
+
+  A mechanism that is both *sound* and *complete*: it has neither false positives nor false negatives. In practice, precise enforcers are generally impossible for non-trivial properties due to decidability limitations.
+]
+
 = Mechanisms
 
 Types (categories) of mechanisms:
@@ -275,6 +583,130 @@ You want to minimize the gap between when you check the security state and when 
   *The key principle*: check all operations, every time, without exception.
 ]
 
+= Attack Vectors
+
+How do attacks occur? What path do they take?
+
+Often, attacks happen because *software* --- or, more aptly, *programmers* --- trust something. That something gets exploited.
+
+#markbox[
+  *Core Idea*: In order for software to be more secure, *minimize trust*. This relates directly to the Principle of Least Privilege.
+]
+
+#markbox[
+  *Core Idea*: Pessimism is pragmatic in the world of software security. There is simply too much complexity in modern machines to guarantee security. Focus on fixing security issues one at a time.
+]
+
+== Categories of Trust
+
+=== SW Trusts User Input
+
+Software makes assumptions about user input that an attacker may violate by providing unexpected input.
+
+Examples of input-based attacks:
+- *Buffer overflow*
+- *SQL injection*
+- *Prompt injection*
+- *Cross-Site Scripting (XSS)*
+
+#definition()[
+  *Confused Deputy Attack*
+
+  A subclass of *privilege escalation attacks*. The attacker's input causes the software to *misuse* its own privileges on behalf of the less-privileged attacker. The software is the "deputy" that gets "confused" into acting against its own interests.
+]
+
+Classic example: a compiler with admin privileges. The normal flow is `source -> compiler -> target`. But what if the attacker provides input that causes the compiler to overwrite a critical system file (e.g., `/etc/passwd`)? The compiler has the privilege to write anywhere, and the attacker tricks it into writing to a sensitive location.
+
+Mitigation: *validate and sanitize inputs*.
+
+=== SW Trusts Users to Behave (Insider Attacks)
+
+The attacker is a *privileged user who misbehaves* (insider attacks), or the attacker *convinces* a privileged user to misbehave.
+
+Mechanisms for preventing insider attacks:
+- *Auditing and logging*
+- *Principle of Least Privilege*
+- *Requiring multiple insiders to approve* sensitive actions
+
+#definition()[
+  *Social Engineering*
+
+  The attacker psychologically convinces a user to perform an insecure action. This is often the most difficult kind of attack to deal with because it targets the human element rather than the software.
+]
+
+#definition()[
+  *Phishing*
+
+  Social engineering by pretending to be a trustworthy entity in *electronic communication*.
+  - *Smishing*: phishing over SMS
+  - *Spear phishing*: targeted phishing against a specific individual or organization (very successful --- roughly 50% success rate)
+]
+
+Standard defense: *user education*.
+
+=== SW Trusts Attackers to Have Limited Resources
+
+The attacker may use more resources than expected.
+
+- *Denial of Service (DoS)*: overwhelming a service with requests so legitimate users cannot access it
+- *Distributed Denial of Service (DDoS)*: a DoS attack launched from many machines simultaneously (often a botnet of compromised "zombie" machines)
+
+=== SW Trusts the Environment
+
+Software trusts the hardware and software environment in which it executes.
+
+*Hardware-based attacks*:
+- *High heat*: can cause unpredictable bit flips in memory
+- *Extreme cold*: can *freeze* memory to retain its state, allowing an attacker to physically remove and analyze the memory (cold boot attack)
+- *Row hammer*: repeatedly accessing a row of memory to cause bit flips in adjacent rows
+- *Side-channel attacks*: extracting secrets by measuring physical properties (timing, power consumption, electromagnetic emissions, etc.)
+
+*Software-based attacks*: exploiting vulnerabilities in the operating system, libraries, or other software that the target software depends on.
+
+== Attack Vector Examples
+
+=== Java Webserver
+
+The textbook (Foundations of Security, p. 59) presents a simple Java webserver with several vulnerabilities:
+
++ *Malformed request*: The attacker inputs an arbitrary request without a proper HTTP header. The string tokenizer raises an exception, the server crashes, resulting in a *DoS*.
+
++ *Path traversal*: The attacker requests a security-sensitive file using directory traversal:
+  ```
+  GET ../../../etc/shadow HTTP/1.0
+  ```
+  The attacker obtains password hashes.
+
++ *Large file request*: The attacker requests an extremely large file. The server attempts to read the entire file into a buffer, runs out of memory, throws an exception, and crashes --- another *DoS*.
+
+=== Ransomware
+
+- Ransomware holds a victim's resources hostage and demands a *ransom*
+- Traditionally, ransomware encrypts a victim's data
+- Modern ransomware may also threaten to *exfiltrate* sensitive data from the victim
+
+= Tradeoffs
+
+== Security vs. Usability
+
+Often, increasing security also decreases the usability of software.
+
+- *Password change requirements*: Users required to change their password regularly may start creating insecure passwords (e.g., `Password1`, `Password2`, ...) because they must change them so often.
+- *Security confirmation dialogues*: Help prevent insider attacks and accidental actions, but can cause "pop-up fatigue" where users blindly click "OK" on everything, which actually *reduces* security.
+
+== Security vs. Costs
+
+Implementing security measures and mechanisms can increase the cost of running software. "Cost" here is broad:
+
+- Running time (computational overhead)
+- Network bandwidth
+- Memory use (data and code)
+- Energy use
+- Labor (personnel, HR, developer time)
+
+#markbox[
+  These tradeoffs are important to consider when designing secure software. A mechanism that is technically superior but too expensive to deploy or too annoying for users may end up being less secure in practice than a simpler, more usable alternative.
+]
 
 = Securing Software Strategies
 

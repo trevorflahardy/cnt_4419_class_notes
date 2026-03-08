@@ -4,6 +4,7 @@ type View = 'notes' | 'quiz' | 'flashcards' | 'chat' | 'announcements' | 'transc
 const activeView = ref<View>('notes')
 const chatPanelWidth = ref(420)
 const isResizing = ref(false)
+const mobileMenuOpen = ref(false)
 
 const views: { key: View; label: string; icon: string }[] = [
     { key: 'notes', label: 'Notes', icon: 'i-heroicons-document-text' },
@@ -14,8 +15,14 @@ const views: { key: View; label: string; icon: string }[] = [
     { key: 'transcripts', label: 'Transcripts', icon: 'i-heroicons-microphone' },
 ]
 
+// Primary tabs shown in bottom bar (icons only on mobile)
+const primaryViews = views.slice(0, 4)
+// Overflow tabs shown in hamburger drawer
+const overflowViews = views.slice(4)
+
 function setView(view: View) {
     activeView.value = view
+    mobileMenuOpen.value = false
 }
 
 function startResize(event: MouseEvent) {
@@ -75,6 +82,10 @@ onBeforeUnmount(() => {
                 <UButton icon="i-simple-icons-github" variant="ghost" color="neutral" size="sm"
                     to="https://github.com/trevorflahardy/cnt_4419_class_notes" target="_blank"
                     aria-label="GitHub repository" />
+                <!-- Hamburger: mobile only -->
+                <UButton class="md:hidden" :icon="mobileMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
+                    variant="ghost" color="neutral" size="sm" aria-label="Open menu"
+                    @click="mobileMenuOpen = !mobileMenuOpen" />
             </div>
         </header>
 
@@ -167,16 +178,52 @@ onBeforeUnmount(() => {
             </Transition>
         </main>
 
-        <!-- ===== Mobile Bottom Navigation ===== -->
+        <!-- ===== Mobile Slide-over Menu ===== -->
+        <Transition name="drawer">
+            <div v-if="mobileMenuOpen"
+                class="fixed inset-0 z-50 md:hidden"
+                @click.self="mobileMenuOpen = false">
+                <!-- Backdrop -->
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="mobileMenuOpen = false" />
+                <!-- Drawer panel -->
+                <nav class="absolute bottom-0 left-0 right-0 rounded-t-2xl border-t border-default bg-default shadow-2xl pb-[env(safe-area-inset-bottom)]">
+                    <div class="mx-auto mt-2 h-1 w-10 rounded-full bg-muted/30" />
+                    <div class="px-4 py-4 space-y-1">
+                        <button v-for="v in views" :key="v.key"
+                            class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors"
+                            :class="activeView === v.key
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted hover:bg-elevated hover:text-highlighted'"
+                            @click="setView(v.key)">
+                            <UIcon :name="v.icon" class="h-5 w-5 shrink-0" />
+                            <span>{{ v.label }}</span>
+                            <UIcon v-if="activeView === v.key" name="i-heroicons-check" class="ml-auto h-4 w-4 text-primary" />
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        </Transition>
+
+        <!-- ===== Mobile Bottom Navigation (primary 4 tabs) ===== -->
         <nav
-            class="flex items-center justify-around border-t border-default bg-default px-2 py-1.5 md:hidden pb-[calc(env(safe-area-inset-bottom)+6px)]">
-            <button v-for="v in views" :key="v.key"
-                class="flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1 text-xs transition-colors" :class="activeView === v.key
+            class="flex items-center border-t border-default bg-default md:hidden pb-[env(safe-area-inset-bottom)]">
+            <button v-for="v in primaryViews" :key="v.key"
+                class="flex flex-1 flex-col items-center gap-0.5 px-1 py-2 text-[11px] transition-colors" :class="activeView === v.key
                     ? 'text-primary font-semibold'
-                    : 'text-muted'
-                    " @click="setView(v.key)">
-                <UIcon :name="v.icon" class="text-xl" />
+                    : 'text-muted'"
+                @click="setView(v.key)">
+                <UIcon :name="v.icon" class="text-[22px]" />
                 <span>{{ v.label }}</span>
+            </button>
+            <!-- More button -->
+            <button
+                class="flex flex-1 flex-col items-center gap-0.5 px-1 py-2 text-[11px] transition-colors"
+                :class="overflowViews.some(v => v.key === activeView)
+                    ? 'text-primary font-semibold'
+                    : 'text-muted'"
+                @click="mobileMenuOpen = true">
+                <UIcon name="i-heroicons-ellipsis-horizontal" class="text-[22px]" />
+                <span>More</span>
             </button>
         </nav>
     </div>
@@ -197,4 +244,21 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(-4px);
 }
+
+/* Drawer slide-up */
+.drawer-enter-active { transition: opacity 0.2s ease; }
+.drawer-leave-active { transition: opacity 0.2s ease; }
+.drawer-enter-from { opacity: 0; }
+.drawer-leave-to { opacity: 0; }
+
+.drawer-enter-active .absolute.bottom-0,
+.drawer-enter-active nav.absolute {
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.drawer-leave-active .absolute.bottom-0,
+.drawer-leave-active nav.absolute {
+    transition: transform 0.2s ease-in;
+}
+.drawer-enter-from nav.absolute { transform: translateY(100%); }
+.drawer-leave-to nav.absolute { transform: translateY(100%); }
 </style>

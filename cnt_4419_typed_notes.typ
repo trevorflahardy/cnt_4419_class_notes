@@ -1761,4 +1761,33 @@ Limitations:
 
 Let's say you change some return address in the stack to point to some location in the code space. With ASLR, the attacker cannot choose some fixed address on all machines to jump to, because the code segment is randomized. So, the attacker has to guess an address in the code segment to jump to, which can be difficult if ASLR is properly implemented and the randomization is strong enough. This makes it more challenging for attackers to successfully execute buffer overflow attacks that rely on jumping to specific addresses in the code segment.
 
-But, in this example, if some attacher can get he address of some pointer into code memory, then that allows you to figure out everything assuming the attacker knows the layout of the code in memory.
+But, in this example, if some attacher can get he address of some pointer into code memory (some address `a'`, which the attacker can find using format string vulnerabilities and other techniques), then that allows you to figure out everything assuming the attacker knows the layout of the code in memory.
+
+=== Control Flow Integrity (CFA)
+
+CFI is a security technique that ensures that the control flow of a program follows a predetermined path, preventing attackers from redirecting execution to malicious code. CFI works by analyzing the program's control flow graph (CFG) and inserting checks at runtime to ensure that the program's execution follows the expected paths defined in the CFG. If an attacker attempts to redirect execution to an unexpected path, the CFI checks will detect this and can take appropriate action (such as terminating the program) to prevent the attack from succeeding.
+
+#definition()[
+  *CFG*: A control flow graph (CFG) is a representation of all the paths that might be traversed through a program during its execution. It is a directed graph where each node represents a basic block of code (a straight-line sequence of instructions with no branches), and each edge represents a possible control flow transfer between blocks (such as jumps, calls, or returns). The CFG is used in various program analysis techniques, including control flow integrity (CFI), to ensure that the program's execution follows expected paths and to detect potential vulnerabilities.
+]
+
+With a CFG,
+1. Each instruction is a node in the graph.
+2.
+$
+  exists "edge"(i, j) "when instruction" j "can immediately follow instruction" i,
+$
+
+To implement the CFI, before any computed jump instruction we will check that the destination is valid. So embed, at every valid destination, a "special code" (does not have to be secret). Check, before jumping, for the correct code.
+
+Consider some `beq` instruction in some assembly code. It could either fall through to the next instruction in the code *or* it could jump to some other special no-operation (NOP) instruction that we have designated as a valid jump target. With CFI, we would embed a special code at the valid jump target (the NOP instruction), and before executing the `beq` instruction, we would check for the presence of that special code at the destination address. If the special code is present, we allow the jump to proceed; if it is not present, we can take appropriate action (such as terminating the program) to prevent a potential attack.
+
+This does add some runtime overhead, as we have to perform these checks before every computed jump instruction, but it can significantly enhance the security of the program by preventing attackers from redirecting execution to malicious code. But, there are many ways to implement CFI, and some implementations may have more or less overhead depending on the specific techniques used and the level of security provided.
+
+Let's say you generated one of these special codes and put it everywhere you have a valid jump. This mitigates: jumping to random places in the code segment, ROP chains, and jumping to the middle of an instruction. However, it does not mitigate: jumping to the middle of a special code (if the special code is long enough that it has multiple instructions), or jumping to the middle of a valid instruction (if the valid instruction is long enough that it has multiple instructions). So, while CFI can provide strong protection against certain types of control flow attacks, it may not be able to prevent all possible attack vectors, especially if the attacker can find ways to bypass the checks or if there are limitations in the implementation of CFI.
+
+There are *multiple assumptions* for this:
+1. *NWC*: No write code. This means that the attacker cannot write to the code segment of memory, which is a common assumption in CFI implementations. If an attacker can write to the code segment, they could potentially modify the special codes used for CFI checks, allowing them to bypass the protection and redirect execution to malicious code.
+2. *NXD*: No execute data. This means that the attacker cannot execute code from the data segment of memory, which is another common assumption in CFI implementations. If an attacker can execute code from the data segment, they could potentially inject malicious code into the data segment and execute it, bypassing CFI protections that rely on the assumption that only code in the code segment can be executed.
+3. *NNQ*: No non-control data. This means that *the attacker cannot modify non-control data* (such as local variables or function arguments) *in a way that could affect the control flow of the program*. If an attacker can modify non-control data, they could potentially cause unintended behavior or exploit other vulnerabilities in the program, even if CFI is in place to protect against control flow redirection attacks.
+

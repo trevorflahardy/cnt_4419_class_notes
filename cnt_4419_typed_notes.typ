@@ -1629,4 +1629,4 @@ The goal here is to randomize the locations of the segments in memory.
 - The pointer values differ machine to machine.
 
 Limitations:
-1. Attacker may exploit other vulnerabilities
+1. Attacker may exploit other vulnerabilities (for example, format string vulnerabilities) to learn the base addresses.

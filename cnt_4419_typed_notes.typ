@@ -1625,3 +1625,8 @@ The professor notes that modern compilers (like `gcc` and `clang`) have built-in
 
 === Address Space Layout Randomization (ASLR)
 
+The goal here is to randomize the locations of the segments in memory.
+- The pointer values differ machine to machine.
+
+Limitations:
+1. Attacker may exploit other vulnerabilities

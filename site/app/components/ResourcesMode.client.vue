@@ -80,7 +80,9 @@ onMounted(() => {
                 <h1 class="text-2xl font-bold text-highlighted">Resources</h1>
                 <p class="mt-1 text-sm text-muted">
                     Study materials, past exams, and other files shared for CNT 4419.
-                    Place files in <code class="rounded bg-elevated px-1 py-0.5 text-xs font-mono">public/resources/</code> to have them appear here.
+                    Place files in <code
+                        class="rounded bg-elevated px-1 py-0.5 text-xs font-mono">public/resources/</code> to have them
+                    appear here (you can PR this btw!).
                 </p>
             </div>
 
@@ -98,8 +100,8 @@ onMounted(() => {
 
             <!-- File tree -->
             <div v-else class="rounded-xl border border-default bg-default overflow-hidden">
-                <ResourcesTree :entries="tree" :expanded="expanded" :depth="0"
-                    @toggle="toggleFolder" :file-icon="fileIcon" :file-color="fileColor" />
+                <ResourcesTree :entries="tree" :expanded="expanded" :depth="0" @toggle="toggleFolder"
+                    :file-icon="fileIcon" :file-color="fileColor" />
             </div>
         </div>
     </div>

@@ -1626,7 +1626,139 @@ The professor notes that modern compilers (like `gcc` and `clang`) have built-in
 === Address Space Layout Randomization (ASLR)
 
 The goal here is to randomize the locations of the segments in memory.
-- The pointer values differ machine to machine.
+
+Expanded, ASLR is a security technique that randomizes the memory addresses used by a program's code, data, and stack segments each time the program is executed. This makes it more difficult for attackers to predict the location of specific code or data in memory, which can help prevent certain types of attacks, such as buffer overflows and return-oriented programming (ROP) attacks.
+
+// ── ASLR Visualization ──────────────────────────────────────────────
+// Helper: draw a single memory-layout column
+#let memory-segment(label, color, height) = {
+  rect(
+    width: 100%,
+    height: height,
+    fill: color.lighten(80%),
+    stroke: 1pt + color,
+    radius: 2pt,
+    inset: 4pt,
+  )[
+    #align(center + horizon)[
+      #text(size: 7.5pt, weight: "bold", fill: color.darken(30%))[#label]
+    ]
+  ]
+}
+
+#let memory-column(title, subtitle, segments, addr-labels) = {
+  block(width: 140pt)[
+    #align(center)[
+      #text(size: 9pt, weight: "bold")[#title] \
+      #text(size: 7pt, fill: luma(120))[#subtitle]
+    ]
+    #v(4pt)
+    // Address column + segment column
+    #block(stroke: 1.5pt + luma(80), radius: 3pt, clip: true, width: 100%)[
+      #stack(
+        dir: ttb,
+        spacing: 0pt,
+        // Top label: High addresses
+        rect(width: 100%, height: 14pt, fill: luma(240), stroke: (bottom: 0.5pt + luma(180)))[
+          #align(center + horizon)[#text(size: 6pt, fill: luma(100))[High Addresses]]
+        ],
+        ..segments
+          .zip(addr-labels)
+          .map(pair => {
+            let (seg, addr) = pair
+            grid(
+              columns: (38pt, 1fr),
+              rows: (seg.at(2),),
+              rect(
+                width: 100%,
+                height: 100%,
+                fill: luma(248),
+                stroke: (right: 0.5pt + luma(200), bottom: 0.5pt + luma(220)),
+                inset: 2pt,
+              )[
+                #align(center + horizon)[
+                  #text(size: 5.5pt, font: "Menlo", fill: luma(100))[#addr]
+                ]
+              ],
+              rect(
+                width: 100%,
+                height: 100%,
+                fill: seg.at(1).lighten(82%),
+                stroke: (bottom: 0.5pt + seg.at(1).lighten(40%)),
+                inset: 3pt,
+              )[
+                #align(center + horizon)[
+                  #text(size: 7pt, weight: "bold", fill: seg.at(1).darken(25%))[#seg.at(0)]
+                ]
+              ],
+            )
+          }),
+        // Bottom label: Low addresses
+        rect(width: 100%, height: 14pt, fill: luma(240), stroke: (top: 0.5pt + luma(180)))[
+          #align(center + horizon)[#text(size: 6pt, fill: luma(100))[Low Addresses]]
+        ],
+      )
+    ]
+  ]
+}
+
+#figure(
+  block(inset: 8pt)[
+    #grid(
+      columns: (1fr, auto, 1fr),
+      column-gutter: 12pt,
+      align: center + horizon,
+
+      // ── Without ASLR ──
+      memory-column(
+        "Without ASLR",
+        "(Fixed layout every run)",
+        (
+          ("Stack ↓", color.red, 36pt),
+          ("(unused)", luma(180), 20pt),
+          ("Heap ↑", color.blue, 30pt),
+          ("Globals (BSS)", color.orange, 24pt),
+          ("Globals (Data)", color.yellow, 24pt),
+          ("Text (Code)", color.green, 30pt),
+        ),
+        ("0xBFFF...", "", "0x0804...", "0x0804...", "0x0804...", "0x0804..."),
+      ),
+
+      // ── Arrow ──
+      block(width: 40pt)[
+        #align(center + horizon)[
+          #text(size: 20pt, fill: color.purple)[→] \
+          #v(2pt)
+          #text(size: 7pt, weight: "bold", fill: color.purple)[ASLR] \
+          #text(size: 6pt, fill: luma(120))[(randomize)]
+        ]
+      ],
+
+      // ── With ASLR ──
+      memory-column(
+        "With ASLR",
+        "(Randomized each run)",
+        (
+          ("Stack ↓", color.red, 36pt),
+          ("(random gap)", luma(180), 28pt),
+          ("Heap ↑", color.blue, 30pt),
+          ("(random gap)", luma(180), 14pt),
+          ("Globals", color.orange, 24pt),
+          ("Text (Code)", color.green, 30pt),
+        ),
+        ("0x7FFC...", "", "0x55A2...", "", "0x5598...", "0x5596..."),
+      ),
+    )
+  ],
+  caption: [Comparison of process memory layout _without_ ASLR (predictable, fixed addresses) versus _with_ ASLR (randomized base addresses for each segment on every execution). The attacker can no longer rely on known addresses to craft exploits.],
+) <fig-aslr>
 
 Limitations:
 1. Attacker may exploit other vulnerabilities (for example, format string vulnerabilities) to learn the base addresses.
+  - Once an attacker gets some address `a` in the stack, they know the offset from the base address. So the attacker knows the `offset` (`o`) by running the program through some debugger (or some test environment). The attacker just has to add the offset `o` to the leaked address `a` to get the base address `b` (i.e., `b = a - o`), which allows them to bypass ASLR and successfully execute a buffer overflow attack. Once one pointer value is leaked, ASLR is circumvented for that segment and all other addresses in that segment can be calculated based on the leaked address and known offsets.
+2. Attacker may brute force, or guess, the base addresses, especially if the randomization is not sufficiently strong or if there are a limited number of possible addresses. For example, if the randomization only allows for a small number of possible base addresses, an attacker could potentially try all of them until they find the correct one, allowing them to bypass ASLR and execute a buffer overflow attack.
+3. Only tries to protect pointers and return addresses (RAs are a type of pointer). For example, if an attacker is able to overwrite local variables or function arguments without overwriting pointers or return addresses, they may still be able to cause unintended behavior or exploit other vulnerabilities in the program, even if ASLR is in place to protect against pointer and RA overwriting attacks.
+
+Let's say you change some return address in the stack to point to some location in the code space. With ASLR, the attacker cannot choose some fixed address on all machines to jump to, because the code segment is randomized. So, the attacker has to guess an address in the code segment to jump to, which can be difficult if ASLR is properly implemented and the randomization is strong enough. This makes it more challenging for attackers to successfully execute buffer overflow attacks that rely on jumping to specific addresses in the code segment.
+
+But, in this example, if some attacher can get he address of some pointer into code memory, then that allows you to figure out everything assuming the attacker knows the layout of the code in memory.

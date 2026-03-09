@@ -1568,8 +1568,9 @@ All this information boils down to *a few high level ideas*:
 
 == Protections modern machines give us against buffer overflow attacks
 
-1. Compiler errors/warnings.
-2. Static canaries (aka "stack guard"): the more modern name is called *stack guard*.
+=== Compiler errors/warnings.
+
+=== Static canaries (aka "stack guard"): the more modern name is called *stack guard*.
 
 #markbox[
   Notes hereon taken on Mar 9, 2026
@@ -1618,4 +1619,9 @@ Sometimes, putting a bit string and a null byte can be combined together. Having
 Limitations of stack guards:
 1. Attacker may guess or brute-force the canary value, especially if it is reused across multiple runs of the program and the canary is not sufficiently random or has a small key space. The stack guard technique relies on the secrecy of the canary value, so if an attacker can guess or brute-force the canary, they can bypass this protection and successfully execute a buffer overflow attack.
 2. Attacker may exploit other vulnerabilities ("vulns") such as format string vulnerabilities or use other techniques to bypass the stack guard protection and learn the canary. For example, an attacker could use a format string vulnerability to leak the canary value, allowing them to bypass the protection and execute a buffer overflow attack.
-3.
+3. Only mitigates RA-overwriting attacks. For example, if the attacker is able to overwrite local variables or function arguments without overwriting the return address, they may still be able to cause unintended behavior or exploit other vulnerabilities in the program, even if the stack guard is in place to protect against RA-overwriting attacks.
+
+The professor notes that modern compilers (like `gcc` and `clang`) have built-in support for stack guards, and they will automatically insert the necessary code to implement this protection when you compile your program with the appropriate flags (e.g., `-fstack-protector`).
+
+=== Address Space Layout Randomization (ASLR)
+

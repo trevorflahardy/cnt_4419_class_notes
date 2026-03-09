@@ -1569,3 +1569,53 @@ All this information boils down to *a few high level ideas*:
 == Protections modern machines give us against buffer overflow attacks
 
 1. Compiler errors/warnings.
+2. Static canaries (aka "stack guard"): the more modern name is called *stack guard*.
+
+#markbox[
+  Notes hereon taken on Mar 9, 2026
+]
+
+$
+  "Buffer Overflows (B.O.s)" subset "Out of Bounds"
+$
+
+#align(center)[
+  #block(inset: 10pt)[
+    #box(width: 220pt, height: 160pt)[
+      // Outer circle - Out of Bounds
+      #place(center + horizon)[
+        #circle(width: 200pt, height: 150pt, fill: color.blue.lighten(85%), stroke: 1.5pt + color.blue)[
+          #align(top + center)[
+            #pad(top: 0pt)[
+              #text(size: 9pt, weight: "bold", fill: color.blue)[Out of Bounds]
+            ]
+          ]
+        ]
+      ]
+      // Inner circle - Buffer Overflows
+      #place(center + horizon)[
+        #pad(top: 20pt)[
+          #circle(width: 120pt, height: 90pt, fill: color.red.lighten(85%), stroke: 1.5pt + color.red)[
+            #align(center + horizon)[
+              #text(size: 8pt, weight: "bold", fill: color.red)[Buffer Overflows \ (B.O.s)]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+]
+
+#definition()[
+  *Stack Guard*: This technique involves placing a small, random value (called a "*canary*") on the stack just before the return address. When a function returns, the program checks if the canary value has been altered. If it has, this indicates that a buffer overflow has occurred, and the program can take appropriate action (such as terminating the process) to prevent the attack from succeeding.
+]
+
+Usually, generating random canary values is very expensive, and so, the canaries get re-used a lot (the professor notes one per run of a program). So, you put a "random" right before the return address (RA), and/or, in some cases, we can put a null byte (or character). We will then check if the canary has or has not been modified before jumping to the RA. If the canary has been modified, then we know that there was a buffer overflow attack, and we can take appropriate action (like terminating the program) to prevent the attack from succeeding.
+
+
+Sometimes, putting a bit string and a null byte can be combined together. Having the null byte alone still provides some protection. So, if the args growing up toward the RA, and you have a null byte as the canary, then if you overflow the buffer and overwrite the null byte, it will cause a string to be terminated early, which can prevent certain types of attacks that rely on string manipulation.
+
+Limitations of stack guards:
+1. Attacker may guess or brute-force the canary value, especially if it is reused across multiple runs of the program and the canary is not sufficiently random or has a small key space. The stack guard technique relies on the secrecy of the canary value, so if an attacker can guess or brute-force the canary, they can bypass this protection and successfully execute a buffer overflow attack.
+2. Attacker may exploit other vulnerabilities ("vulns") such as format string vulnerabilities or use other techniques to bypass the stack guard protection and learn the canary. For example, an attacker could use a format string vulnerability to leak the canary value, allowing them to bypass the protection and execute a buffer overflow attack.
+3.

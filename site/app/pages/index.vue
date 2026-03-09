@@ -1,5 +1,5 @@
 <script setup lang="ts">
-type View = 'notes' | 'quiz' | 'flashcards' | 'chat' | 'announcements' | 'transcripts'
+type View = 'notes' | 'quiz' | 'flashcards' | 'chat' | 'announcements' | 'transcripts' | 'resources'
 
 const activeView = ref<View>('notes')
 const chatPanelWidth = ref(420)
@@ -13,6 +13,7 @@ const views: { key: View; label: string; icon: string }[] = [
     { key: 'chat', label: 'Chat', icon: 'i-heroicons-chat-bubble-left-right' },
     { key: 'announcements', label: 'Professor Says', icon: 'i-heroicons-megaphone' },
     { key: 'transcripts', label: 'Transcripts', icon: 'i-heroicons-microphone' },
+    { key: 'resources', label: 'Resources', icon: 'i-heroicons-folder-open' },
 ]
 
 // Primary tabs shown in bottom bar (icons only on mobile)
@@ -168,6 +169,20 @@ onBeforeUnmount(() => {
                 <div v-if="activeView === 'transcripts'" class="h-full overflow-hidden">
                     <ClientOnly>
                         <TranscriptsMode />
+                        <template #fallback>
+                            <div class="flex h-full items-center justify-center">
+                                <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-muted" />
+                            </div>
+                        </template>
+                    </ClientOnly>
+                </div>
+            </Transition>
+
+            <!-- Resources -->
+            <Transition name="fade" mode="out-in">
+                <div v-if="activeView === 'resources'" class="h-full overflow-hidden">
+                    <ClientOnly>
+                        <ResourcesMode />
                         <template #fallback>
                             <div class="flex h-full items-center justify-center">
                                 <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-muted" />

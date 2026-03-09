@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "sync:pdf": "node ./scripts/sync-pdf.mjs",
-    "build": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && nuxt build",
-    "dev": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && nuxt dev",
-    "generate": "bun run sync:pdf && nuxt generate",
+    "sync:resources": "node ./scripts/sync-resources.mjs",
+    "build": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && bun run sync:resources && nuxt build",
+    "dev": "node ../scripts/local-pipeline.mjs && bun run sync:pdf && bun run sync:resources && nuxt dev",
+    "generate": "bun run sync:pdf && bun run sync:resources && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

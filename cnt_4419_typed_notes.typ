@@ -5,6 +5,7 @@
   author: "Trevor Flahardy",
   abstract: "Working class notes for CNT 4419: Secure Coding the the University of South Florida.",
   bibliography-style: "ieee",
+  lang: "en",
 )
 
 = What Does It Mean for Software to Be Secure?

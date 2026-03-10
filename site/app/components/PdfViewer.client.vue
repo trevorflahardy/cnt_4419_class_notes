@@ -147,8 +147,7 @@ async function loadPdf() {
     loadError.value = ''
 
     try {
-        const fetchCache = cacheBuster.value !== null ? 'no-cache' : 'force-cache'
-        const response = await fetch(resolvedSource.value, { cache: fetchCache })
+        const response = await fetch(resolvedSource.value, { cache: 'no-store' })
         if (!response.ok) {
             throw new Error(`PDF not found at ${resolvedSource.value}`)
         }
@@ -361,7 +360,8 @@ function queueSearch() {
 }
 
 onMounted(() => {
-    loadPdf()
+    // Always bust cache on first load so users get the latest notes.pdf.
+    refreshPdf()
 })
 
 watch(resolvedSource, () => {

@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-bold text-highlighted">Practice Quiz</h1>
-            <p class="text-sm text-muted mt-0.5">{{ ALL_QUESTIONS.length }} questions across {{ CHAPTERS.length }} chapters</p>
+            <p class="text-sm text-muted mt-0.5">{{ totalQuestionCount }} questions across {{ chapters.length }} chapters</p>
           </div>
           <!-- XP Badge -->
           <div class="flex flex-col items-end gap-0.5">
@@ -36,14 +36,14 @@
               <span class="text-xl">📚</span>
               <div class="min-w-0 flex-1">
                 <p class="font-semibold text-sm text-highlighted">All Chapters</p>
-                <p class="text-xs text-muted">{{ ALL_QUESTIONS.length }} questions</p>
+                <p class="text-xs text-muted">{{ totalQuestionCount }} questions</p>
               </div>
               <UIcon v-if="selectedChapter === null" name="i-heroicons-check-circle-solid" class="h-5 w-5 shrink-0 text-primary" />
             </button>
 
             <!-- Individual chapter cards -->
             <button
-              v-for="ch in CHAPTERS"
+              v-for="ch in chapters"
               :key="ch.id"
               class="flex flex-col items-start gap-1.5 rounded-xl border-2 px-3 py-3 text-left transition-all duration-150 active:scale-[0.97]"
               :class="selectedChapter === ch.id
@@ -104,22 +104,32 @@
         </div>
 
         <!-- Available count warning -->
-        <p v-if="availableCount < questionCount" class="text-xs text-amber-600 flex items-center gap-1.5">
+        <p v-if="!countsLoading && availableCount < questionCount" class="text-xs text-amber-600 flex items-center gap-1.5">
           <UIcon name="i-heroicons-information-circle" class="h-4 w-4 shrink-0" />
           Only {{ availableCount }} questions match your filters — quiz will use all of them.
+        </p>
+
+        <p v-if="countsLoading" class="text-xs text-muted flex items-center gap-1.5">
+          <UIcon name="i-heroicons-arrow-path" class="h-4 w-4 shrink-0 animate-spin" />
+          Loading available questions...
+        </p>
+
+        <p v-if="prepareQuizError" class="text-xs text-red-500 flex items-center gap-1.5">
+          <UIcon name="i-heroicons-exclamation-circle" class="h-4 w-4 shrink-0" />
+          {{ prepareQuizError }}
         </p>
 
         <!-- Start button -->
         <button
           class="w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 text-base font-bold transition-all duration-150 active:scale-[0.98]"
-          :class="availableCount > 0
+          :class="availableCount > 0 && !isPreparingQuiz && !countsLoading
             ? 'bg-primary text-white shadow-lg shadow-primary/25 hover:brightness-110'
             : 'cursor-not-allowed bg-elevated text-muted'"
-          :disabled="availableCount === 0"
+          :disabled="availableCount === 0 || isPreparingQuiz || countsLoading"
           @click="handleStart"
         >
-          <UIcon name="i-heroicons-play-circle-solid" class="h-5 w-5" />
-          Start Quiz
+          <UIcon :name="isPreparingQuiz ? 'i-heroicons-arrow-path' : 'i-heroicons-play-circle-solid'" class="h-5 w-5" :class="isPreparingQuiz ? 'animate-spin' : ''" />
+          {{ isPreparingQuiz ? 'Preparing Quiz...' : 'Start Quiz' }}
           <span class="opacity-70 text-sm font-normal">({{ Math.min(availableCount, questionCount) }} questions)</span>
         </button>
 
@@ -510,13 +520,19 @@
 </template>
 
 <script setup lang="ts">
-import { ALL_QUESTIONS, CHAPTERS, getChapterQuestionCount, filterQuestions, type McQuestion } from '~/composables/useQuestionBank'
+import {
+  getChapters,
+  getFilteredQuestionCount,
+  getTotalQuestionCount,
+  type McQuestion,
+} from '~/composables/useQuestionBank'
 
 const {
   view, questions, currentIdx, answers, saSubmitted, saGrades,
   aiExplanations, isExplaining, explainError,
   currentQuestion, currentAnswer, isAnswered, score, chapterBreakdown,
   xp, xpThisRound, currentLevel, nextLevel, xpToNextLevel,
+  chapters, isPreparingQuiz, prepareQuizError,
   selectedChapter, selectedType, selectedDifficulty, questionCount,
   startQuiz, submitMcAnswer, submitTfAnswer, submitSaText, selfGradeSa,
   nextQuestion, prevQuestion, goToQuestion, finishQuiz, resetQuiz, explainWithAI,
@@ -550,22 +566,59 @@ const SA_GRADES = [
 const saInputText = ref('')
 watch(currentIdx, () => { saInputText.value = (answers.value[currentIdx.value] as string) ?? '' })
 
-const availableCount = computed(() => filterQuestions({
-  chapter: selectedChapter.value,
-  type: selectedType.value,
-  difficulty: selectedDifficulty.value,
-  shuffle: false,
-}).length)
+const totalQuestionCount = ref(0)
+const availableCount = ref(0)
+const countsLoading = ref(true)
+const chapterQuestionCounts = ref<Record<number, number>>({})
 
-function handleStart() {
+function getChapterQuestionCount(chapterId: number) {
+  return chapterQuestionCounts.value[chapterId] ?? 0
+}
+
+async function refreshCounts() {
+  countsLoading.value = true
+  try {
+    const [total, filtered] = await Promise.all([
+      getTotalQuestionCount(null),
+      getFilteredQuestionCount({
+        chapter: selectedChapter.value,
+        type: selectedType.value,
+        difficulty: selectedDifficulty.value,
+      }),
+    ])
+    totalQuestionCount.value = total
+    availableCount.value = filtered
+  } finally {
+    countsLoading.value = false
+  }
+}
+
+async function loadQuizSetupData() {
+  chapters.value = await getChapters()
+  const chapterCountEntries = await Promise.all(
+    chapters.value.map(async ch => [ch.id, await getFilteredQuestionCount({ chapter: ch.id, type: 'all', difficulty: 'mixed' })] as const),
+  )
+  chapterQuestionCounts.value = Object.fromEntries(chapterCountEntries)
+  await refreshCounts()
+}
+
+onMounted(async () => {
+  await loadQuizSetupData()
+})
+
+watch([selectedChapter, selectedType, selectedDifficulty], () => {
+  refreshCounts()
+})
+
+async function handleStart() {
   saInputText.value = ''
-  startQuiz()
+  await startQuiz()
 }
 
 const answeredCount = computed(() => answers.value.filter(a => a !== null && a !== undefined).length)
 
 const currentChapterName = computed(() => {
-  const ch = CHAPTERS.find(c => c.id === currentQuestion.value?.chapter)
+  const ch = chapters.value.find(c => c.id === currentQuestion.value?.chapter)
   return ch?.name ?? 'Unknown'
 })
 

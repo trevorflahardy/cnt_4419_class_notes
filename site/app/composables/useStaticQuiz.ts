@@ -1,4 +1,4 @@
-import { filterQuestions, type BankQuestion, type McQuestion, CHAPTERS } from './useQuestionBank'
+import { filterQuestions, getChapters, type BankQuestion, type Chapter, type McQuestion } from './useQuestionBank'
 
 export type SaGrade = 'correct' | 'partial' | 'incorrect'
 export type QuizView = 'setup' | 'active' | 'review'
@@ -23,6 +23,9 @@ const aiExplanations = ref<Record<number, string>>({})
 const isExplaining = ref<Record<number, boolean>>({})
 const explainError = ref<Record<number, string>>({})
 const xpThisRound = ref(0)
+const isPreparingQuiz = ref(false)
+const prepareQuizError = ref('')
+const chapters = ref<Chapter[]>([])
 
 // Config (persists between sessions)
 const selectedChapter = ref<number | null>(null)
@@ -90,11 +93,16 @@ const chapterBreakdown = computed(() => {
     if (isCorrectAnswer(i)) e.correct++
   })
   return Array.from(map.values()).map(e => {
-    const ch = CHAPTERS.find(c => c.id === e.chapterId)
+    const ch = chapters.value.find(c => c.id === e.chapterId)
     const pct = e.total > 0 ? (e.correct / e.total) * 100 : 0
     return { ...e, name: ch?.name ?? 'Unknown', emoji: ch?.emoji ?? '📚', pct }
   })
 })
+
+async function ensureChaptersLoaded() {
+  if (chapters.value.length > 0) return
+  chapters.value = await getChapters()
+}
 
 // ── Pure actions (no composable deps) ──
 function isCorrectAnswer(idx: number): boolean {
@@ -112,24 +120,35 @@ function awardXp(amount: number) {
   xpThisRound.value += amount
 }
 
-function startQuiz() {
-  const qs = filterQuestions({
-    chapter: selectedChapter.value,
-    type: selectedType.value,
-    difficulty: selectedDifficulty.value,
-    count: questionCount.value,
-    shuffle: true,
-  })
-  questions.value = qs
-  currentIdx.value = 0
-  answers.value = new Array(qs.length).fill(null)
-  saSubmitted.value = new Array(qs.length).fill(false)
-  saGrades.value = {}
-  aiExplanations.value = {}
-  isExplaining.value = {}
-  explainError.value = {}
-  xpThisRound.value = 0
-  view.value = 'active'
+async function startQuiz() {
+  isPreparingQuiz.value = true
+  prepareQuizError.value = ''
+
+  try {
+    await ensureChaptersLoaded()
+    const qs = await filterQuestions({
+      chapter: selectedChapter.value,
+      type: selectedType.value,
+      difficulty: selectedDifficulty.value,
+      count: questionCount.value,
+      shuffle: true,
+    })
+
+    questions.value = qs
+    currentIdx.value = 0
+    answers.value = new Array(qs.length).fill(null)
+    saSubmitted.value = new Array(qs.length).fill(false)
+    saGrades.value = {}
+    aiExplanations.value = {}
+    isExplaining.value = {}
+    explainError.value = {}
+    xpThisRound.value = 0
+    view.value = 'active'
+  } catch (err) {
+    prepareQuizError.value = err instanceof Error ? err.message : 'Failed to load quiz questions.'
+  } finally {
+    isPreparingQuiz.value = false
+  }
 }
 
 function submitMcAnswer(optionIdx: number) {
@@ -241,7 +260,7 @@ Give a 2-3 sentence explanation that helps the student understand the key concep
 
   return {
     // Config
-    selectedChapter, selectedType, selectedDifficulty, questionCount,
+    selectedChapter, selectedType, selectedDifficulty, questionCount, chapters,
     // State
     view, questions, currentIdx, answers, saSubmitted, saGrades,
     aiExplanations, isExplaining, explainError,
@@ -249,6 +268,8 @@ Give a 2-3 sentence explanation that helps the student understand the key concep
     currentQuestion, currentAnswer, isAnswered, score, chapterBreakdown,
     // XP
     xp, xpThisRound, currentLevel, nextLevel, xpToNextLevel, LEVELS,
+    // Loading state
+    isPreparingQuiz, prepareQuizError,
     // Actions
     startQuiz, submitMcAnswer, submitTfAnswer, submitSaText, selfGradeSa,
     nextQuestion, prevQuestion, goToQuestion, finishQuiz, resetQuiz,

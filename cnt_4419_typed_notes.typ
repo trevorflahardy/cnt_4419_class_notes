@@ -1793,3 +1793,4 @@ There are *multiple assumptions* for this:
 
 Limitations:
 - "Mimicry" attack: An attacker could potentially craft a malicious payload that mimics the expected control flow of the program, including the presence of the special codes used for CFI checks. By carefully constructing their payload to include valid jump targets and special codes, an attacker could bypass CFI protections and redirect execution to their malicious code without triggering any alarms. This type of attack is known as a "mimicry" attack, and it highlights the importance of implementing CFI in a way that is robust against such evasion techniques.
+  - Program can still jump to instructions it hsouldn't as long as it's on a valid control flow path, IE stays on valid control flow path.

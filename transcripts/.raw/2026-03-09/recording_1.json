@@ -1,0 +1,5186 @@
+{
+  "source_recording": "recording_1.m4a",
+  "full_text": "I'm going to put it on the course of the... It is in due until after it's time break. So you have some time to do it, but I wanted to give you as much time as I do it. And it gets you the Tuesday afternoon to get the facts right and break. It will be within the event. It's on the right. I think one of the four questions. I've sent it, but the assignment that you've made. Are you on the course web page? Yes, course web page. Okay, I'll look at it. It's working for me, last time. It is for me. Thank you. You've only come to Canvas, but it's available on the course web page. Yes, so you have to go to the course web page. This little bit has a link to the course web page. So you only need to be working at the course web page unless you're not in the camera. Okay, so let's post it and... Right, so... All the more here, please. Any questions about the assignment you go to our key AU end? It was held in the front today. Okay, so send any questions about the assignments to you. Are submissions on Canvas? I know that's on the subject box. Yes, yes. Yeah, the assignment explains you need to submit it on Canvas. Yeah, so please read the assignment. I hope we answer those in your question of business about it. Okay, any other questions? Remember we have the test coming up next last. What's the days? Maybe, maybe. Anything you look about through me in the past today is fair game. Okay, where are the tests? Also, you know, all the way back to day one of the courses is fair game. I know you said all exams are key motor including quizzes, but are you... Do you have a tendency to focus on the later material or is it equally key motor? Like anything? It's something... Anything is fair. I mean, right. If you put yourself in my shoes, you can start to think about what's important. If I talk to you about it in class, I think it's pretty important. And if you think about it, how much time have we spent on buffer overflows? I would bet. I haven't had the test yet. I still need to make this test, but I would bet that the buffer overflows will work better. So, you know, you can kind of think through that. I think it's a lot of time. I would also be here. Everything's fair game, but you know, big topic like buffer overflows. I want to thank you, Mr. President. Would you expect to be a group of questions? I think that if you're on the internet, you can ask me to hire a semester. I just should. It's all fair game. Okay. Any other questions before we start covering any of the material? Okay. So today we should be able to wrap up buffer overflows. Actually, the timing and the test are pretty good in that sense. So, I want to make up where we left off last time, remember, what we've been thinking about. We've got protections for buffer overflows. We talked about what needs major protection. Maybe the most important practice are the in-exfits. And then we talked about, well, the factors can still succeed. It's high to mid-exfits, and we talked about how back it happened. And then we also discussed protections that we as secure coders can put in our code. So, things that we can do, I'll lower some of those. Like, is secure coders how can we mitigate buffer overflows? Okay. So, I'm not talking about things like in-exfits. When I ask a question like that, if something like that appears on the test, specifically referring to lawsuits like application coders. They were not using the in-exfits, but were not coding in-exfits. They were that's a hardware feature that the operating system will put in place for us. Application programmers, you know, touch the in-exfits. That's just in place for us. One of us that had these things organized in our heads. So, in-exfits, but that's not really for us as secure coders. So, secure coders, what do you do? Check the read-exfits. Yeah, that's a big one. They're good. That's really addressing the root problem that you're using. Check all the read-exes. Any time you in-ex input array, you want to make sure that your index is in balance. So, in fact, this is probably a good time to mention that we have, like, this class of attacks, or we've been talking about buffer overflows. Buffer overflows are a strict subset of a broader class to be out of bounds. Accesses. So, like, out of bounds, writes, for example. That's really what we, all of the buffer overflows we've seen have been out of bounds, writes. So, like, we're filling them buffer up and then we're continuing to write out of bounds. Like, out of bounds, further along than where we should ask. So, out of bounds, writes. There can also be out of bounds, reads. And we'll talk about that. Probably we won't get to it today, so that'll have to wait until after we reach. And we'll talk about that. This is good for you to organize your thoughts. So, anyway, checking the array bounds before you access them, that's really big. I want else. Yeah, yeah. So, right. And it has to screen the two ideas in one is, so, like, you can use the St.Pur versions, like, the in-area versions of things. So, there's one idea. In-area versions of library functions. And another idea would be to use a St.String library. Which is what assignment one asks you to do. Like, on assignment one. Use the St.Pur string library. That'll help with some buffer overflows. Right. String these buffer overflows. I turn on P.V.S. out. We talked about there other problems, like, you could have a buffer events. And, you know, if you're not checking the array bounds, you can still, you know, overflow buffer events. Yeah. And I'd say language trade. Yeah. I'd say language would be another really important idea for what we as secure coders can do to many gaveover overflows. And if that one, I think we hit all the main points we talked about in class, what we as secure coders can do. And so, now I want to continue our discussion of other things that maybe are a little further outside of our control. As secure coders, those are the first one. You know, this is something we implement with this is something we as secure coders can use. Basically, when I'm getting at your initial protections beyond an expense, then it are helpful for us as secure coders, but not really things that we can control ourselves. So, we could use compiler errors in mornings. We talked about that. You know, it asks a lot of compilers will give you a warning or an error if you try to use it as, can you try to invoke it as other 12 though? Okay. Depending on your bill scripts, you may be ignoring warnings at whatever level your compiler generates them for that. So, this can be helpful. It's not foolproof though. Okay. And others of those unsafe library calls, there could be no warning for them. And remember, we talked about a lot of such compilers. Strength and care, strength and foundation, strength and copy, all of those stand, standing functions. Next one. Okay. So, that's where we flattened off the class. Okay. Next technique is stack communities. Okay. It's kind of like stack communities is the more generic name of the common more specific name is called stack hard because this is the techniques first name by the creators of the technique. It's really interesting paper in here, if you have extra time, you can go read. I think it's from like 1998. The research paper that proposed this technique called stack hard. Very interesting because when we look back historically at it, it's like in my graduate security courses one, the paper I pulled up is an example of what not to do when you write a research. It's really interesting from that perspective because it means grand claim to about how stack hard will prevent all of our overflow attacks. And that's really not true. Okay. So, this is why, and of course like this, we emphasize, okay, what can we do? Like, why can we prove about security mechanisms? And if you start thinking logically, you'll see that stack hard, which we'll talk about now, stack hard doesn't provide. It certainly doesn't know what a buffer overflow is. Right. You know that because buffer overflow is remain one of the top categories of the tasks. Okay. So, none of these techniques have been buffer overflow. These are, was there sometimes called speed box. Okay. So, stack hard will insert a fanary here. And so, this is like a generic coal mine. Is the thing about this is some random big sequence. And the idea is that then if the attacker overflows a buffer, and he tries to like overwrite, overwrite, overwrite. So, this canary, the attacker would have to overwrite it in order to get to the return address. And his canary is intended to be a super value. The attacker won't know. Hard to guess. Hard to guess this canary about. And then when the function finishes, when we're returning the kernel function, and we pop this frame off the stack, we jump to the return address at the same time. But right before we jump to the return address, we'll check to make sure the canary hasn't been modified. If it has, then we hope a program. We raise an exception, a security exception. Okay. So, let me help try and make a few notes about this. Our game will put a while. You can think of this as a random and practice for efficiency reasons. Usually, these canaries are pretty used. But as I like, you start up a program and maybe your operating system is just using this to make an area on all programs throughout its life. Maybe refresh is a canary once every time you start a new program. Really start thinking through this technique. You can see, well, even better would be if you have a unique, like a fresh canary on every single frame. I don't know of any implementation that does that though, because the performance hit. So, generating random numbers, random bits, is an expensive homage. And we want this to be random hard to guess. So, it's even more difficult than just random, it's quite easy for me to use this spring. Remember that? Perfectly graphically strong. Okay, that's very expensive. Okay. So, people want this fast. And also, they've been used as canaries. A lot. So, maybe all the canaries on a given machine are the same throughout all programs, all frames and everything. So, we'll put a random. And again, this means like, cryptographically strong random number, random bit string. Right before, right before the return address. Again, normally it's just one canary program, maybe even for many runs of a program. We'll check canary, passons, and modify. Okay, so before we jump to the return address, we'll check the canary. Make sure it has been modified. Okay, come. Well, how often, how often are, well, like, this is operation. Like, step A, how often does this happen? Every single method in visualization. Okay, step B, every single method, return. D and D, these are common operations. Okay, so security engineers would worry about the running time overhead from this. It's a one technique would be okay. And we will get less protections, but we can still get some protections if, what if the canary pages make it all zeroes? Put a random bit string. Right before the return address. Or in some cases, people just put like a null, a null like a null character. Why would you do that? The null character doesn't really give you the same security protection base of weaker. So weaker protection, sometimes these are common, right away. Okay, so the attacker will know this null function. If you just use a null by the attacker, put over it with the zero. Okay, and then modify the return address, everything will look fine. But having a null like here still provides some protection, which is now, if any of this data gets interpreted as a string, the null like here will terminate that string. Okay, in terms of that, it mitigates some mother tax, we've actually hopefully won't have time to talk about it later today. Sometimes attackers can actually like read some of these values off the stack. Okay, so if you put a null by right here, in guarantees that any of this string reading is going in before this one. Okay, so that's a similar idea. So I think I should say hand or an old character. Okay, because you could do both. Okay, so this is the big idea of stack bar. Any questions about it? Yeah. How do we check that? How does it look like? Yeah, right. So the executable code will have hard coded this canary. So it'll know what the value should be. These are before you return from a function, it'll check that this value is what you should connect with the month bus. Well, so this is one of the potential ways to circumvent stack bar would be what if an attacker does know this canary? Well, then the attacker can overwrite it with the correct value and then overwrite the return address. And the code, the check will say, okay, well, an area looks good. Okay, so this will be one of our limitations. Okay, well, and there are different ways an attacker could be here. An area plot would be just like root-forced. Basically root-forced, hopefully you all know this term right. And 11 passwords a lot. So you see the idea that the attacker could just try all possibilities. And then with passwords, that's why you get locked out after a certain number of failed attempts to mitigate root-forced tasks. Okay, well, same idea with stack art. An attacker might just try all of these. How many of these things usually? Well, you have to remember, we want this to be highly optimized. We want to minimize time and creating the random bits. The word maybe even half of the word. So maybe a couple of bytes. Or write the most. And within the realm of possibility and attacker may be able to root-forced. Canary. Oh, one. An attacker. Name. Let's say yes. Or, root-forced. And I hope it's clear if an attacker knows the Canary value then this technique doesn't give you anything. Okay. So once you've hacked this technique, roll-wise on the secrecy of the Canary. So it will depend on the system when- so the question is when is the Canary generated? Some systems will generate when you load up the operating system. When you install the operating system for the first time. And they'll just use the same Canary over and over. Others will like every time you start a program. Program startup. So that may be the most common would be like, you start a program. The Canary gets you in there even once for that entire program. Okay. So the same Canary value will be used everywhere on the staff. Okay. Okay. Well, a similar limitation is an attacker makes more other vulnerabilities. People don't actually bring the Canary off the staff. Okay. So there are other kinds of memory vulnerabilities that can give you the power to read values on the staff. And we'll talk about that. It would say if not today then right after. It's like an arrow. We need to name for it. So attacker may like exploit other vulnerabilities. Other vulnerabilities. And I'll say, for example, FormatString attacks. FormatString vulnerabilities. Okay. This is my attack. We'll talk about next after we finish buffer over close. So the attacker makes exploit other vulnerabilities to learn the Canary. And once the attacker gets a Canary, StackArt is useless. If anything, StackArt is like a negative at that point. It's just slowing everything down. Oh, and by the way, there are like, there's been a lot of research papers written about these things too. Okay. So attackers have a sophisticated toolkit to proceed over around these first two options. Yeah, right. Right. So the attacker may be able to use those like reverse engineering techniques and exploit problems with the random generation of algorithms in this stuff. It's like sea spring types of vulnerabilities as well. Usually as long as we're using or as long as our system is using like a standard sea spring library, we think of like sea spring vulnerabilities as being very sophisticated to figure out what to find new vulnerabilities like that. So usually we think of that as like, wow, that'd be like a nation state. Not some small person with huge resources. Okay. So the third one though, I think the third one is the most interesting. Because these first two are just like, I don't know, maybe more obvious. Like maybe it's relying on the secrecy of the community. Let's take this through the secondary protecting. So what did we talk about is powers in a pattern by overflowing. What could they disrupt by overflowing lovers? Yeah, change arguments. We're not protecting the arguments at all. An attacker who may know overflow one local and overwrite another local. Overwrite arguments. Let's see what about another segment. We're just talking about the staff. Keep these above her overflows completely uninfected. Overflows on global. So we're only protecting, we're only adding one mitigation and one segment of the program. This one mitigation is helping effecting one of the data one pointer. The attacker can overwrite any of the other pointers. Are there other? Yeah, so you can and you could with the areas in the e-bid, I don't know many widespread use of that thing. The original research paper does like fear eyes about these extensions. The run time overhead gets like four years of magnitude higher. So the reason this became popular and I have talked with some of the people who have come into this. They said the reason was we liked it because it's even give us something and the run time overhead was around five percent. Five, six percent run time overhead. When we look back now, I'm not sure that the engineers of today would make that same decision. Because five to six percent overhead is still something and this cost benefit, I'm not sure if people would still decide to support it. All the sophisticated tools that the attackers have to get around this and do other things. Okay, so let me say only mitigates R-A-L-H-M-N. So would you say one of the limitations on the downsides of this that is mining trees the potential for false positives? False positives, I can say we really don't expect any false positives. I would say false negatives here. This is a really good question. This is right before our test. False positives shouldn't be of the yield here because there's no reason that the engineers should be overwritten. There's no way any legitimate overwriting of a container should happen. Again, it should never be changed. It should never be written to. Once the return address is on the stack, that shouldn't be modified either. So you pop the frame so no modification should happen. False positives, no. False negatives, yes. Those first two techniques we pop about the first two limitations as we give us false negatives. Let's give a review of our terminology from earlier in that semester. So that's what I'm going to say about that technique about the stack hard. Okay, the next one, address-based layout or endimization. So why is it that I read just a few questions? After the whole frame pointer is because the attacker may overwrite values like these local rules or arguments. The attacker may overwrite these things. So we want the canary at the end of the group with the canary down here then it wouldn't protect the return address. Because the right could just have end and overwrite the return address. That's why the canary isn't. The better it explicitly chosen, the place been right before the return address. And fairness, that is a special pointer. It makes sense for a security perspective one of the factors of this special pointer. So you know, stack hard gets us something and that's going to be true with all of these. Okay, so this is all the spectrum. This is all cost-fantated analysis. Okay, if you really want whole safety, then go into a high-stay point. Everything else is trying to find a balance where we still get a lot of the performance benefits of C and C plus plus. Okay, but we're not going to get the full security of a tight-taped language. I've saved language running more slow. I see it's going to be in a way in general. I don't know if they're with that. So all of these techniques are still trying to maintain as much of this performance or make it trade off a balance. You know, it's like unprotected C versus, you know, a type-safe, type-safe language. And then you have just like, unprotected C. Okay, so all of these things are trying to make different trade-offs in here. Okay, we're trying to get some of this performance. Some of the performance benefits, you know, and some of the security benefits. Okay, going all right with that idea. A lot of times students get stuck on that. Like, oh, they're not perfect yet. Like, now these are going to be perfect. If you want perfection, use a type-safe language and just take that performance. Only reason we care about these other ideas is because they're giving us something. Without taking away too much performance. Okay, so address states layout. Randomization. Okay, next technique. By the way, so stack our expected to be running off pretty much all of our devices. So, it's like, you know, modern machines are using standard. I was saying like, I'm going to say a lot of times I've been using this before. I'm saying type-safe language in general are expected to have works performance. Then weekly type and type. Okay, so like machine code, you're probably at the highest performance. Okay, and again, you know, I'm going to plug in hybrid sports. We talked about this and we can write some machine code and we can carry it. What a compiler is going to write it in. Again, order back in different. Okay, so if you really want high performance code, you handwrite. Handwrite. Okay, if you have the time, like the personnel, to do that. Okay, and then you have like a language license. Pretty close. Pretty close to, you know, it's a low level, pretty low level. Now, and then you go up to the expected language. Generally, it should be slower. Even something like Russ. It's intended to be extremely efficient and try to get close to see. It's generally done for me as efficient as possible. If it provides a lot of protection, so it's going straight on. So you said you wanted protection to get it like the same. Let me let you hand out proper loads of type-safe. Correct. Yeah, yeah, good point. Yes. So as we discussed, assuming the type-safe, the type-safe is implementing correctly, you will not have upper overflows and type-safe programming languages. Okay, you really should know that any of these out-of-ounds rights at all. Okay, so type-safe languages will protect against these things. So you can see why type-safe language is, but in this course, we also call strongly type languages why they're so popular. All of these modern languages go Russ, I mentioned, a little less modern, rather than Java, C-Charp. All of these things are very popular, strictly language and Python, Ruby, all take takes. So you don't have to worry about these things. And then, if the point is once more, programming in C and C++ requires extra peace. Okay, like you need to know about these things. Go and post it online. LLN Genericode may have upper overflows of 100 billion years in here. You need to know how to out it. Okay, ASLR now. Okay, ASLR is another one that's up popular. This is why we use it. Okay, so the idea here is, well, let's try to make it harder for attackers to guess or figure out pointer value. Okay, so we already saw, like, Sackyard protects one pointer, one kind of pointer value, or return after. So it's a pointer value. We end up updating our programming counter to, it's a code pointer. So, if you can see, like, yeah, to an attacker, these pointers, like code pointers, but other pointers as well are, you know, powerful. So what if we were to technique where we, if I could make it harder to guess or figure out pointer values, and that's what ASLR tries to do by trying to put every program segment, every memory segment, and make the ASLR as for that memory segment be brand of eyes. Okay, so maybe a program starts, and, you know, what are our memory segments again? Another good review of questions, sort of, Sack, that we need to know. Data. We have rules. Yeah, let me go under text or whatever. Okay, well, so with ASLR, maybe you, like, maybe you send logical addresses, maybe there's, like, a break on each of these, and there's not of them, might be a base error, maybe you keep these two in a base and with the loading value, we talked about, but you separate these other two. So the idea is that the base address for each segment will be brand of eyes. So that way an attacker can just know because he's tried it on his machine, and he knows it, like, oh, well, the kind of base address of the Sack is whatever, you know, the option, text address. Now the attacker maybe has to go to another step to try to figure out, like, is this Sack even begin, the memory? It might be different, and it's expected to be different on every machine. So what works in the attacker's lab may not work on a base, though. The attacker can just hard-pown one address here, or, you know, same, the attacker can just know, like, oh, I have a point, you know, the return address, and you can write here, because this is where I want to go. So the unknown base address, there's a long time. That's the big idea of the A-S-L-A. So, brand of eyes, and the locations, all the segments in memory. The pointer, like, the concrete pointer values, the actual pointer values, the bit strings for each address, will give her the sheet in the machine. Minotions. Okay, well, so what's important for an attacker now? Now, like, another, really, what we're doing is we're making another secret. Maybe thinking about Stack-Art as, oh, there's a secret. If the attacker gives a secret, then the mechanism is worthless. So there is a canary here. So what are the secret, as well, the secret is moving, whatever the base address is of each person. You have to get it, and if you keep this separated, and it's on, then that may have its own base address. And it could be top or bottom. Okay, so, only, what's the attacker? A, split, other vulnerability. Okay, so it's the same limitation that we had with Stack-Art. Anther may exploit other vulnerabilities, or the same example as before. Again, for example, you know, formats, training, vulnerabilities. Now, two, learn the base addresses. So, like, if you think through this, if an attacker can get one known pointer, say, into the stack, the attacker will know, or could know, from running on his own machine, he kind of might know, okay, well, this thing I got, this pointer value for, is I didn't offset, oh, whatever, from the base of the stack. Okay, so, to give one pointer into the stack, one pointer into the E, and your global, and your code, maybe one pointer will uncover the base address, or that, say. Everyone already knows that, because, like, once an attacker gets this address A, will be attacked, will know the offset, the offset, from the base, from the base address, the offset, to get the hit. So, the attacker already knows how. Okay, just from, like, running the program through the logger, you know, you can't go just now. Oh, well, you know, A is like, whatever, you know, 100 bytes down from the base address. Okay, so if an attacker gets A, then the attacker just attracts, or, say, here we're going up. So, adds 100 to get to the base. So, once one pointer value is leaked, then ASLR is, you know, we've sort of committed ASLR for that second. Okay, if we get a pointer into the code memory, then we, we look to see, we, we, the base address, because the attacker will know the offset. We're not ready to have, or we can assume the attacker is good enough offset. Yeah, well, the attacker will know, okay, so the attacker doesn't use A to have to wait, oh, the offset. So, the offset, the attacker can know by running this program in, you know, his own test environment. Okay, so the attacker can run the code through, like, the logger, and you can see, okay, well, on logger, you know, A is 100 bytes down on the stack. Okay, and this program, when he's running this way, is going to put A 100 bytes down. Okay, so if you need A, how do you subtract, or you, in this case, add 100, because we're going up, and that'll give you this top address. Okay, so sometimes the base address will be considered down here, and the lowest, in which case, you subtract. Okay, so the base of the sort, the first four machines, but get all sorts of stuff. Correct. Yeah. So, we mean the programs run the same way, the offset will be the same. So, all this is doing is, for its locations, when I say locations, I'm really saying, like, your base address. Base addresses of base addresses. It's not like every value within the same name is randomized, like, it's a random location. It's just the base address. The one-cent attacker gets a single address, a single pointer into that type of name. And assume that they have the base address as well. So, you mentioned on the canaries that it is expensive on the overhead part to generate a bunch of keys every time. Is it expensive to randomize the address on these? Yeah, well, so, right. How expensive is it being, if you think about it, this is a great question. Well, I should be writing the test. So, you know, what I think about this, how often is a stack-art operation happening? Okay, so, there are different parts of stack-art. There's like, creating the canary to a front. That maybe only happens once in the beginning of the program. Maybe we're creating one canary, but then we have to push and pop the canary every time we invoke or return from a function. Okay, here, what are we doing? Well, we're creating, I don't know, three to four random base values. Okay, so that's like more random number creation than a single canary. So, a little more overhead there, but there's no extra overhead on the function returns, function calls, any of that stuff. Okay, so this, you kind of hate the price upfront. So, you mentioned for the canaries that you could do a term method and then with refresh, that's a different one. Okay, yes. But with canaries, let's assume that, like, can practice, let's assume that canaries will be expert given program. Okay, so the stack will have all equal canary values all the way up. So, this is technically more efficient because it only does it up front and then it doesn't do it anymore for the early beta run. Yeah, it depends on the program. Right, this is where we get into engineering, right, because it only does it on how many function calls in return to have. So, like, stack cards really fast when you go and invoke conflusions. But this is going to be stable, no matter what, because you have to generate the front up front. So, this may vary, this will always be the same. This will have some upfront overhead. This is another key where I think in breakfast back, and then people are okay with this, but people are much less excited than they were about this initially. Because, you know, we're kind of like stack cards really tough. Over time, people have found and created tools to circumvent this. But it is very popular, I expect it's on and it's running on all of our machines. Okay, podwildo, we've got one similar limitation to stack cards. Now, there's another one which would be just like before I just reversed the order. But, you know, the stack card, I think, is limitations on and on too. Those may be the same as they may be just in the opposite order, which is, you know, attacker being group force. Or, you know, guess, guess, or group force. These addresses. Okay, what about, so remember, a third limitation from stack card was only the return address is protected. We have a similar kind of limitation here. Well, these products, more than return address, right? Yeah, since it also protects return address. This is really protecting or was it a 10-D? Yeah, so the base address, which in turn protects, you know, any time the attacker tries to override a pointer point to something, you know, some particular spot. It's really, this is protecting attempting to protect point picks. Well, can buffer overflows do bad things at non-pointing values? Yes, yes, they can. Okay, so you can still overflow buffers and override everything else with no issue. ASLR won't stand in the way of that. Okay, so all these things like, oh, it looks like the right, secret keys, you can override objects in memory of them. And the heat and the stack, anywhere. As long as it's not a pointer. Okay, so, um, the values, I guess, are saved only to try to protect. Pointers. Pointers, and again, that would include return addresses. Return addresses are kinds of points. So I could only see this as protecting, sorry, I could only see this as mitigating attacks. Okay, so what is this crime mitigating behavior being? Okay, so suppose we have no stack art. Okay, so predicts stack art, both of you just have ASLR. Okay, so ASLR is in place. Okay, so what we do with the next one. So the attacker wants to overwrite some return address. He's going to get overwritten to point down here. That is specific spot. Okay, well, so the idea of ASLR is, you know, the attacker catches hard code this value anymore. Can't just overwrite return address is some fixed constant value for all machines. And now the attacker has to know, well, what's this address? It's a really good one, I was going to say, you know, the base, and then add some offset to get to the actual, you know, attack address. Okay, so this is what's really happening is, we made it, we've added an extra step, where an attacker doesn't know that, like, it's to overwrite the return address with, to get to exactly right here. And because it's going to vary machine machine, because B changes on each machine. Every machine has a different E now. Okay, so now really an attacker needs to run, a separate attack. Okay, step one is find some pointer in the code. Okay, use that. So maybe the attacker gets this, so this is like a prime. And now the attacker concludes this, concludes B, because the attacker knows this all session will prime. Okay, so the attacker gets a prime, the attacker, you know, pick your towel, no prime, but just running it on the test environment. Okay, and with that, the attacker goes B, the attacker also knows O, from his test environment, and then that gets finally disabled. I don't know if maybe this is just pointer or anything, so taking, one to know some pointer in your code memory, then that allows you to figure out everything, assuming the attacker knows the layout of code. Okay, members, thank you. What are the others looking for? Uh, yes, no offsleds are winning the attackers, hooding code in on a, like, a data segment. Oh, so it's not a problem segment? Okay, yes, like no offsleds, you would hope wouldn't be in a memory, although, you know, with variable length instructions, like we talked about variable width instructions, you could have no offsleds unintentionally inside this code segment, so that would look like a good help. Okay, but no offsleds, we think it would be more like, it would have a means to do it, so the attacker would like, like, a thousand no offsleds, and then unboying, and, uh, they could say, remember, yeah. I'm just told that confused on this, I understand the concept, and how an attacker can find out the upset, but how do they get the 8th problem? What's the method here? Yeah, so there will, we'll see, uh, there could be other techies, and it might be used, to figure out the 8th wrong, okay? And that would be things like formaturing vulnerabilities. So there are other ways an attacker might, for example, as an attacker can leak the return address, wonder return address, well, that would be something. That would be a pointer somewhere in the code member. Once an attacker can leak some say code pointer, such as a return address, then the attacker has this, this 8th problem. So 8th problem is only available through explaining other vulnerabilities. You can't find it unless there's another vulnerability that allows that in the first place. Um, right, yeah, okay. Right, so the attacker could explain some other vulnerability, to figure out the 8th problem, and with that, you know, the attacker will assume no so prime and no, so the attacker already knows no and no prime. The attacker gets 8th problem now, the attacker can get it. I don't know, or even this idea, and again, we'll see examples, but it is basically that idea, the attacker can leak a return address. Well, that's a pointer in the code member. Okay, so once in a week, some code pointer, the ASLR is gone. Like the ASLR is gone. All right, how the workflow integrity is the tower last one? There are the last techniques. And again, as we're going through these, hopefully you can see these are things that are programs we can manage, but they're not things that we as senior coders are in control. Okay, we can use, we can use these, not from others, and things, we use these techniques, but we're not implementing them ourselves. I'm assuming we're the application program. If we were the operating system programmer, then we'd be getting into things like SACR and ASLR. Okay, so the operating system, and I'm assuming these things. Okay, same with control flow integrity. Okay, so control flow integrity is based on a simple idea, which is that our machine code could more state our program never jumps inappropriately. Okay, so in our developer overflow, a pack example, we had like the attacker in the classic version, the attacker was jumping to some malware, that the attacker embedded in the stack. Right, and so we don't want that. Okay, and X-Pay, so we're dead back. Well, the Indian attacker maybe can jump into good memory and like some convinced security checks, you know, Ron makes a act called do all these other things. Well, control flow integrity will try to prevent that by saying, okay, anytime there's a computer jump. So for any computer jump, instruction, is the brand machine code. The machine code has some instructions that are computer jumps. This means that we don't know statically where we'll jump to, if it's a security branch. Like a branch, if some values zero, it's a branch if register one is zero, a branch over here, otherwise it's all free to the next register. If that would be a computing jump. Or you could say jump to whatever's in register class. There are no may with these ideas. Machine node often has other kinds of non-computed jumps that are just like, hey, jump directly to this address. So we statically know where we're jumping in actions. So it turns out with these overflow attacks, and actually a lot of C, C plus plus attacks, the big problem is that we're jumping in executing code that we never should be able to. If you look at our control photograph, if you look at the sequence of instructions that are followed, this would be a correct graph. So maybe from this instruction, we could either these two next instructions. So let's say we execute this one. And from here, maybe this is another branch instruction. And it could execute one of these two possibilities. But now maybe there's some attack going on. And the attacker has actually made it so that we jump not where we should be jumping. This instruction. But now we're jumping down here to some instruction that should never follow this one. Like statically, we know that only certain instructions could follow this one. And the attacker actually is making us jump to places we should never be able to execute. So if you go back to your notes, if you think through it, you'll see this is a really common pattern in these attacks. OK, so control flow integrity. This is a control flow graph. And so this mechanism, CFI, is intended to force the integrity of the control flow graph. In other words, the graph, the control flow graph, can't be modified in these weird ways. And runtime. So how do you get to where this will change in other description? Yeah. So this will modify instruction. It will modify code. They implement CFI. So a compiler, the compiler can be modified just like it would be with stack hard. And so there the compiler is going to be modified to do all the canary work. Here we're going to have to modify the compiler to add certain things. So what we're going to do is before any computing jump instruction, we're going to have a check to make sure that we're jumping to 1 of the allowed destinations of this jump. So every jump has some set of destinations and structures. So we have a control flow graph. There are lots of ways you can build these control flow graphs here. And the disc technique, it'll be instruction. Here's a node in the graph, where a vertex. And there's an edge from iKJ. By the way, this is a directed graph. A directed graph. It is directed to the diagram. So CFG's are diagrams. Each instruction is a node. And the existing edge from iKJ when instruction J, and immediately follow instruction i. So now with CFG, CFG is going to use the control flow graph. So this is intended to protect against wrong changes as well. Yes. OK, so this, well, it's hard to mean to be subjective. But I would say this provides the strongest protections being that we'll talk about. OK, so this isn't perfect. This has one of the patients who has a control flow. OK, so before any jump instruction, I'll check that the destination is valid. OK, how are we going to do that? Well, OK, so we're going to implement this by real embed. Match every valid destination. Like a special code. OK, turn it out. I don't know if you want to spend a bunch of class time knowing you know this, but it turns out this special code doesn't have to be secret. The attacker can know all these special codes. OK, but we're going to put not going to call it a secret code because it doesn't need to be secret, but it's a code. And technically it needs to be unique within the code and remember that I'll just say a special code. Show a few code. OK, and then we'll check before jumping. For the crank code. OK, so this is being embed as special code. The way this is can be implemented is you would have like a no-walk here. OK, so we're going to jump now. So we're going to jump. So you're jumping, well, maybe you can range. It's a branch. Branch in zero. Branch of zero on, you know, register five. OK, so this instruction could. If r5 is not zero, the instruction might just fall through to the next one. You'll have a program with assembly before. OK, so you know, it could fall through, but then otherwise, so we'll say otherwise, some branch. If r5 is zero to, I'm going to call this like program point number one. And then I'm going to label this program point number one. OK, so this instruction, this branch instruction, it could fall through to the next instruction, whatever it is. Or it can jump to a no-walk with a code. So we're going to embed a code inside a no-walk. And it turns out many instructions have this capability. I mean, in fact, now Intel has added this as a new kind of instruction for this technique. OK, so you would have this. And then you would have the normal code that you want to run here. So like your normal instructions. OK, so to hand jump here down. So now, before you actually do this, you're going to do a check. Like, hey, is register five actually zero? Anything is, then let's jump down here. So we embed at the destination some special code. And then we're going to check. And so up here, we're actually going to check the code beforehand. So there are different ways you can do this. I guess I'll check the code. And you don't have to put it on. Where are we going to jump in? I'm going to count more. OK, so that is if you check before you do the jump. And at the jump destination, you've been betting a code in a way that it doesn't affect the computation. OK, so this does have runtime over time. Every computer jump now, you have a check. In the clouds, ways you can implement this. Like, you can reuse the same code throughout the whole program. And all of the code memory, every computer jump could use the same code. Like, you should think through that. What does that mean? Why would you want to do that? You put the same in every valley destination of a jump. You put the same code in place. Does that mean anything? You can get a report code before you start. Yeah. So that's going to improve efficiency a lot. OK, because you're only generating one code, checking for one code. Does it give you an A-E security benefit? It can't be attacked because it's not code. Yes, the attacker can't override code memory. So we're assuming that the attacker is not able to write new code and be able to send the attacker can like, overwrite code memory. We rely on it in a function that's sometimes well at the NWC, on no write code, it's a non-writeable code memory. And also, so this is one of the assumptions, I guess. OK, that's one. Another one is the index bitter place. OK, so it's called non-exput data. So that means like, you know, index bits are in place. And technically, there's a one last assumption, which is that these special codes are only used for this purpose. OK, the special code is never used for any other purpose in code memory. Because why? If they were, then those would be marking valid jump destinations. So any time this special code appears in memory, it should be marking a jump destination. This is called the unique assumption, which is that codes only appear in valid testing. So it's only appeared in valid jump destinations. OK, so let's assume that our programs are using the exact same code everywhere. So every possible place you could jump to has the same code. And before every computer jump, we check for that code. Does that get us any security benefits? You've done the same code from the company unique only for children of the same parent. No, so in this case, I'm saying, so I'm doing, having us think this is another case of a big spectrum of possibilities. OK, so one end of this spectrum would be used to use the exact same code, the special code everywhere. And every embedded, every, you know, in a no-op, it's every single possible place you could jump to. OK, and before every jump, you check for that one code. Does that get you any security benefits? Oh, that's a good case. So I think it's a good case. Perfect. It may engage jumping in some places it should never get valid destination. Like remember, we talked about jumping to so convince security checks. Like you're opening a file. Well, you should only be able to jump to the beginning of the file open code, where it does the security checks. You shouldn't be able to just jump around the security checks. Just jump straight to the code where you open the file. It's also mitigates what else. While remember, we talked about the rock chains, they could have variable width instructions. This may engage that. Now you can only jump to a valid beginning of an instruction. So this still, even in this simple version, it still gets you some nice security benefits. And then like at the other extreme of the spectrum movie, you can think of it as every destination has its own unique code. So you never reuse these special codes. And then like before you do a jump, like here, you can check whether you have code C or C-pronged. It could be this. OK, so you can do more checks. But if every destination has its own special code, you need code in here. Now we get a blog finder granularity control. So now we're checking, OK, I'm only going to allow us to jump from one of these two locations. If you reuse codes everywhere, you can jump from here to this one. And because this is a valid jump destination. But now I can only be unique codes everywhere. I can only jump from one of these two, allow. I don't know, OK, with that. OK, so like CFI is a framework. And you could have this spectrum of implementation and possibility, a trade-offs. More different kinds of codes here than fire granularity, better security benefits, or just reuse the same code everywhere. And then you get the soft security benefits, but also faster. If you created a unique special code for a unique jump, wouldn't it become more expensive over time? It's just not worth it. Yeah, and right. Yeah, and so it turns out there actually breaks the whole due to optimize this. So like, for simplicity, I'm talking about like this. Really, you could combine these into an equivalence class. And you could say, well, CNC prime are valid destinations of this one. So I'm going to combine those into like one equivalence class called C double prime. And then the vote have C double prime here. Because nothing else, let's say, might jumble them, although it is based on these colors. I'm just saying there are optimizations that you can do to minimize this. Without any optimizations, though, this is in square. And a lot of times people are OK with adding in square to memory size. Because it is in square and running for addition. And this is a lot of extra details. So the example you're saying about jumping to bits of code of reusing the same code throughout the entire program. And let's use the same example with files. You want to do the security check. But the after the security check where you actually see the code is a valid destination. So what does that provide? It may not be a valid destination. I think it depends on how they go. It's a good one. Yeah. It may not have to be depending on how you set up that. OK. Yeah. That's an example. In general, we can think that the part after security checks may not be a valid place you can jump in. OK. And you can control all of this with CIPon. So you can say what's a valid destination. And you could eliminate as a possibility something that in theory, maybe in the machine code, it could jump there. You could say, no, actually my policy, my control flow policies can come down. OK. I believe the first two points are not necessarily CIPOs. Coons at a attacker like add a publisher to the file and the same code to the other two. Yeah. So the attacker can write code memory. So the attacker can add new versions of these codes in memory. OK. So the attacker can, if the attacker does have a code that's here, you'd like the stack. The attacker can jump in memory. OK. So no one in the code doesn't help the attacker. Because you can jump in with all the stack with the main machine today. And you can, the attacker can point the code in memory. I think you're good. So what are limitations here? We have enough time with quickly limitations of CIPO. OK. And I have one. OK. It's a big one. Maybe some of you are starting to think about this. But it's an idea called mimic green. It's a green. It has. So this is where an attacker could subvert the flow control. As long as it follows this graph. So maybe when we're running the program, it's supposed to jump over here. Well, this is also a valid destiny. So the attacker can is on the CIPO, the mimic's. Because obviously the attacker can mimic the valid control flow in the hacker can send jump to places that shouldn't be allowed. So the attacker should just constrain to the control flow graph. And sometimes control flow graphs are really imprecise. Sometimes they don't know where your jumping to. And so there could be a lot of possibilities in the attacker could take the flow control. OK. So let me just write something like that. As long as the attacker just means like a valid path. So program. So let me just write this. Now two instructions. So I'll add two instructions. You shouldn't. As long as it's on a valid control flow path. As long as it stays on valid. And the attacker stays on some valid path. CIPO detects the attack. And there are, again, there are papers, logs, if you have a certain frequency of volume. That's why it's a lot of clever, mini-target packs against CIP.",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 7.0,
+      "text": "I'm going to put it on the course of the..."
+    },
+    {
+      "start": 7.0,
+      "end": 10.0,
+      "text": "It is in due until after it's time break."
+    },
+    {
+      "start": 10.0,
+      "end": 14.0,
+      "text": "So you have some time to do it, but I wanted to give you as much time as I do it."
+    },
+    {
+      "start": 14.0,
+      "end": 18.0,
+      "text": "And it gets you the Tuesday afternoon to get the facts right and break."
+    },
+    {
+      "start": 18.0,
+      "end": 20.0,
+      "text": "It will be within the event."
+    },
+    {
+      "start": 20.0,
+      "end": 21.0,
+      "text": "It's on the right."
+    },
+    {
+      "start": 21.0,
+      "end": 23.0,
+      "text": "I think one of the four questions."
+    },
+    {
+      "start": 23.0,
+      "end": 27.0,
+      "text": "I've sent it, but the assignment that you've made."
+    },
+    {
+      "start": 27.0,
+      "end": 30.0,
+      "text": "Are you on the course web page?"
+    },
+    {
+      "start": 30.0,
+      "end": 32.0,
+      "text": "Yes, course web page."
+    },
+    {
+      "start": 32.0,
+      "end": 34.0,
+      "text": "Okay, I'll look at it."
+    },
+    {
+      "start": 34.0,
+      "end": 36.0,
+      "text": "It's working for me, last time."
+    },
+    {
+      "start": 36.0,
+      "end": 37.0,
+      "text": "It is for me."
+    },
+    {
+      "start": 37.0,
+      "end": 38.0,
+      "text": "Thank you."
+    },
+    {
+      "start": 38.0,
+      "end": 41.0,
+      "text": "You've only come to Canvas, but it's available on the course web page."
+    },
+    {
+      "start": 41.0,
+      "end": 44.0,
+      "text": "Yes, so you have to go to the course web page."
+    },
+    {
+      "start": 44.0,
+      "end": 47.0,
+      "text": "This little bit has a link to the course web page."
+    },
+    {
+      "start": 47.0,
+      "end": 52.0,
+      "text": "So you only need to be working at the course web page unless you're not in the camera."
+    },
+    {
+      "start": 53.0,
+      "end": 56.0,
+      "text": "Okay, so let's post it and..."
+    },
+    {
+      "start": 56.0,
+      "end": 58.0,
+      "text": "Right, so..."
+    },
+    {
+      "start": 58.0,
+      "end": 60.0,
+      "text": "All the more here, please."
+    },
+    {
+      "start": 60.0,
+      "end": 64.0,
+      "text": "Any questions about the assignment you go to our key AU end?"
+    },
+    {
+      "start": 64.0,
+      "end": 67.0,
+      "text": "It was held in the front today."
+    },
+    {
+      "start": 67.0,
+      "end": 70.0,
+      "text": "Okay, so send any questions about the assignments to you."
+    },
+    {
+      "start": 70.0,
+      "end": 72.0,
+      "text": "Are submissions on Canvas?"
+    },
+    {
+      "start": 72.0,
+      "end": 74.0,
+      "text": "I know that's on the subject box."
+    },
+    {
+      "start": 74.0,
+      "end": 75.0,
+      "text": "Yes, yes."
+    },
+    {
+      "start": 75.0,
+      "end": 78.0,
+      "text": "Yeah, the assignment explains you need to submit it on Canvas."
+    },
+    {
+      "start": 78.0,
+      "end": 81.0,
+      "text": "Yeah, so please read the assignment."
+    },
+    {
+      "start": 81.0,
+      "end": 86.0,
+      "text": "I hope we answer those in your question of business about it."
+    },
+    {
+      "start": 86.0,
+      "end": 90.0,
+      "text": "Okay, any other questions?"
+    },
+    {
+      "start": 90.0,
+      "end": 97.0,
+      "text": "Remember we have the test coming up next last."
+    },
+    {
+      "start": 97.0,
+      "end": 99.0,
+      "text": "What's the days?"
+    },
+    {
+      "start": 99.0,
+      "end": 101.0,
+      "text": "Maybe, maybe."
+    },
+    {
+      "start": 101.0,
+      "end": 105.0,
+      "text": "Anything you look about through me in the past today is fair game."
+    },
+    {
+      "start": 105.0,
+      "end": 108.0,
+      "text": "Okay, where are the tests?"
+    },
+    {
+      "start": 108.0,
+      "end": 115.0,
+      "text": "Also, you know, all the way back to day one of the courses is fair game."
+    },
+    {
+      "start": 115.0,
+      "end": 119.0,
+      "text": "I know you said all exams are key motor including quizzes,"
+    },
+    {
+      "start": 119.0,
+      "end": 120.0,
+      "text": "but are you..."
+    },
+    {
+      "start": 120.0,
+      "end": 124.0,
+      "text": "Do you have a tendency to focus on the later material or is it equally key motor?"
+    },
+    {
+      "start": 124.0,
+      "end": 125.0,
+      "text": "Like anything?"
+    },
+    {
+      "start": 125.0,
+      "end": 126.0,
+      "text": "It's something..."
+    },
+    {
+      "start": 126.0,
+      "end": 128.0,
+      "text": "Anything is fair."
+    },
+    {
+      "start": 128.0,
+      "end": 130.0,
+      "text": "I mean, right."
+    },
+    {
+      "start": 130.0,
+      "end": 136.0,
+      "text": "If you put yourself in my shoes, you can start to think about what's important."
+    },
+    {
+      "start": 136.0,
+      "end": 140.0,
+      "text": "If I talk to you about it in class, I think it's pretty important."
+    },
+    {
+      "start": 140.0,
+      "end": 145.0,
+      "text": "And if you think about it, how much time have we spent on buffer overflows?"
+    },
+    {
+      "start": 145.0,
+      "end": 146.0,
+      "text": "I would bet."
+    },
+    {
+      "start": 146.0,
+      "end": 149.0,
+      "text": "I haven't had the test yet."
+    },
+    {
+      "start": 149.0,
+      "end": 157.0,
+      "text": "I still need to make this test, but I would bet that the buffer overflows will work better."
+    },
+    {
+      "start": 157.0,
+      "end": 161.0,
+      "text": "So, you know, you can kind of think through that."
+    },
+    {
+      "start": 161.0,
+      "end": 163.0,
+      "text": "I think it's a lot of time."
+    },
+    {
+      "start": 163.0,
+      "end": 165.0,
+      "text": "I would also be here."
+    },
+    {
+      "start": 165.0,
+      "end": 170.0,
+      "text": "Everything's fair game, but you know, big topic like buffer overflows."
+    },
+    {
+      "start": 170.0,
+      "end": 172.0,
+      "text": "I want to thank you, Mr. President."
+    },
+    {
+      "start": 172.0,
+      "end": 175.0,
+      "text": "Would you expect to be a group of questions?"
+    },
+    {
+      "start": 175.0,
+      "end": 184.0,
+      "text": "I think that if you're on the internet, you can ask me to hire a semester."
+    },
+    {
+      "start": 184.0,
+      "end": 186.0,
+      "text": "I just should."
+    },
+    {
+      "start": 186.0,
+      "end": 189.0,
+      "text": "It's all fair game."
+    },
+    {
+      "start": 189.0,
+      "end": 196.0,
+      "text": "Okay. Any other questions before we start covering any of the material?"
+    },
+    {
+      "start": 196.0,
+      "end": 199.0,
+      "text": "Okay. So today we should be able to wrap up buffer overflows."
+    },
+    {
+      "start": 199.0,
+      "end": 205.0,
+      "text": "Actually, the timing and the test are pretty good in that sense."
+    },
+    {
+      "start": 205.0,
+      "end": 211.0,
+      "text": "So, I want to make up where we left off last time, remember, what we've been thinking about."
+    },
+    {
+      "start": 211.0,
+      "end": 213.0,
+      "text": "We've got protections for buffer overflows."
+    },
+    {
+      "start": 213.0,
+      "end": 216.0,
+      "text": "We talked about what needs major protection."
+    },
+    {
+      "start": 216.0,
+      "end": 220.0,
+      "text": "Maybe the most important practice are the in-exfits."
+    },
+    {
+      "start": 220.0,
+      "end": 225.0,
+      "text": "And then we talked about, well, the factors can still succeed."
+    },
+    {
+      "start": 225.0,
+      "end": 228.0,
+      "text": "It's high to mid-exfits, and we talked about how back it happened."
+    },
+    {
+      "start": 228.0,
+      "end": 234.0,
+      "text": "And then we also discussed protections that we as secure coders can put in our code."
+    },
+    {
+      "start": 234.0,
+      "end": 238.0,
+      "text": "So, things that we can do, I'll lower some of those."
+    },
+    {
+      "start": 238.0,
+      "end": 242.0,
+      "text": "Like, is secure coders how can we mitigate buffer overflows?"
+    },
+    {
+      "start": 242.0,
+      "end": 245.0,
+      "text": "Okay. So, I'm not talking about things like in-exfits."
+    },
+    {
+      "start": 245.0,
+      "end": 249.0,
+      "text": "When I ask a question like that, if something like that appears on the test,"
+    },
+    {
+      "start": 249.0,
+      "end": 253.0,
+      "text": "specifically referring to lawsuits like application coders."
+    },
+    {
+      "start": 253.0,
+      "end": 260.0,
+      "text": "They were not using the in-exfits, but were not coding in-exfits."
+    },
+    {
+      "start": 260.0,
+      "end": 266.0,
+      "text": "They were that's a hardware feature that the operating system will put in place for us."
+    },
+    {
+      "start": 266.0,
+      "end": 270.0,
+      "text": "Application programmers, you know, touch the in-exfits."
+    },
+    {
+      "start": 270.0,
+      "end": 273.0,
+      "text": "That's just in place for us."
+    },
+    {
+      "start": 273.0,
+      "end": 278.0,
+      "text": "One of us that had these things organized in our heads."
+    },
+    {
+      "start": 278.0,
+      "end": 281.0,
+      "text": "So, in-exfits, but that's not really for us as secure coders."
+    },
+    {
+      "start": 281.0,
+      "end": 284.0,
+      "text": "So, secure coders, what do you do? Check the read-exfits."
+    },
+    {
+      "start": 284.0,
+      "end": 286.0,
+      "text": "Yeah, that's a big one. They're good."
+    },
+    {
+      "start": 286.0,
+      "end": 290.0,
+      "text": "That's really addressing the root problem that you're using."
+    },
+    {
+      "start": 290.0,
+      "end": 292.0,
+      "text": "Check all the read-exes."
+    },
+    {
+      "start": 292.0,
+      "end": 299.0,
+      "text": "Any time you in-ex input array, you want to make sure that your index is in balance."
+    },
+    {
+      "start": 299.0,
+      "end": 305.0,
+      "text": "So, in fact, this is probably a good time to mention that we have, like,"
+    },
+    {
+      "start": 305.0,
+      "end": 312.0,
+      "text": "this class of attacks, or we've been talking about buffer overflows."
+    },
+    {
+      "start": 312.0,
+      "end": 323.0,
+      "text": "Buffer overflows are a strict subset of a broader class to be out of bounds."
+    },
+    {
+      "start": 323.0,
+      "end": 327.0,
+      "text": "Accesses. So, like, out of bounds, writes, for example."
+    },
+    {
+      "start": 327.0,
+      "end": 338.0,
+      "text": "That's really what we, all of the buffer overflows we've seen have been out of bounds, writes."
+    },
+    {
+      "start": 338.0,
+      "end": 343.0,
+      "text": "So, like, we're filling them buffer up and then we're continuing to write out of bounds."
+    },
+    {
+      "start": 343.0,
+      "end": 347.0,
+      "text": "Like, out of bounds, further along than where we should ask."
+    },
+    {
+      "start": 347.0,
+      "end": 352.0,
+      "text": "So, out of bounds, writes. There can also be out of bounds, reads."
+    },
+    {
+      "start": 352.0,
+      "end": 356.0,
+      "text": "And we'll talk about that. Probably we won't get to it today,"
+    },
+    {
+      "start": 356.0,
+      "end": 359.0,
+      "text": "so that'll have to wait until after we reach."
+    },
+    {
+      "start": 359.0,
+      "end": 362.0,
+      "text": "And we'll talk about that."
+    },
+    {
+      "start": 362.0,
+      "end": 365.0,
+      "text": "This is good for you to organize your thoughts."
+    },
+    {
+      "start": 365.0,
+      "end": 370.0,
+      "text": "So, anyway, checking the array bounds before you access them, that's really big."
+    },
+    {
+      "start": 370.0,
+      "end": 372.0,
+      "text": "I want else."
+    },
+    {
+      "start": 372.0,
+      "end": 376.0,
+      "text": "Yeah, yeah. So, right."
+    },
+    {
+      "start": 376.0,
+      "end": 382.0,
+      "text": "And it has to screen the two ideas in one is, so, like, you can use the St.Pur versions,"
+    },
+    {
+      "start": 382.0,
+      "end": 386.0,
+      "text": "like, the in-area versions of things."
+    },
+    {
+      "start": 386.0,
+      "end": 389.0,
+      "text": "So, there's one idea. In-area versions of library functions."
+    },
+    {
+      "start": 389.0,
+      "end": 393.0,
+      "text": "And another idea would be to use a St.String library."
+    },
+    {
+      "start": 393.0,
+      "end": 398.0,
+      "text": "Which is what assignment one asks you to do."
+    },
+    {
+      "start": 398.0,
+      "end": 400.0,
+      "text": "Like, on assignment one."
+    },
+    {
+      "start": 400.0,
+      "end": 405.0,
+      "text": "Use the St.Pur string library. That'll help with some buffer overflows."
+    },
+    {
+      "start": 405.0,
+      "end": 408.0,
+      "text": "Right. String these buffer overflows."
+    },
+    {
+      "start": 408.0,
+      "end": 410.0,
+      "text": "I turn on P.V.S. out."
+    },
+    {
+      "start": 410.0,
+      "end": 414.0,
+      "text": "We talked about there other problems, like, you could have a buffer events."
+    },
+    {
+      "start": 414.0,
+      "end": 419.0,
+      "text": "And, you know, if you're not checking the array bounds, you can still, you know, overflow buffer events."
+    },
+    {
+      "start": 419.0,
+      "end": 424.0,
+      "text": "Yeah. And I'd say language trade."
+    },
+    {
+      "start": 424.0,
+      "end": 432.0,
+      "text": "Yeah. I'd say language would be another really important idea for what we as secure coders can do to many gaveover overflows."
+    },
+    {
+      "start": 432.0,
+      "end": 438.0,
+      "text": "And if that one, I think we hit all the main points we talked about in class,"
+    },
+    {
+      "start": 438.0,
+      "end": 440.0,
+      "text": "what we as secure coders can do."
+    },
+    {
+      "start": 440.0,
+      "end": 448.0,
+      "text": "And so, now I want to continue our discussion of other things that maybe are a little further outside of our control."
+    },
+    {
+      "start": 448.0,
+      "end": 451.0,
+      "text": "As secure coders, those are the first one."
+    },
+    {
+      "start": 451.0,
+      "end": 457.0,
+      "text": "You know, this is something we implement with this is something we as secure coders can use."
+    },
+    {
+      "start": 457.0,
+      "end": 462.0,
+      "text": "Basically, when I'm getting at your initial protections beyond an expense,"
+    },
+    {
+      "start": 462.0,
+      "end": 471.0,
+      "text": "then it are helpful for us as secure coders, but not really things that we can control ourselves."
+    },
+    {
+      "start": 471.0,
+      "end": 476.0,
+      "text": "So, we could use compiler errors in mornings. We talked about that."
+    },
+    {
+      "start": 476.0,
+      "end": 482.0,
+      "text": "You know, it asks a lot of compilers will give you a warning or an error if you try to use it as,"
+    },
+    {
+      "start": 482.0,
+      "end": 487.0,
+      "text": "can you try to invoke it as other 12 though?"
+    },
+    {
+      "start": 487.0,
+      "end": 498.0,
+      "text": "Okay. Depending on your bill scripts, you may be ignoring warnings at whatever level your compiler generates them for that."
+    },
+    {
+      "start": 498.0,
+      "end": 503.0,
+      "text": "So, this can be helpful. It's not foolproof though."
+    },
+    {
+      "start": 503.0,
+      "end": 510.0,
+      "text": "Okay. And others of those unsafe library calls, there could be no warning for them."
+    },
+    {
+      "start": 510.0,
+      "end": 515.0,
+      "text": "And remember, we talked about a lot of such compilers."
+    },
+    {
+      "start": 515.0,
+      "end": 526.0,
+      "text": "Strength and care, strength and foundation, strength and copy, all of those stand, standing functions."
+    },
+    {
+      "start": 526.0,
+      "end": 531.0,
+      "text": "Next one. Okay. So, that's where we flattened off the class."
+    },
+    {
+      "start": 531.0,
+      "end": 535.0,
+      "text": "Okay. Next technique is stack communities."
+    },
+    {
+      "start": 535.0,
+      "end": 549.0,
+      "text": "Okay. It's kind of like stack communities is the more generic name of the common more specific name is called stack hard because this is the techniques first name by the creators of the technique."
+    },
+    {
+      "start": 549.0,
+      "end": 556.0,
+      "text": "It's really interesting paper in here, if you have extra time, you can go read. I think it's from like 1998."
+    },
+    {
+      "start": 556.0,
+      "end": 561.0,
+      "text": "The research paper that proposed this technique called stack hard."
+    },
+    {
+      "start": 561.0,
+      "end": 570.0,
+      "text": "Very interesting because when we look back historically at it, it's like in my graduate security courses one,"
+    },
+    {
+      "start": 570.0,
+      "end": 575.0,
+      "text": "the paper I pulled up is an example of what not to do when you write a research."
+    },
+    {
+      "start": 575.0,
+      "end": 586.0,
+      "text": "It's really interesting from that perspective because it means grand claim to about how stack hard will prevent all of our overflow attacks."
+    },
+    {
+      "start": 586.0,
+      "end": 594.0,
+      "text": "And that's really not true. Okay. So, this is why, and of course like this, we emphasize, okay, what can we do?"
+    },
+    {
+      "start": 594.0,
+      "end": 603.0,
+      "text": "Like, why can we prove about security mechanisms? And if you start thinking logically, you'll see that stack hard, which we'll talk about now,"
+    },
+    {
+      "start": 603.0,
+      "end": 609.0,
+      "text": "stack hard doesn't provide. It certainly doesn't know what a buffer overflow is."
+    },
+    {
+      "start": 609.0,
+      "end": 615.0,
+      "text": "Right. You know that because buffer overflow is remain one of the top categories of the tasks."
+    },
+    {
+      "start": 615.0,
+      "end": 621.0,
+      "text": "Okay. So, none of these techniques have been buffer overflow."
+    },
+    {
+      "start": 621.0,
+      "end": 630.0,
+      "text": "These are, was there sometimes called speed box. Okay. So, stack hard will insert a fanary here."
+    },
+    {
+      "start": 630.0,
+      "end": 636.0,
+      "text": "And so, this is like a generic coal mine. Is the thing about this is some random big sequence."
+    },
+    {
+      "start": 636.0,
+      "end": 645.0,
+      "text": "And the idea is that then if the attacker overflows a buffer, and he tries to like overwrite, overwrite, overwrite."
+    },
+    {
+      "start": 645.0,
+      "end": 653.0,
+      "text": "So, this canary, the attacker would have to overwrite it in order to get to the return address."
+    },
+    {
+      "start": 653.0,
+      "end": 664.0,
+      "text": "And his canary is intended to be a super value. The attacker won't know. Hard to guess. Hard to guess this canary about."
+    },
+    {
+      "start": 664.0,
+      "end": 672.0,
+      "text": "And then when the function finishes, when we're returning the kernel function, and we pop this frame off the stack,"
+    },
+    {
+      "start": 672.0,
+      "end": 680.0,
+      "text": "we jump to the return address at the same time. But right before we jump to the return address, we'll check to make sure the canary hasn't been modified."
+    },
+    {
+      "start": 680.0,
+      "end": 688.0,
+      "text": "If it has, then we hope a program. We raise an exception, a security exception."
+    },
+    {
+      "start": 688.0,
+      "end": 694.0,
+      "text": "Okay. So, let me help try and make a few notes about this."
+    },
+    {
+      "start": 694.0,
+      "end": 704.0,
+      "text": "Our game will put a while. You can think of this as a random and practice for efficiency reasons."
+    },
+    {
+      "start": 704.0,
+      "end": 714.0,
+      "text": "Usually, these canaries are pretty used. But as I like, you start up a program and maybe your operating system is just using this"
+    },
+    {
+      "start": 714.0,
+      "end": 720.0,
+      "text": "to make an area on all programs throughout its life."
+    },
+    {
+      "start": 720.0,
+      "end": 728.0,
+      "text": "Maybe refresh is a canary once every time you start a new program."
+    },
+    {
+      "start": 728.0,
+      "end": 740.0,
+      "text": "Really start thinking through this technique. You can see, well, even better would be if you have a unique, like a fresh canary on every single frame."
+    },
+    {
+      "start": 740.0,
+      "end": 745.0,
+      "text": "I don't know of any implementation that does that though, because the performance hit."
+    },
+    {
+      "start": 745.0,
+      "end": 752.0,
+      "text": "So, generating random numbers, random bits, is an expensive homage."
+    },
+    {
+      "start": 752.0,
+      "end": 760.0,
+      "text": "And we want this to be random hard to guess. So, it's even more difficult than just random,"
+    },
+    {
+      "start": 760.0,
+      "end": 765.0,
+      "text": "it's quite easy for me to use this spring. Remember that? Perfectly graphically strong."
+    },
+    {
+      "start": 765.0,
+      "end": 772.0,
+      "text": "Okay, that's very expensive. Okay. So, people want this fast."
+    },
+    {
+      "start": 772.0,
+      "end": 777.0,
+      "text": "And also, they've been used as canaries."
+    },
+    {
+      "start": 777.0,
+      "end": 786.0,
+      "text": "A lot. So, maybe all the canaries on a given machine are the same throughout all programs, all frames and everything."
+    },
+    {
+      "start": 787.0,
+      "end": 790.0,
+      "text": "So, we'll put a random."
+    },
+    {
+      "start": 790.0,
+      "end": 800.0,
+      "text": "And again, this means like, cryptographically strong random number, random bit string."
+    },
+    {
+      "start": 800.0,
+      "end": 812.0,
+      "text": "Right before, right before the return address."
+    },
+    {
+      "start": 812.0,
+      "end": 819.0,
+      "text": "Again, normally it's just one canary program, maybe even for many runs of a program."
+    },
+    {
+      "start": 819.0,
+      "end": 830.0,
+      "text": "We'll check canary, passons, and modify."
+    },
+    {
+      "start": 830.0,
+      "end": 845.0,
+      "text": "Okay, so before we jump to the return address, we'll check the canary."
+    },
+    {
+      "start": 845.0,
+      "end": 852.0,
+      "text": "Make sure it has been modified."
+    },
+    {
+      "start": 852.0,
+      "end": 864.0,
+      "text": "Okay, come. Well, how often, how often are, well, like, this is operation."
+    },
+    {
+      "start": 864.0,
+      "end": 869.0,
+      "text": "Like, step A, how often does this happen? Every single method in visualization."
+    },
+    {
+      "start": 869.0,
+      "end": 877.0,
+      "text": "Okay, step B, every single method, return. D and D, these are common operations."
+    },
+    {
+      "start": 877.0,
+      "end": 885.0,
+      "text": "Okay, so security engineers would worry about the running time overhead from this."
+    },
+    {
+      "start": 885.0,
+      "end": 889.0,
+      "text": "It's a one technique would be okay."
+    },
+    {
+      "start": 889.0,
+      "end": 901.0,
+      "text": "And we will get less protections, but we can still get some protections if, what if the canary pages make it all zeroes?"
+    },
+    {
+      "start": 901.0,
+      "end": 907.0,
+      "text": "Put a random bit string. Right before the return address."
+    },
+    {
+      "start": 907.0,
+      "end": 919.0,
+      "text": "Or in some cases, people just put like a null, a null like a null character."
+    },
+    {
+      "start": 919.0,
+      "end": 927.0,
+      "text": "Why would you do that? The null character doesn't really give you the same security protection base of weaker."
+    },
+    {
+      "start": 927.0,
+      "end": 933.0,
+      "text": "So weaker protection, sometimes these are common, right away."
+    },
+    {
+      "start": 933.0,
+      "end": 937.0,
+      "text": "Okay, so the attacker will know this null function."
+    },
+    {
+      "start": 937.0,
+      "end": 941.0,
+      "text": "If you just use a null by the attacker, put over it with the zero."
+    },
+    {
+      "start": 941.0,
+      "end": 947.0,
+      "text": "Okay, and then modify the return address, everything will look fine."
+    },
+    {
+      "start": 947.0,
+      "end": 959.0,
+      "text": "But having a null like here still provides some protection, which is now, if any of this data gets interpreted as a string,"
+    },
+    {
+      "start": 959.0,
+      "end": 963.0,
+      "text": "the null like here will terminate that string."
+    },
+    {
+      "start": 963.0,
+      "end": 970.0,
+      "text": "Okay, in terms of that, it mitigates some mother tax, we've actually hopefully won't have time to talk about it later today."
+    },
+    {
+      "start": 970.0,
+      "end": 976.0,
+      "text": "Sometimes attackers can actually like read some of these values off the stack."
+    },
+    {
+      "start": 976.0,
+      "end": 988.0,
+      "text": "Okay, so if you put a null by right here, in guarantees that any of this string reading is going in before this one."
+    },
+    {
+      "start": 988.0,
+      "end": 992.0,
+      "text": "Okay, so that's a similar idea."
+    },
+    {
+      "start": 992.0,
+      "end": 1002.0,
+      "text": "So I think I should say hand or an old character. Okay, because you could do both."
+    },
+    {
+      "start": 1002.0,
+      "end": 1008.0,
+      "text": "Okay, so this is the big idea of stack bar. Any questions about it? Yeah."
+    },
+    {
+      "start": 1008.0,
+      "end": 1012.0,
+      "text": "How do we check that? How does it look like? Yeah, right."
+    },
+    {
+      "start": 1012.0,
+      "end": 1018.0,
+      "text": "So the executable code will have hard coded this canary."
+    },
+    {
+      "start": 1018.0,
+      "end": 1022.0,
+      "text": "So it'll know what the value should be."
+    },
+    {
+      "start": 1022.0,
+      "end": 1028.0,
+      "text": "These are before you return from a function, it'll check that this value is what you should connect with the month bus."
+    },
+    {
+      "start": 1028.0,
+      "end": 1037.0,
+      "text": "Well, so this is one of the potential ways to circumvent stack bar would be what if an attacker does know this canary?"
+    },
+    {
+      "start": 1037.0,
+      "end": 1043.0,
+      "text": "Well, then the attacker can overwrite it with the correct value and then overwrite the return address."
+    },
+    {
+      "start": 1043.0,
+      "end": 1049.0,
+      "text": "And the code, the check will say, okay, well, an area looks good."
+    },
+    {
+      "start": 1049.0,
+      "end": 1058.0,
+      "text": "Okay, so this will be one of our limitations."
+    },
+    {
+      "start": 1058.0,
+      "end": 1063.0,
+      "text": "Okay, well, and there are different ways an attacker could be here."
+    },
+    {
+      "start": 1063.0,
+      "end": 1067.0,
+      "text": "An area plot would be just like root-forced."
+    },
+    {
+      "start": 1067.0,
+      "end": 1071.0,
+      "text": "Basically root-forced, hopefully you all know this term right."
+    },
+    {
+      "start": 1071.0,
+      "end": 1079.0,
+      "text": "And 11 passwords a lot. So you see the idea that the attacker could just try all possibilities."
+    },
+    {
+      "start": 1079.0,
+      "end": 1086.0,
+      "text": "And then with passwords, that's why you get locked out after a certain number of failed attempts to mitigate root-forced tasks."
+    },
+    {
+      "start": 1086.0,
+      "end": 1090.0,
+      "text": "Okay, well, same idea with stack art."
+    },
+    {
+      "start": 1090.0,
+      "end": 1095.0,
+      "text": "An attacker might just try all of these. How many of these things usually?"
+    },
+    {
+      "start": 1095.0,
+      "end": 1099.0,
+      "text": "Well, you have to remember, we want this to be highly optimized."
+    },
+    {
+      "start": 1099.0,
+      "end": 1104.0,
+      "text": "We want to minimize time and creating the random bits."
+    },
+    {
+      "start": 1104.0,
+      "end": 1110.0,
+      "text": "The word maybe even half of the word. So maybe a couple of bytes."
+    },
+    {
+      "start": 1110.0,
+      "end": 1118.0,
+      "text": "Or write the most. And within the realm of possibility and attacker may be able to root-forced."
+    },
+    {
+      "start": 1118.0,
+      "end": 1120.0,
+      "text": "Canary."
+    },
+    {
+      "start": 1120.0,
+      "end": 1124.0,
+      "text": "Oh, one. An attacker."
+    },
+    {
+      "start": 1124.0,
+      "end": 1127.0,
+      "text": "Name."
+    },
+    {
+      "start": 1132.0,
+      "end": 1135.0,
+      "text": "Let's say yes."
+    },
+    {
+      "start": 1135.0,
+      "end": 1139.0,
+      "text": "Or, root-forced."
+    },
+    {
+      "start": 1143.0,
+      "end": 1151.0,
+      "text": "And I hope it's clear if an attacker knows the Canary value then this technique doesn't give you anything."
+    },
+    {
+      "start": 1151.0,
+      "end": 1158.0,
+      "text": "Okay. So once you've hacked this technique, roll-wise on the secrecy of the Canary."
+    },
+    {
+      "start": 1158.0,
+      "end": 1169.0,
+      "text": "So it will depend on the system when- so the question is when is the Canary generated?"
+    },
+    {
+      "start": 1169.0,
+      "end": 1173.0,
+      "text": "Some systems will generate when you load up the operating system."
+    },
+    {
+      "start": 1173.0,
+      "end": 1176.0,
+      "text": "When you install the operating system for the first time."
+    },
+    {
+      "start": 1176.0,
+      "end": 1179.0,
+      "text": "And they'll just use the same Canary over and over."
+    },
+    {
+      "start": 1179.0,
+      "end": 1184.0,
+      "text": "Others will like every time you start a program. Program startup."
+    },
+    {
+      "start": 1184.0,
+      "end": 1188.0,
+      "text": "So that may be the most common would be like, you start a program."
+    },
+    {
+      "start": 1188.0,
+      "end": 1192.0,
+      "text": "The Canary gets you in there even once for that entire program."
+    },
+    {
+      "start": 1192.0,
+      "end": 1197.0,
+      "text": "Okay. So the same Canary value will be used everywhere on the staff."
+    },
+    {
+      "start": 1197.0,
+      "end": 1202.0,
+      "text": "Okay."
+    },
+    {
+      "start": 1203.0,
+      "end": 1211.0,
+      "text": "Okay. Well, a similar limitation is an attacker makes more other vulnerabilities."
+    },
+    {
+      "start": 1211.0,
+      "end": 1216.0,
+      "text": "People don't actually bring the Canary off the staff."
+    },
+    {
+      "start": 1216.0,
+      "end": 1224.0,
+      "text": "Okay. So there are other kinds of memory vulnerabilities that can give you the power to read values on the staff."
+    },
+    {
+      "start": 1224.0,
+      "end": 1229.0,
+      "text": "And we'll talk about that. It would say if not today then right after."
+    },
+    {
+      "start": 1229.0,
+      "end": 1233.0,
+      "text": "It's like an arrow. We need to name for it."
+    },
+    {
+      "start": 1233.0,
+      "end": 1242.0,
+      "text": "So attacker may like exploit other vulnerabilities."
+    },
+    {
+      "start": 1242.0,
+      "end": 1251.0,
+      "text": "Other vulnerabilities. And I'll say, for example, FormatString attacks."
+    },
+    {
+      "start": 1251.0,
+      "end": 1260.0,
+      "text": "FormatString vulnerabilities."
+    },
+    {
+      "start": 1260.0,
+      "end": 1268.0,
+      "text": "Okay. This is my attack. We'll talk about next after we finish buffer over close."
+    },
+    {
+      "start": 1268.0,
+      "end": 1278.0,
+      "text": "So the attacker makes exploit other vulnerabilities to learn the Canary."
+    },
+    {
+      "start": 1278.0,
+      "end": 1283.0,
+      "text": "And once the attacker gets a Canary, StackArt is useless."
+    },
+    {
+      "start": 1283.0,
+      "end": 1286.0,
+      "text": "If anything, StackArt is like a negative at that point."
+    },
+    {
+      "start": 1286.0,
+      "end": 1293.0,
+      "text": "It's just slowing everything down."
+    },
+    {
+      "start": 1293.0,
+      "end": 1299.0,
+      "text": "Oh, and by the way, there are like, there's been a lot of research papers written about these things too."
+    },
+    {
+      "start": 1299.0,
+      "end": 1319.0,
+      "text": "Okay. So attackers have a sophisticated toolkit to proceed over around these first two options."
+    },
+    {
+      "start": 1319.0,
+      "end": 1333.0,
+      "text": "Yeah, right. Right. So the attacker may be able to use those like reverse engineering techniques and exploit problems with the random generation of algorithms in this stuff."
+    },
+    {
+      "start": 1333.0,
+      "end": 1336.0,
+      "text": "It's like sea spring types of vulnerabilities as well."
+    },
+    {
+      "start": 1336.0,
+      "end": 1344.0,
+      "text": "Usually as long as we're using or as long as our system is using like a standard sea spring library,"
+    },
+    {
+      "start": 1344.0,
+      "end": 1355.0,
+      "text": "we think of like sea spring vulnerabilities as being very sophisticated to figure out what to find new vulnerabilities like that."
+    },
+    {
+      "start": 1355.0,
+      "end": 1359.0,
+      "text": "So usually we think of that as like, wow, that'd be like a nation state."
+    },
+    {
+      "start": 1359.0,
+      "end": 1364.0,
+      "text": "Not some small person with huge resources."
+    },
+    {
+      "start": 1364.0,
+      "end": 1371.0,
+      "text": "Okay. So the third one though, I think the third one is the most interesting."
+    },
+    {
+      "start": 1371.0,
+      "end": 1376.0,
+      "text": "Because these first two are just like, I don't know, maybe more obvious."
+    },
+    {
+      "start": 1376.0,
+      "end": 1382.0,
+      "text": "Like maybe it's relying on the secrecy of the community."
+    },
+    {
+      "start": 1382.0,
+      "end": 1390.0,
+      "text": "Let's take this through the secondary protecting."
+    },
+    {
+      "start": 1390.0,
+      "end": 1397.0,
+      "text": "So what did we talk about is powers in a pattern by overflowing."
+    },
+    {
+      "start": 1397.0,
+      "end": 1402.0,
+      "text": "What could they disrupt by overflowing lovers?"
+    },
+    {
+      "start": 1402.0,
+      "end": 1407.0,
+      "text": "Yeah, change arguments. We're not protecting the arguments at all."
+    },
+    {
+      "start": 1407.0,
+      "end": 1413.0,
+      "text": "An attacker who may know overflow one local and overwrite another local."
+    },
+    {
+      "start": 1413.0,
+      "end": 1420.0,
+      "text": "Overwrite arguments. Let's see what about another segment."
+    },
+    {
+      "start": 1420.0,
+      "end": 1423.0,
+      "text": "We're just talking about the staff."
+    },
+    {
+      "start": 1423.0,
+      "end": 1430.0,
+      "text": "Keep these above her overflows completely uninfected."
+    },
+    {
+      "start": 1430.0,
+      "end": 1433.0,
+      "text": "Overflows on global."
+    },
+    {
+      "start": 1433.0,
+      "end": 1441.0,
+      "text": "So we're only protecting, we're only adding one mitigation and one segment of the program."
+    },
+    {
+      "start": 1441.0,
+      "end": 1447.0,
+      "text": "This one mitigation is helping effecting one of the data one pointer."
+    },
+    {
+      "start": 1447.0,
+      "end": 1452.0,
+      "text": "The attacker can overwrite any of the other pointers."
+    },
+    {
+      "start": 1452.0,
+      "end": 1456.0,
+      "text": "Are there other?"
+    },
+    {
+      "start": 1456.0,
+      "end": 1463.0,
+      "text": "Yeah, so you can and you could with the areas in the e-bid, I don't know many widespread use of that thing."
+    },
+    {
+      "start": 1463.0,
+      "end": 1470.0,
+      "text": "The original research paper does like fear eyes about these extensions."
+    },
+    {
+      "start": 1470.0,
+      "end": 1475.0,
+      "text": "The run time overhead gets like four years of magnitude higher."
+    },
+    {
+      "start": 1475.0,
+      "end": 1484.0,
+      "text": "So the reason this became popular and I have talked with some of the people who have come into this."
+    },
+    {
+      "start": 1484.0,
+      "end": 1494.0,
+      "text": "They said the reason was we liked it because it's even give us something and the run time overhead was around five percent."
+    },
+    {
+      "start": 1494.0,
+      "end": 1500.0,
+      "text": "Five, six percent run time overhead."
+    },
+    {
+      "start": 1500.0,
+      "end": 1508.0,
+      "text": "When we look back now, I'm not sure that the engineers of today would make that same decision."
+    },
+    {
+      "start": 1508.0,
+      "end": 1518.0,
+      "text": "Because five to six percent overhead is still something and this cost benefit, I'm not sure if people would still decide to support it."
+    },
+    {
+      "start": 1518.0,
+      "end": 1527.0,
+      "text": "All the sophisticated tools that the attackers have to get around this and do other things."
+    },
+    {
+      "start": 1527.0,
+      "end": 1556.0,
+      "text": "Okay, so let me say only mitigates R-A-L-H-M-N."
+    },
+    {
+      "start": 1556.0,
+      "end": 1565.0,
+      "text": "So would you say one of the limitations on the downsides of this that is mining trees the potential for false positives?"
+    },
+    {
+      "start": 1565.0,
+      "end": 1570.0,
+      "text": "False positives, I can say we really don't expect any false positives."
+    },
+    {
+      "start": 1570.0,
+      "end": 1574.0,
+      "text": "I would say false negatives here. This is a really good question."
+    },
+    {
+      "start": 1574.0,
+      "end": 1578.0,
+      "text": "This is right before our test."
+    },
+    {
+      "start": 1578.0,
+      "end": 1588.0,
+      "text": "False positives shouldn't be of the yield here because there's no reason that the engineers should be overwritten."
+    },
+    {
+      "start": 1588.0,
+      "end": 1593.0,
+      "text": "There's no way any legitimate overwriting of a container should happen."
+    },
+    {
+      "start": 1593.0,
+      "end": 1596.0,
+      "text": "Again, it should never be changed. It should never be written to."
+    },
+    {
+      "start": 1596.0,
+      "end": 1601.0,
+      "text": "Once the return address is on the stack, that shouldn't be modified either."
+    },
+    {
+      "start": 1601.0,
+      "end": 1606.0,
+      "text": "So you pop the frame so no modification should happen."
+    },
+    {
+      "start": 1606.0,
+      "end": 1608.0,
+      "text": "False positives, no. False negatives, yes."
+    },
+    {
+      "start": 1608.0,
+      "end": 1615.0,
+      "text": "Those first two techniques we pop about the first two limitations as we give us false negatives."
+    },
+    {
+      "start": 1615.0,
+      "end": 1622.0,
+      "text": "Let's give a review of our terminology from earlier in that semester."
+    },
+    {
+      "start": 1622.0,
+      "end": 1632.0,
+      "text": "So that's what I'm going to say about that technique about the stack hard."
+    },
+    {
+      "start": 1632.0,
+      "end": 1636.0,
+      "text": "Okay, the next one, address-based layout or endimization."
+    },
+    {
+      "start": 1636.0,
+      "end": 1642.0,
+      "text": "So why is it that I read just a few questions?"
+    },
+    {
+      "start": 1642.0,
+      "end": 1654.0,
+      "text": "After the whole frame pointer is because the attacker may overwrite values like these local rules or arguments."
+    },
+    {
+      "start": 1654.0,
+      "end": 1657.0,
+      "text": "The attacker may overwrite these things."
+    },
+    {
+      "start": 1657.0,
+      "end": 1662.0,
+      "text": "So we want the canary at the end of the group with the canary down here then it wouldn't protect the return address."
+    },
+    {
+      "start": 1662.0,
+      "end": 1667.0,
+      "text": "Because the right could just have end and overwrite the return address."
+    },
+    {
+      "start": 1667.0,
+      "end": 1669.0,
+      "text": "That's why the canary isn't."
+    },
+    {
+      "start": 1669.0,
+      "end": 1676.0,
+      "text": "The better it explicitly chosen, the place been right before the return address."
+    },
+    {
+      "start": 1676.0,
+      "end": 1681.0,
+      "text": "And fairness, that is a special pointer."
+    },
+    {
+      "start": 1681.0,
+      "end": 1688.0,
+      "text": "It makes sense for a security perspective one of the factors of this special pointer."
+    },
+    {
+      "start": 1688.0,
+      "end": 1693.0,
+      "text": "So you know, stack hard gets us something and that's going to be true with all of these."
+    },
+    {
+      "start": 1693.0,
+      "end": 1696.0,
+      "text": "Okay, so this is all the spectrum."
+    },
+    {
+      "start": 1696.0,
+      "end": 1699.0,
+      "text": "This is all cost-fantated analysis."
+    },
+    {
+      "start": 1699.0,
+      "end": 1704.0,
+      "text": "Okay, if you really want whole safety, then go into a high-stay point."
+    },
+    {
+      "start": 1704.0,
+      "end": 1711.0,
+      "text": "Everything else is trying to find a balance where we still get a lot of the performance benefits of C and C plus plus."
+    },
+    {
+      "start": 1711.0,
+      "end": 1717.0,
+      "text": "Okay, but we're not going to get the full security of a tight-taped language."
+    },
+    {
+      "start": 1717.0,
+      "end": 1721.0,
+      "text": "I've saved language running more slow."
+    },
+    {
+      "start": 1721.0,
+      "end": 1724.0,
+      "text": "I see it's going to be in a way in general."
+    },
+    {
+      "start": 1724.0,
+      "end": 1726.0,
+      "text": "I don't know if they're with that."
+    },
+    {
+      "start": 1726.0,
+      "end": 1732.0,
+      "text": "So all of these techniques are still trying to maintain as much of this performance or make it trade off a balance."
+    },
+    {
+      "start": 1732.0,
+      "end": 1738.0,
+      "text": "You know, it's like unprotected C versus, you know, a type-safe, type-safe language."
+    },
+    {
+      "start": 1738.0,
+      "end": 1743.0,
+      "text": "And then you have just like, unprotected C."
+    },
+    {
+      "start": 1744.0,
+      "end": 1749.0,
+      "text": "Okay, so all of these things are trying to make different trade-offs in here."
+    },
+    {
+      "start": 1749.0,
+      "end": 1752.0,
+      "text": "Okay, we're trying to get some of this performance."
+    },
+    {
+      "start": 1752.0,
+      "end": 1758.0,
+      "text": "Some of the performance benefits, you know, and some of the security benefits."
+    },
+    {
+      "start": 1758.0,
+      "end": 1763.0,
+      "text": "Okay, going all right with that idea."
+    },
+    {
+      "start": 1763.0,
+      "end": 1766.0,
+      "text": "A lot of times students get stuck on that."
+    },
+    {
+      "start": 1766.0,
+      "end": 1768.0,
+      "text": "Like, oh, they're not perfect yet."
+    },
+    {
+      "start": 1768.0,
+      "end": 1770.0,
+      "text": "Like, now these are going to be perfect."
+    },
+    {
+      "start": 1770.0,
+      "end": 1774.0,
+      "text": "If you want perfection, use a type-safe language and just take that performance."
+    },
+    {
+      "start": 1774.0,
+      "end": 1779.0,
+      "text": "Only reason we care about these other ideas is because they're giving us something."
+    },
+    {
+      "start": 1779.0,
+      "end": 1783.0,
+      "text": "Without taking away too much performance."
+    },
+    {
+      "start": 1783.0,
+      "end": 1789.0,
+      "text": "Okay, so address states layout."
+    },
+    {
+      "start": 1789.0,
+      "end": 1792.0,
+      "text": "Randomization."
+    },
+    {
+      "start": 1798.0,
+      "end": 1805.0,
+      "text": "Okay, next technique."
+    },
+    {
+      "start": 1805.0,
+      "end": 1812.0,
+      "text": "By the way, so stack our expected to be running off pretty much all of our devices."
+    },
+    {
+      "start": 1812.0,
+      "end": 1818.0,
+      "text": "So, it's like, you know, modern machines are using standard."
+    },
+    {
+      "start": 1818.0,
+      "end": 1824.0,
+      "text": "I was saying like, I'm going to say a lot of times I've been using this before."
+    },
+    {
+      "start": 1824.0,
+      "end": 1829.0,
+      "text": "I'm saying type-safe language in general are expected to have works performance."
+    },
+    {
+      "start": 1829.0,
+      "end": 1833.0,
+      "text": "Then weekly type and type."
+    },
+    {
+      "start": 1833.0,
+      "end": 1838.0,
+      "text": "Okay, so like machine code, you're probably at the highest performance."
+    },
+    {
+      "start": 1838.0,
+      "end": 1843.0,
+      "text": "Okay, and again, you know, I'm going to plug in hybrid sports."
+    },
+    {
+      "start": 1843.0,
+      "end": 1847.0,
+      "text": "We talked about this and we can write some machine code and we can carry it."
+    },
+    {
+      "start": 1847.0,
+      "end": 1849.0,
+      "text": "What a compiler is going to write it in."
+    },
+    {
+      "start": 1849.0,
+      "end": 1851.0,
+      "text": "Again, order back in different."
+    },
+    {
+      "start": 1851.0,
+      "end": 1854.0,
+      "text": "Okay, so if you really want high performance code, you handwrite."
+    },
+    {
+      "start": 1854.0,
+      "end": 1857.0,
+      "text": "Handwrite."
+    },
+    {
+      "start": 1857.0,
+      "end": 1862.0,
+      "text": "Okay, if you have the time, like the personnel, to do that."
+    },
+    {
+      "start": 1862.0,
+      "end": 1865.0,
+      "text": "Okay, and then you have like a language license."
+    },
+    {
+      "start": 1865.0,
+      "end": 1866.0,
+      "text": "Pretty close."
+    },
+    {
+      "start": 1866.0,
+      "end": 1870.0,
+      "text": "Pretty close to, you know, it's a low level, pretty low level."
+    },
+    {
+      "start": 1870.0,
+      "end": 1873.0,
+      "text": "Now, and then you go up to the expected language."
+    },
+    {
+      "start": 1873.0,
+      "end": 1875.0,
+      "text": "Generally, it should be slower."
+    },
+    {
+      "start": 1875.0,
+      "end": 1877.0,
+      "text": "Even something like Russ."
+    },
+    {
+      "start": 1877.0,
+      "end": 1882.0,
+      "text": "It's intended to be extremely efficient and try to get close to see."
+    },
+    {
+      "start": 1882.0,
+      "end": 1886.0,
+      "text": "It's generally done for me as efficient as possible."
+    },
+    {
+      "start": 1886.0,
+      "end": 1891.0,
+      "text": "If it provides a lot of protection, so it's going straight on."
+    },
+    {
+      "start": 1891.0,
+      "end": 1894.0,
+      "text": "So you said you wanted protection to get it like the same."
+    },
+    {
+      "start": 1894.0,
+      "end": 1897.0,
+      "text": "Let me let you hand out proper loads of type-safe."
+    },
+    {
+      "start": 1897.0,
+      "end": 1898.0,
+      "text": "Correct."
+    },
+    {
+      "start": 1898.0,
+      "end": 1899.0,
+      "text": "Yeah, yeah, good point."
+    },
+    {
+      "start": 1899.0,
+      "end": 1900.0,
+      "text": "Yes."
+    },
+    {
+      "start": 1900.0,
+      "end": 1905.0,
+      "text": "So as we discussed, assuming the type-safe, the type-safe is implementing correctly,"
+    },
+    {
+      "start": 1905.0,
+      "end": 1912.0,
+      "text": "you will not have upper overflows and type-safe programming languages."
+    },
+    {
+      "start": 1912.0,
+      "end": 1919.0,
+      "text": "Okay, you really should know that any of these out-of-ounds rights at all."
+    },
+    {
+      "start": 1919.0,
+      "end": 1923.0,
+      "text": "Okay, so type-safe languages will protect against these things."
+    },
+    {
+      "start": 1923.0,
+      "end": 1928.0,
+      "text": "So you can see why type-safe language is, but in this course,"
+    },
+    {
+      "start": 1928.0,
+      "end": 1932.0,
+      "text": "we also call strongly type languages why they're so popular."
+    },
+    {
+      "start": 1932.0,
+      "end": 1937.0,
+      "text": "All of these modern languages go Russ, I mentioned,"
+    },
+    {
+      "start": 1937.0,
+      "end": 1942.0,
+      "text": "a little less modern, rather than Java, C-Charp."
+    },
+    {
+      "start": 1942.0,
+      "end": 1947.0,
+      "text": "All of these things are very popular, strictly language and Python, Ruby,"
+    },
+    {
+      "start": 1947.0,
+      "end": 1949.0,
+      "text": "all take takes."
+    },
+    {
+      "start": 1949.0,
+      "end": 1951.0,
+      "text": "So you don't have to worry about these things."
+    },
+    {
+      "start": 1951.0,
+      "end": 1958.0,
+      "text": "And then, if the point is once more, programming in C and C++ requires extra peace."
+    },
+    {
+      "start": 1958.0,
+      "end": 1961.0,
+      "text": "Okay, like you need to know about these things."
+    },
+    {
+      "start": 1961.0,
+      "end": 1964.0,
+      "text": "Go and post it online."
+    },
+    {
+      "start": 1964.0,
+      "end": 1970.0,
+      "text": "LLN Genericode may have upper overflows of 100 billion years in here."
+    },
+    {
+      "start": 1970.0,
+      "end": 1975.0,
+      "text": "You need to know how to out it."
+    },
+    {
+      "start": 1975.0,
+      "end": 1977.0,
+      "text": "Okay, ASLR now."
+    },
+    {
+      "start": 1977.0,
+      "end": 1981.0,
+      "text": "Okay, ASLR is another one that's up popular."
+    },
+    {
+      "start": 1981.0,
+      "end": 1983.0,
+      "text": "This is why we use it."
+    },
+    {
+      "start": 1983.0,
+      "end": 1992.0,
+      "text": "Okay, so the idea here is, well, let's try to make it harder for attackers to guess"
+    },
+    {
+      "start": 1992.0,
+      "end": 1995.0,
+      "text": "or figure out pointer value."
+    },
+    {
+      "start": 1995.0,
+      "end": 1999.0,
+      "text": "Okay, so we already saw, like, Sackyard protects one pointer,"
+    },
+    {
+      "start": 1999.0,
+      "end": 2002.0,
+      "text": "one kind of pointer value, or return after."
+    },
+    {
+      "start": 2002.0,
+      "end": 2004.0,
+      "text": "So it's a pointer value."
+    },
+    {
+      "start": 2004.0,
+      "end": 2009.0,
+      "text": "We end up updating our programming counter to, it's a code pointer."
+    },
+    {
+      "start": 2009.0,
+      "end": 2015.0,
+      "text": "So, if you can see, like, yeah, to an attacker, these pointers, like code pointers,"
+    },
+    {
+      "start": 2015.0,
+      "end": 2019.0,
+      "text": "but other pointers as well are, you know, powerful."
+    },
+    {
+      "start": 2019.0,
+      "end": 2025.0,
+      "text": "So what if we were to technique where we, if I could make it harder to guess or figure out pointer values,"
+    },
+    {
+      "start": 2025.0,
+      "end": 2034.0,
+      "text": "and that's what ASLR tries to do by trying to put every program segment, every memory segment,"
+    },
+    {
+      "start": 2034.0,
+      "end": 2039.0,
+      "text": "and make the ASLR as for that memory segment be brand of eyes."
+    },
+    {
+      "start": 2039.0,
+      "end": 2046.0,
+      "text": "Okay, so maybe a program starts, and, you know, what are our memory segments again?"
+    },
+    {
+      "start": 2046.0,
+      "end": 2053.0,
+      "text": "Another good review of questions, sort of, Sack, that we need to know."
+    },
+    {
+      "start": 2053.0,
+      "end": 2054.0,
+      "text": "Data."
+    },
+    {
+      "start": 2054.0,
+      "end": 2057.0,
+      "text": "We have rules."
+    },
+    {
+      "start": 2057.0,
+      "end": 2060.0,
+      "text": "Yeah, let me go under text or whatever."
+    },
+    {
+      "start": 2060.0,
+      "end": 2073.0,
+      "text": "Okay, well, so with ASLR, maybe you, like, maybe you send logical addresses,"
+    },
+    {
+      "start": 2073.0,
+      "end": 2079.0,
+      "text": "maybe there's, like, a break on each of these, and there's not of them, might be a base error,"
+    },
+    {
+      "start": 2079.0,
+      "end": 2084.0,
+      "text": "maybe you keep these two in a base and with the loading value, we talked about,"
+    },
+    {
+      "start": 2084.0,
+      "end": 2087.0,
+      "text": "but you separate these other two."
+    },
+    {
+      "start": 2087.0,
+      "end": 2093.0,
+      "text": "So the idea is that the base address for each segment will be brand of eyes."
+    },
+    {
+      "start": 2093.0,
+      "end": 2097.0,
+      "text": "So that way an attacker can just know because he's tried it on his machine,"
+    },
+    {
+      "start": 2097.0,
+      "end": 2105.0,
+      "text": "and he knows it, like, oh, well, the kind of base address of the Sack is whatever, you know, the option,"
+    },
+    {
+      "start": 2105.0,
+      "end": 2107.0,
+      "text": "text address."
+    },
+    {
+      "start": 2107.0,
+      "end": 2113.0,
+      "text": "Now the attacker maybe has to go to another step to try to figure out, like,"
+    },
+    {
+      "start": 2113.0,
+      "end": 2116.0,
+      "text": "is this Sack even begin, the memory?"
+    },
+    {
+      "start": 2116.0,
+      "end": 2122.0,
+      "text": "It might be different, and it's expected to be different on every machine."
+    },
+    {
+      "start": 2122.0,
+      "end": 2127.0,
+      "text": "So what works in the attacker's lab may not work on a base, though."
+    },
+    {
+      "start": 2127.0,
+      "end": 2134.0,
+      "text": "The attacker can just hard-pown one address here, or, you know, same, the attacker can just know,"
+    },
+    {
+      "start": 2134.0,
+      "end": 2139.0,
+      "text": "like, oh, I have a point, you know, the return address, and you can write here,"
+    },
+    {
+      "start": 2139.0,
+      "end": 2141.0,
+      "text": "because this is where I want to go."
+    },
+    {
+      "start": 2141.0,
+      "end": 2146.0,
+      "text": "So the unknown base address, there's a long time."
+    },
+    {
+      "start": 2146.0,
+      "end": 2150.0,
+      "text": "That's the big idea of the A-S-L-A."
+    },
+    {
+      "start": 2150.0,
+      "end": 2156.0,
+      "text": "So, brand of eyes,"
+    },
+    {
+      "start": 2156.0,
+      "end": 2161.0,
+      "text": "and the locations,"
+    },
+    {
+      "start": 2161.0,
+      "end": 2170.0,
+      "text": "all the segments in memory."
+    },
+    {
+      "start": 2170.0,
+      "end": 2180.0,
+      "text": "The pointer, like, the concrete pointer values,"
+    },
+    {
+      "start": 2180.0,
+      "end": 2186.0,
+      "text": "the actual pointer values, the bit strings for each address,"
+    },
+    {
+      "start": 2186.0,
+      "end": 2193.0,
+      "text": "will give her the sheet in the machine."
+    },
+    {
+      "start": 2201.0,
+      "end": 2206.0,
+      "text": "Minotions."
+    },
+    {
+      "start": 2206.0,
+      "end": 2211.0,
+      "text": "Okay, well, so what's important for an attacker now?"
+    },
+    {
+      "start": 2211.0,
+      "end": 2215.0,
+      "text": "Now, like, another, really, what we're doing is we're making another secret."
+    },
+    {
+      "start": 2215.0,
+      "end": 2218.0,
+      "text": "Maybe thinking about Stack-Art as, oh, there's a secret."
+    },
+    {
+      "start": 2218.0,
+      "end": 2224.0,
+      "text": "If the attacker gives a secret, then the mechanism is worthless."
+    },
+    {
+      "start": 2224.0,
+      "end": 2226.0,
+      "text": "So there is a canary here."
+    },
+    {
+      "start": 2226.0,
+      "end": 2229.0,
+      "text": "So what are the secret, as well, the secret is moving,"
+    },
+    {
+      "start": 2229.0,
+      "end": 2232.0,
+      "text": "whatever the base address is of each person."
+    },
+    {
+      "start": 2232.0,
+      "end": 2235.0,
+      "text": "You have to get it, and if you keep this separated,"
+    },
+    {
+      "start": 2235.0,
+      "end": 2239.0,
+      "text": "and it's on, then that may have its own base address."
+    },
+    {
+      "start": 2239.0,
+      "end": 2246.0,
+      "text": "And it could be top or bottom."
+    },
+    {
+      "start": 2246.0,
+      "end": 2253.0,
+      "text": "Okay, so, only, what's the attacker?"
+    },
+    {
+      "start": 2254.0,
+      "end": 2260.0,
+      "text": "A, split,"
+    },
+    {
+      "start": 2260.0,
+      "end": 2265.0,
+      "text": "other vulnerability."
+    },
+    {
+      "start": 2265.0,
+      "end": 2272.0,
+      "text": "Okay, so it's the same limitation that we had with Stack-Art."
+    },
+    {
+      "start": 2272.0,
+      "end": 2276.0,
+      "text": "Anther may exploit other vulnerabilities,"
+    },
+    {
+      "start": 2276.0,
+      "end": 2279.0,
+      "text": "or the same example as before."
+    },
+    {
+      "start": 2280.0,
+      "end": 2288.0,
+      "text": "Again, for example, you know, formats, training, vulnerabilities."
+    },
+    {
+      "start": 2288.0,
+      "end": 2296.0,
+      "text": "Now, two, learn the base addresses."
+    },
+    {
+      "start": 2296.0,
+      "end": 2299.0,
+      "text": "So, like, if you think through this,"
+    },
+    {
+      "start": 2299.0,
+      "end": 2306.0,
+      "text": "if an attacker can get one known pointer, say, into the stack,"
+    },
+    {
+      "start": 2306.0,
+      "end": 2311.0,
+      "text": "the attacker will know, or could know, from running on his own machine,"
+    },
+    {
+      "start": 2311.0,
+      "end": 2315.0,
+      "text": "he kind of might know, okay, well, this thing I got,"
+    },
+    {
+      "start": 2315.0,
+      "end": 2319.0,
+      "text": "this pointer value for, is I didn't offset, oh,"
+    },
+    {
+      "start": 2319.0,
+      "end": 2323.0,
+      "text": "whatever, from the base of the stack."
+    },
+    {
+      "start": 2323.0,
+      "end": 2327.0,
+      "text": "Okay, so, to give one pointer into the stack,"
+    },
+    {
+      "start": 2327.0,
+      "end": 2330.0,
+      "text": "one pointer into the E, and your global,"
+    },
+    {
+      "start": 2330.0,
+      "end": 2335.0,
+      "text": "and your code, maybe one pointer will uncover"
+    },
+    {
+      "start": 2335.0,
+      "end": 2340.0,
+      "text": "the base address, or that, say."
+    },
+    {
+      "start": 2340.0,
+      "end": 2342.0,
+      "text": "Everyone already knows that,"
+    },
+    {
+      "start": 2342.0,
+      "end": 2346.0,
+      "text": "because, like, once an attacker gets this address A,"
+    },
+    {
+      "start": 2346.0,
+      "end": 2349.0,
+      "text": "will be attacked, will know the offset,"
+    },
+    {
+      "start": 2349.0,
+      "end": 2354.0,
+      "text": "the offset, from the base, from the base address,"
+    },
+    {
+      "start": 2354.0,
+      "end": 2356.0,
+      "text": "the offset, to get the hit."
+    },
+    {
+      "start": 2356.0,
+      "end": 2359.0,
+      "text": "So, the attacker already knows how."
+    },
+    {
+      "start": 2359.0,
+      "end": 2363.0,
+      "text": "Okay, just from, like, running the program through the logger,"
+    },
+    {
+      "start": 2363.0,
+      "end": 2365.0,
+      "text": "you know, you can't go just now."
+    },
+    {
+      "start": 2365.0,
+      "end": 2368.0,
+      "text": "Oh, well, you know, A is like, whatever, you know,"
+    },
+    {
+      "start": 2368.0,
+      "end": 2371.0,
+      "text": "100 bytes down from the base address."
+    },
+    {
+      "start": 2371.0,
+      "end": 2374.0,
+      "text": "Okay, so if an attacker gets A, then the attacker just attracts,"
+    },
+    {
+      "start": 2374.0,
+      "end": 2376.0,
+      "text": "or, say, here we're going up."
+    },
+    {
+      "start": 2376.0,
+      "end": 2381.0,
+      "text": "So, adds 100 to get to the base."
+    },
+    {
+      "start": 2381.0,
+      "end": 2385.0,
+      "text": "So, once one pointer value is leaked,"
+    },
+    {
+      "start": 2385.0,
+      "end": 2390.0,
+      "text": "then ASLR is, you know, we've sort of committed ASLR"
+    },
+    {
+      "start": 2390.0,
+      "end": 2392.0,
+      "text": "for that second."
+    },
+    {
+      "start": 2392.0,
+      "end": 2397.0,
+      "text": "Okay, if we get a pointer into the code memory,"
+    },
+    {
+      "start": 2397.0,
+      "end": 2402.0,
+      "text": "then we, we look to see, we, we, the base address,"
+    },
+    {
+      "start": 2402.0,
+      "end": 2405.0,
+      "text": "because the attacker will know the offset."
+    },
+    {
+      "start": 2405.0,
+      "end": 2410.0,
+      "text": "We're not ready to have, or we can assume the attacker"
+    },
+    {
+      "start": 2410.0,
+      "end": 2412.0,
+      "text": "is good enough offset."
+    },
+    {
+      "start": 2412.0,
+      "end": 2419.0,
+      "text": "Yeah, well, the attacker will know,"
+    },
+    {
+      "start": 2419.0,
+      "end": 2422.0,
+      "text": "okay, so the attacker doesn't use A to have to wait,"
+    },
+    {
+      "start": 2422.0,
+      "end": 2423.0,
+      "text": "oh, the offset."
+    },
+    {
+      "start": 2423.0,
+      "end": 2429.0,
+      "text": "So, the offset, the attacker can know by running this program"
+    },
+    {
+      "start": 2429.0,
+      "end": 2434.0,
+      "text": "in, you know, his own test environment."
+    },
+    {
+      "start": 2434.0,
+      "end": 2437.0,
+      "text": "Okay, so the attacker can run the code through, like, the logger,"
+    },
+    {
+      "start": 2437.0,
+      "end": 2439.0,
+      "text": "and you can see, okay, well, on logger,"
+    },
+    {
+      "start": 2439.0,
+      "end": 2443.0,
+      "text": "you know, A is 100 bytes down on the stack."
+    },
+    {
+      "start": 2443.0,
+      "end": 2445.0,
+      "text": "Okay, and this program, when he's running this way,"
+    },
+    {
+      "start": 2445.0,
+      "end": 2448.0,
+      "text": "is going to put A 100 bytes down."
+    },
+    {
+      "start": 2448.0,
+      "end": 2451.0,
+      "text": "Okay, so if you need A, how do you subtract, or you,"
+    },
+    {
+      "start": 2451.0,
+      "end": 2454.0,
+      "text": "in this case, add 100, because we're going up,"
+    },
+    {
+      "start": 2454.0,
+      "end": 2457.0,
+      "text": "and that'll give you this top address."
+    },
+    {
+      "start": 2457.0,
+      "end": 2461.0,
+      "text": "Okay, so sometimes the base address will be considered down here,"
+    },
+    {
+      "start": 2461.0,
+      "end": 2464.0,
+      "text": "and the lowest, in which case, you subtract."
+    },
+    {
+      "start": 2464.0,
+      "end": 2468.0,
+      "text": "Okay, so the base of the sort, the first four machines,"
+    },
+    {
+      "start": 2468.0,
+      "end": 2470.0,
+      "text": "but get all sorts of stuff."
+    },
+    {
+      "start": 2470.0,
+      "end": 2471.0,
+      "text": "Correct."
+    },
+    {
+      "start": 2471.0,
+      "end": 2472.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2472.0,
+      "end": 2474.0,
+      "text": "So, we mean the programs run the same way,"
+    },
+    {
+      "start": 2474.0,
+      "end": 2476.0,
+      "text": "the offset will be the same."
+    },
+    {
+      "start": 2476.0,
+      "end": 2479.0,
+      "text": "So, all this is doing is, for its locations,"
+    },
+    {
+      "start": 2479.0,
+      "end": 2481.0,
+      "text": "when I say locations, I'm really saying, like,"
+    },
+    {
+      "start": 2481.0,
+      "end": 2484.0,
+      "text": "your base address."
+    },
+    {
+      "start": 2484.0,
+      "end": 2488.0,
+      "text": "Base addresses of base addresses."
+    },
+    {
+      "start": 2488.0,
+      "end": 2492.0,
+      "text": "It's not like every value within the same name is randomized,"
+    },
+    {
+      "start": 2492.0,
+      "end": 2494.0,
+      "text": "like, it's a random location."
+    },
+    {
+      "start": 2494.0,
+      "end": 2498.0,
+      "text": "It's just the base address."
+    },
+    {
+      "start": 2498.0,
+      "end": 2501.0,
+      "text": "The one-cent attacker gets a single address,"
+    },
+    {
+      "start": 2501.0,
+      "end": 2505.0,
+      "text": "a single pointer into that type of name."
+    },
+    {
+      "start": 2505.0,
+      "end": 2508.0,
+      "text": "And assume that they have the base address as well."
+    },
+    {
+      "start": 2508.0,
+      "end": 2512.0,
+      "text": "So, you mentioned on the canaries that it is expensive"
+    },
+    {
+      "start": 2512.0,
+      "end": 2515.0,
+      "text": "on the overhead part to generate a bunch of keys every time."
+    },
+    {
+      "start": 2515.0,
+      "end": 2520.0,
+      "text": "Is it expensive to randomize the address on these?"
+    },
+    {
+      "start": 2520.0,
+      "end": 2522.0,
+      "text": "Yeah, well, so, right."
+    },
+    {
+      "start": 2522.0,
+      "end": 2525.0,
+      "text": "How expensive is it being, if you think about it,"
+    },
+    {
+      "start": 2525.0,
+      "end": 2527.0,
+      "text": "this is a great question."
+    },
+    {
+      "start": 2527.0,
+      "end": 2530.0,
+      "text": "Well, I should be writing the test."
+    },
+    {
+      "start": 2530.0,
+      "end": 2533.0,
+      "text": "So, you know, what I think about this,"
+    },
+    {
+      "start": 2533.0,
+      "end": 2538.0,
+      "text": "how often is a stack-art operation happening?"
+    },
+    {
+      "start": 2538.0,
+      "end": 2540.0,
+      "text": "Okay, so, there are different parts of stack-art."
+    },
+    {
+      "start": 2540.0,
+      "end": 2543.0,
+      "text": "There's like, creating the canary to a front."
+    },
+    {
+      "start": 2543.0,
+      "end": 2546.0,
+      "text": "That maybe only happens once in the beginning of the program."
+    },
+    {
+      "start": 2546.0,
+      "end": 2548.0,
+      "text": "Maybe we're creating one canary,"
+    },
+    {
+      "start": 2548.0,
+      "end": 2552.0,
+      "text": "but then we have to push and pop the canary every time we invoke"
+    },
+    {
+      "start": 2552.0,
+      "end": 2554.0,
+      "text": "or return from a function."
+    },
+    {
+      "start": 2554.0,
+      "end": 2556.0,
+      "text": "Okay, here, what are we doing?"
+    },
+    {
+      "start": 2556.0,
+      "end": 2562.0,
+      "text": "Well, we're creating, I don't know, three to four random base values."
+    },
+    {
+      "start": 2562.0,
+      "end": 2566.0,
+      "text": "Okay, so that's like more random number creation"
+    },
+    {
+      "start": 2566.0,
+      "end": 2568.0,
+      "text": "than a single canary."
+    },
+    {
+      "start": 2568.0,
+      "end": 2570.0,
+      "text": "So, a little more overhead there,"
+    },
+    {
+      "start": 2570.0,
+      "end": 2574.0,
+      "text": "but there's no extra overhead on the function returns,"
+    },
+    {
+      "start": 2574.0,
+      "end": 2577.0,
+      "text": "function calls, any of that stuff."
+    },
+    {
+      "start": 2577.0,
+      "end": 2582.0,
+      "text": "Okay, so this, you kind of hate the price upfront."
+    },
+    {
+      "start": 2582.0,
+      "end": 2586.0,
+      "text": "So, you mentioned for the canaries that you could do a term method"
+    },
+    {
+      "start": 2586.0,
+      "end": 2590.0,
+      "text": "and then with refresh, that's a different one."
+    },
+    {
+      "start": 2590.0,
+      "end": 2591.0,
+      "text": "Okay, yes."
+    },
+    {
+      "start": 2591.0,
+      "end": 2596.0,
+      "text": "But with canaries, let's assume that, like, can practice,"
+    },
+    {
+      "start": 2596.0,
+      "end": 2600.0,
+      "text": "let's assume that canaries will be expert given program."
+    },
+    {
+      "start": 2600.0,
+      "end": 2606.0,
+      "text": "Okay, so the stack will have all equal canary values all the way up."
+    },
+    {
+      "start": 2606.0,
+      "end": 2608.0,
+      "text": "So, this is technically more efficient"
+    },
+    {
+      "start": 2608.0,
+      "end": 2611.0,
+      "text": "because it only does it up front and then it doesn't do it anymore"
+    },
+    {
+      "start": 2611.0,
+      "end": 2612.0,
+      "text": "for the early beta run."
+    },
+    {
+      "start": 2612.0,
+      "end": 2614.0,
+      "text": "Yeah, it depends on the program."
+    },
+    {
+      "start": 2614.0,
+      "end": 2617.0,
+      "text": "Right, this is where we get into engineering,"
+    },
+    {
+      "start": 2617.0,
+      "end": 2621.0,
+      "text": "right, because it only does it on how many function calls in return to have."
+    },
+    {
+      "start": 2621.0,
+      "end": 2626.0,
+      "text": "So, like, stack cards really fast when you go and invoke conflusions."
+    },
+    {
+      "start": 2626.0,
+      "end": 2629.0,
+      "text": "But this is going to be stable, no matter what,"
+    },
+    {
+      "start": 2629.0,
+      "end": 2631.0,
+      "text": "because you have to generate the front up front."
+    },
+    {
+      "start": 2631.0,
+      "end": 2633.0,
+      "text": "So, this may vary, this will always be the same."
+    },
+    {
+      "start": 2633.0,
+      "end": 2635.0,
+      "text": "This will have some upfront overhead."
+    },
+    {
+      "start": 2635.0,
+      "end": 2638.0,
+      "text": "This is another key where I think in breakfast back,"
+    },
+    {
+      "start": 2638.0,
+      "end": 2640.0,
+      "text": "and then people are okay with this,"
+    },
+    {
+      "start": 2640.0,
+      "end": 2644.0,
+      "text": "but people are much less excited than they were about this initially."
+    },
+    {
+      "start": 2644.0,
+      "end": 2648.0,
+      "text": "Because, you know, we're kind of like stack cards really tough."
+    },
+    {
+      "start": 2648.0,
+      "end": 2654.0,
+      "text": "Over time, people have found and created tools to circumvent this."
+    },
+    {
+      "start": 2654.0,
+      "end": 2659.0,
+      "text": "But it is very popular, I expect it's on and it's running on all of our machines."
+    },
+    {
+      "start": 2659.0,
+      "end": 2664.0,
+      "text": "Okay, podwildo, we've got one similar limitation to stack cards."
+    },
+    {
+      "start": 2664.0,
+      "end": 2669.0,
+      "text": "Now, there's another one which would be just like before I just reversed the order."
+    },
+    {
+      "start": 2669.0,
+      "end": 2673.0,
+      "text": "But, you know, the stack card, I think, is limitations on and on too."
+    },
+    {
+      "start": 2673.0,
+      "end": 2676.0,
+      "text": "Those may be the same as they may be just in the opposite order,"
+    },
+    {
+      "start": 2676.0,
+      "end": 2679.0,
+      "text": "which is, you know, attacker being group force."
+    },
+    {
+      "start": 2679.0,
+      "end": 2686.0,
+      "text": "Or, you know, guess, guess, or group force."
+    },
+    {
+      "start": 2686.0,
+      "end": 2691.0,
+      "text": "These addresses."
+    },
+    {
+      "start": 2700.0,
+      "end": 2706.0,
+      "text": "Okay, what about, so remember, a third limitation from stack card"
+    },
+    {
+      "start": 2706.0,
+      "end": 2709.0,
+      "text": "was only the return address is protected."
+    },
+    {
+      "start": 2709.0,
+      "end": 2713.0,
+      "text": "We have a similar kind of limitation here."
+    },
+    {
+      "start": 2713.0,
+      "end": 2717.0,
+      "text": "Well, these products, more than return address, right?"
+    },
+    {
+      "start": 2717.0,
+      "end": 2720.0,
+      "text": "Yeah, since it also protects return address."
+    },
+    {
+      "start": 2720.0,
+      "end": 2725.0,
+      "text": "This is really protecting or was it a 10-D?"
+    },
+    {
+      "start": 2726.0,
+      "end": 2731.0,
+      "text": "Yeah, so the base address, which in turn protects, you know,"
+    },
+    {
+      "start": 2731.0,
+      "end": 2735.0,
+      "text": "any time the attacker tries to override a pointer point"
+    },
+    {
+      "start": 2735.0,
+      "end": 2738.0,
+      "text": "to something, you know, some particular spot."
+    },
+    {
+      "start": 2738.0,
+      "end": 2744.0,
+      "text": "It's really, this is protecting attempting to protect point picks."
+    },
+    {
+      "start": 2744.0,
+      "end": 2749.0,
+      "text": "Well, can buffer overflows do bad things at non-pointing values?"
+    },
+    {
+      "start": 2749.0,
+      "end": 2752.0,
+      "text": "Yes, yes, they can."
+    },
+    {
+      "start": 2752.0,
+      "end": 2757.0,
+      "text": "Okay, so you can still overflow buffers and override everything else"
+    },
+    {
+      "start": 2757.0,
+      "end": 2758.0,
+      "text": "with no issue."
+    },
+    {
+      "start": 2758.0,
+      "end": 2761.0,
+      "text": "ASLR won't stand in the way of that."
+    },
+    {
+      "start": 2761.0,
+      "end": 2764.0,
+      "text": "Okay, so all these things like, oh, it looks like the right,"
+    },
+    {
+      "start": 2764.0,
+      "end": 2768.0,
+      "text": "secret keys, you can override objects in memory of them."
+    },
+    {
+      "start": 2768.0,
+      "end": 2772.0,
+      "text": "And the heat and the stack, anywhere."
+    },
+    {
+      "start": 2772.0,
+      "end": 2775.0,
+      "text": "As long as it's not a pointer."
+    },
+    {
+      "start": 2775.0,
+      "end": 2781.0,
+      "text": "Okay, so, um, the values, I guess, are saved only to try to protect."
+    },
+    {
+      "start": 2782.0,
+      "end": 2785.0,
+      "text": "Pointers."
+    },
+    {
+      "start": 2785.0,
+      "end": 2790.0,
+      "text": "Pointers, and again, that would include return addresses."
+    },
+    {
+      "start": 2790.0,
+      "end": 2793.0,
+      "text": "Return addresses are kinds of points."
+    },
+    {
+      "start": 2799.0,
+      "end": 2803.0,
+      "text": "So I could only see this as protecting, sorry,"
+    },
+    {
+      "start": 2803.0,
+      "end": 2806.0,
+      "text": "I could only see this as mitigating attacks."
+    },
+    {
+      "start": 2807.0,
+      "end": 2816.0,
+      "text": "Okay, so what is this crime mitigating behavior being?"
+    },
+    {
+      "start": 2816.0,
+      "end": 2820.0,
+      "text": "Okay, so suppose we have no stack art."
+    },
+    {
+      "start": 2820.0,
+      "end": 2824.0,
+      "text": "Okay, so predicts stack art, both of you just have ASLR."
+    },
+    {
+      "start": 2824.0,
+      "end": 2827.0,
+      "text": "Okay, so ASLR is in place."
+    },
+    {
+      "start": 2827.0,
+      "end": 2830.0,
+      "text": "Okay, so what we do with the next one."
+    },
+    {
+      "start": 2830.0,
+      "end": 2834.0,
+      "text": "So the attacker wants to overwrite some return address."
+    },
+    {
+      "start": 2835.0,
+      "end": 2838.0,
+      "text": "He's going to get overwritten to point down here."
+    },
+    {
+      "start": 2838.0,
+      "end": 2841.0,
+      "text": "That is specific spot."
+    },
+    {
+      "start": 2841.0,
+      "end": 2846.0,
+      "text": "Okay, well, so the idea of ASLR is, you know,"
+    },
+    {
+      "start": 2846.0,
+      "end": 2850.0,
+      "text": "the attacker catches hard code this value anymore."
+    },
+    {
+      "start": 2850.0,
+      "end": 2857.0,
+      "text": "Can't just overwrite return address is some fixed constant value for all machines."
+    },
+    {
+      "start": 2857.0,
+      "end": 2862.0,
+      "text": "And now the attacker has to know, well, what's this address?"
+    },
+    {
+      "start": 2863.0,
+      "end": 2866.0,
+      "text": "It's a really good one, I was going to say, you know, the base,"
+    },
+    {
+      "start": 2866.0,
+      "end": 2872.0,
+      "text": "and then add some offset to get to the actual, you know, attack address."
+    },
+    {
+      "start": 2872.0,
+      "end": 2876.0,
+      "text": "Okay, so this is what's really happening is, we made it,"
+    },
+    {
+      "start": 2876.0,
+      "end": 2881.0,
+      "text": "we've added an extra step, where an attacker doesn't know that, like,"
+    },
+    {
+      "start": 2881.0,
+      "end": 2886.0,
+      "text": "it's to overwrite the return address with, to get to exactly right here."
+    },
+    {
+      "start": 2886.0,
+      "end": 2889.0,
+      "text": "And because it's going to vary machine machine,"
+    },
+    {
+      "start": 2889.0,
+      "end": 2892.0,
+      "text": "because B changes on each machine."
+    },
+    {
+      "start": 2892.0,
+      "end": 2895.0,
+      "text": "Every machine has a different E now."
+    },
+    {
+      "start": 2895.0,
+      "end": 2901.0,
+      "text": "Okay, so now really an attacker needs to run, a separate attack."
+    },
+    {
+      "start": 2901.0,
+      "end": 2905.0,
+      "text": "Okay, step one is find some pointer in the code."
+    },
+    {
+      "start": 2905.0,
+      "end": 2907.0,
+      "text": "Okay, use that."
+    },
+    {
+      "start": 2907.0,
+      "end": 2911.0,
+      "text": "So maybe the attacker gets this, so this is like a prime."
+    },
+    {
+      "start": 2911.0,
+      "end": 2916.0,
+      "text": "And now the attacker concludes this, concludes B,"
+    },
+    {
+      "start": 2917.0,
+      "end": 2922.0,
+      "text": "because the attacker knows this all session will prime."
+    },
+    {
+      "start": 2922.0,
+      "end": 2926.0,
+      "text": "Okay, so the attacker gets a prime, the attacker, you know,"
+    },
+    {
+      "start": 2926.0,
+      "end": 2930.0,
+      "text": "pick your towel, no prime, but just running it on the test environment."
+    },
+    {
+      "start": 2930.0,
+      "end": 2935.0,
+      "text": "Okay, and with that, the attacker goes B, the attacker also knows O,"
+    },
+    {
+      "start": 2935.0,
+      "end": 2940.0,
+      "text": "from his test environment, and then that gets finally disabled."
+    },
+    {
+      "start": 2940.0,
+      "end": 2943.0,
+      "text": "I don't know if maybe this is just pointer or anything,"
+    },
+    {
+      "start": 2944.0,
+      "end": 2948.0,
+      "text": "so taking, one to know some pointer in your code memory,"
+    },
+    {
+      "start": 2948.0,
+      "end": 2954.0,
+      "text": "then that allows you to figure out everything, assuming the attacker knows the layout of code."
+    },
+    {
+      "start": 2954.0,
+      "end": 2956.0,
+      "text": "Okay, members, thank you."
+    },
+    {
+      "start": 2956.0,
+      "end": 2960.0,
+      "text": "What are the others looking for?"
+    },
+    {
+      "start": 2960.0,
+      "end": 2965.0,
+      "text": "Uh, yes, no offsleds are winning the attackers,"
+    },
+    {
+      "start": 2965.0,
+      "end": 2969.0,
+      "text": "hooding code in on a, like, a data segment."
+    },
+    {
+      "start": 2969.0,
+      "end": 2971.0,
+      "text": "Oh, so it's not a problem segment?"
+    },
+    {
+      "start": 2971.0,
+      "end": 2976.0,
+      "text": "Okay, yes, like no offsleds, you would hope wouldn't be in a memory,"
+    },
+    {
+      "start": 2976.0,
+      "end": 2979.0,
+      "text": "although, you know, with variable length instructions,"
+    },
+    {
+      "start": 2979.0,
+      "end": 2982.0,
+      "text": "like we talked about variable width instructions,"
+    },
+    {
+      "start": 2982.0,
+      "end": 2987.0,
+      "text": "you could have no offsleds unintentionally inside this code segment,"
+    },
+    {
+      "start": 2987.0,
+      "end": 2992.0,
+      "text": "so that would look like a good help."
+    },
+    {
+      "start": 2992.0,
+      "end": 2996.0,
+      "text": "Okay, but no offsleds, we think it would be more like,"
+    },
+    {
+      "start": 2996.0,
+      "end": 2999.0,
+      "text": "it would have a means to do it, so the attacker would like,"
+    },
+    {
+      "start": 2999.0,
+      "end": 3004.0,
+      "text": "like, a thousand no offsleds, and then unboying,"
+    },
+    {
+      "start": 3004.0,
+      "end": 3007.0,
+      "text": "and, uh, they could say, remember, yeah."
+    },
+    {
+      "start": 3007.0,
+      "end": 3010.0,
+      "text": "I'm just told that confused on this, I understand the concept,"
+    },
+    {
+      "start": 3010.0,
+      "end": 3012.0,
+      "text": "and how an attacker can find out the upset,"
+    },
+    {
+      "start": 3012.0,
+      "end": 3015.0,
+      "text": "but how do they get the 8th problem?"
+    },
+    {
+      "start": 3015.0,
+      "end": 3016.0,
+      "text": "What's the method here?"
+    },
+    {
+      "start": 3016.0,
+      "end": 3019.0,
+      "text": "Yeah, so there will, we'll see, uh,"
+    },
+    {
+      "start": 3019.0,
+      "end": 3022.0,
+      "text": "there could be other techies, and it might be used,"
+    },
+    {
+      "start": 3022.0,
+      "end": 3025.0,
+      "text": "to figure out the 8th wrong, okay?"
+    },
+    {
+      "start": 3025.0,
+      "end": 3028.0,
+      "text": "And that would be things like formaturing vulnerabilities."
+    },
+    {
+      "start": 3028.0,
+      "end": 3031.0,
+      "text": "So there are other ways an attacker might, for example,"
+    },
+    {
+      "start": 3031.0,
+      "end": 3034.0,
+      "text": "as an attacker can leak the return address,"
+    },
+    {
+      "start": 3034.0,
+      "end": 3038.0,
+      "text": "wonder return address, well, that would be something."
+    },
+    {
+      "start": 3038.0,
+      "end": 3042.0,
+      "text": "That would be a pointer somewhere in the code member."
+    },
+    {
+      "start": 3042.0,
+      "end": 3045.0,
+      "text": "Once an attacker can leak some say code pointer,"
+    },
+    {
+      "start": 3045.0,
+      "end": 3052.0,
+      "text": "such as a return address, then the attacker has this, this 8th problem."
+    },
+    {
+      "start": 3052.0,
+      "end": 3056.0,
+      "text": "So 8th problem is only available through explaining other vulnerabilities."
+    },
+    {
+      "start": 3056.0,
+      "end": 3060.0,
+      "text": "You can't find it unless there's another vulnerability that allows that in the first place."
+    },
+    {
+      "start": 3060.0,
+      "end": 3062.0,
+      "text": "Um, right, yeah, okay."
+    },
+    {
+      "start": 3062.0,
+      "end": 3065.0,
+      "text": "Right, so the attacker could explain some other vulnerability,"
+    },
+    {
+      "start": 3065.0,
+      "end": 3068.0,
+      "text": "to figure out the 8th problem, and with that, you know,"
+    },
+    {
+      "start": 3068.0,
+      "end": 3071.0,
+      "text": "the attacker will assume no so prime and no,"
+    },
+    {
+      "start": 3071.0,
+      "end": 3074.0,
+      "text": "so the attacker already knows no and no prime."
+    },
+    {
+      "start": 3074.0,
+      "end": 3079.0,
+      "text": "The attacker gets 8th problem now, the attacker can get it."
+    },
+    {
+      "start": 3079.0,
+      "end": 3082.0,
+      "text": "I don't know, or even this idea,"
+    },
+    {
+      "start": 3082.0,
+      "end": 3084.0,
+      "text": "and again, we'll see examples,"
+    },
+    {
+      "start": 3084.0,
+      "end": 3088.0,
+      "text": "but it is basically that idea, the attacker can leak a return address."
+    },
+    {
+      "start": 3088.0,
+      "end": 3091.0,
+      "text": "Well, that's a pointer in the code member."
+    },
+    {
+      "start": 3091.0,
+      "end": 3093.0,
+      "text": "Okay, so once in a week,"
+    },
+    {
+      "start": 3093.0,
+      "end": 3097.0,
+      "text": "some code pointer, the ASLR is gone."
+    },
+    {
+      "start": 3097.0,
+      "end": 3099.0,
+      "text": "Like the ASLR is gone."
+    },
+    {
+      "start": 3104.0,
+      "end": 3111.0,
+      "text": "All right, how the workflow integrity is the tower last one?"
+    },
+    {
+      "start": 3112.0,
+      "end": 3115.0,
+      "text": "There are the last techniques."
+    },
+    {
+      "start": 3115.0,
+      "end": 3117.0,
+      "text": "And again, as we're going through these,"
+    },
+    {
+      "start": 3117.0,
+      "end": 3120.0,
+      "text": "hopefully you can see these are things that are programs we can manage,"
+    },
+    {
+      "start": 3120.0,
+      "end": 3124.0,
+      "text": "but they're not things that we as senior coders are in control."
+    },
+    {
+      "start": 3124.0,
+      "end": 3127.0,
+      "text": "Okay, we can use, we can use these,"
+    },
+    {
+      "start": 3127.0,
+      "end": 3131.0,
+      "text": "not from others, and things, we use these techniques,"
+    },
+    {
+      "start": 3131.0,
+      "end": 3135.0,
+      "text": "but we're not implementing them ourselves."
+    },
+    {
+      "start": 3135.0,
+      "end": 3139.0,
+      "text": "I'm assuming we're the application program."
+    },
+    {
+      "start": 3140.0,
+      "end": 3143.0,
+      "text": "If we were the operating system programmer,"
+    },
+    {
+      "start": 3143.0,
+      "end": 3147.0,
+      "text": "then we'd be getting into things like SACR and ASLR."
+    },
+    {
+      "start": 3147.0,
+      "end": 3149.0,
+      "text": "Okay, so the operating system,"
+    },
+    {
+      "start": 3149.0,
+      "end": 3151.0,
+      "text": "and I'm assuming these things."
+    },
+    {
+      "start": 3151.0,
+      "end": 3155.0,
+      "text": "Okay, same with control flow integrity."
+    },
+    {
+      "start": 3155.0,
+      "end": 3166.0,
+      "text": "Okay, so control flow integrity is based on a simple idea,"
+    },
+    {
+      "start": 3167.0,
+      "end": 3178.0,
+      "text": "which is that our machine code could more"
+    },
+    {
+      "start": 3178.0,
+      "end": 3184.0,
+      "text": "state our program never jumps inappropriately."
+    },
+    {
+      "start": 3184.0,
+      "end": 3188.0,
+      "text": "Okay, so in our developer overflow,"
+    },
+    {
+      "start": 3188.0,
+      "end": 3193.0,
+      "text": "a pack example, we had like the attacker in the classic version,"
+    },
+    {
+      "start": 3193.0,
+      "end": 3196.0,
+      "text": "the attacker was jumping to some malware,"
+    },
+    {
+      "start": 3196.0,
+      "end": 3199.0,
+      "text": "that the attacker embedded in the stack."
+    },
+    {
+      "start": 3199.0,
+      "end": 3201.0,
+      "text": "Right, and so we don't want that."
+    },
+    {
+      "start": 3201.0,
+      "end": 3203.0,
+      "text": "Okay, and X-Pay, so we're dead back."
+    },
+    {
+      "start": 3203.0,
+      "end": 3206.0,
+      "text": "Well, the Indian attacker maybe can jump into good memory"
+    },
+    {
+      "start": 3206.0,
+      "end": 3208.0,
+      "text": "and like some convinced security checks,"
+    },
+    {
+      "start": 3208.0,
+      "end": 3211.0,
+      "text": "you know, Ron makes a act called do all these other things."
+    },
+    {
+      "start": 3211.0,
+      "end": 3214.0,
+      "text": "Well, control flow integrity will try to prevent that by saying,"
+    },
+    {
+      "start": 3214.0,
+      "end": 3217.0,
+      "text": "okay, anytime there's a computer jump."
+    },
+    {
+      "start": 3217.0,
+      "end": 3227.0,
+      "text": "So for any computer jump,"
+    },
+    {
+      "start": 3227.0,
+      "end": 3234.0,
+      "text": "instruction, is the brand machine code."
+    },
+    {
+      "start": 3234.0,
+      "end": 3239.0,
+      "text": "The machine code has some instructions that are"
+    },
+    {
+      "start": 3239.0,
+      "end": 3240.0,
+      "text": "computer jumps."
+    },
+    {
+      "start": 3240.0,
+      "end": 3244.0,
+      "text": "This means that we don't know statically where we'll jump to,"
+    },
+    {
+      "start": 3244.0,
+      "end": 3246.0,
+      "text": "if it's a security branch."
+    },
+    {
+      "start": 3246.0,
+      "end": 3250.0,
+      "text": "Like a branch, if some values zero,"
+    },
+    {
+      "start": 3250.0,
+      "end": 3252.1,
+      "text": "it's a branch if register one is zero,"
+    },
+    {
+      "start": 3252.1,
+      "end": 3254.56,
+      "text": "a branch over here, otherwise it's all free to the next"
+    },
+    {
+      "start": 3254.56,
+      "end": 3255.56,
+      "text": "register."
+    },
+    {
+      "start": 3255.56,
+      "end": 3257.2,
+      "text": "If that would be a computing jump."
+    },
+    {
+      "start": 3257.2,
+      "end": 3260.4,
+      "text": "Or you could say jump to whatever's in register"
+    },
+    {
+      "start": 3260.4,
+      "end": 3262.28,
+      "text": "class."
+    },
+    {
+      "start": 3262.28,
+      "end": 3264.8,
+      "text": "There are no may with these ideas."
+    },
+    {
+      "start": 3264.8,
+      "end": 3267.76,
+      "text": "Machine node often has other kinds of non-computed"
+    },
+    {
+      "start": 3267.76,
+      "end": 3273.36,
+      "text": "jumps that are just like, hey, jump directly to this address."
+    },
+    {
+      "start": 3273.36,
+      "end": 3278.1600000000003,
+      "text": "So we statically know where we're jumping in actions."
+    },
+    {
+      "start": 3278.1600000000003,
+      "end": 3280.6400000000003,
+      "text": "So it turns out with these overflow attacks,"
+    },
+    {
+      "start": 3280.6400000000003,
+      "end": 3287.32,
+      "text": "and actually a lot of C, C plus plus attacks,"
+    },
+    {
+      "start": 3287.32,
+      "end": 3289.8,
+      "text": "the big problem is that we're jumping"
+    },
+    {
+      "start": 3289.8,
+      "end": 3293.8,
+      "text": "in executing code that we never should be able to."
+    },
+    {
+      "start": 3293.8,
+      "end": 3295.92,
+      "text": "If you look at our control photograph,"
+    },
+    {
+      "start": 3295.92,
+      "end": 3302.0,
+      "text": "if you look at the sequence of instructions that are followed,"
+    },
+    {
+      "start": 3302.0,
+      "end": 3305.6,
+      "text": "this would be a correct graph."
+    },
+    {
+      "start": 3305.6,
+      "end": 3313.76,
+      "text": "So maybe from this instruction, we could either"
+    },
+    {
+      "start": 3313.76,
+      "end": 3316.88,
+      "text": "these two next instructions."
+    },
+    {
+      "start": 3316.88,
+      "end": 3319.8,
+      "text": "So let's say we execute this one."
+    },
+    {
+      "start": 3319.8,
+      "end": 3323.04,
+      "text": "And from here, maybe this is another branch instruction."
+    },
+    {
+      "start": 3323.04,
+      "end": 3326.92,
+      "text": "And it could execute one of these two possibilities."
+    },
+    {
+      "start": 3326.92,
+      "end": 3329.8,
+      "text": "But now maybe there's some attack going on."
+    },
+    {
+      "start": 3329.8,
+      "end": 3333.4,
+      "text": "And the attacker has actually made it so that we jump not"
+    },
+    {
+      "start": 3333.4,
+      "end": 3335.6800000000003,
+      "text": "where we should be jumping."
+    },
+    {
+      "start": 3335.6800000000003,
+      "end": 3337.0,
+      "text": "This instruction."
+    },
+    {
+      "start": 3337.0,
+      "end": 3341.32,
+      "text": "But now we're jumping down here to some instruction"
+    },
+    {
+      "start": 3341.32,
+      "end": 3345.48,
+      "text": "that should never follow this one."
+    },
+    {
+      "start": 3345.48,
+      "end": 3350.1600000000003,
+      "text": "Like statically, we know that only certain instructions"
+    },
+    {
+      "start": 3350.1600000000003,
+      "end": 3351.6400000000003,
+      "text": "could follow this one."
+    },
+    {
+      "start": 3351.6400000000003,
+      "end": 3354.1200000000003,
+      "text": "And the attacker actually is making us jump to places"
+    },
+    {
+      "start": 3354.1200000000003,
+      "end": 3357.8,
+      "text": "we should never be able to execute."
+    },
+    {
+      "start": 3357.8,
+      "end": 3361.1200000000003,
+      "text": "So if you go back to your notes, if you think through it,"
+    },
+    {
+      "start": 3361.1200000000003,
+      "end": 3365.7200000000003,
+      "text": "you'll see this is a really common pattern in these attacks."
+    },
+    {
+      "start": 3365.7200000000003,
+      "end": 3367.28,
+      "text": "OK, so control flow integrity."
+    },
+    {
+      "start": 3367.28,
+      "end": 3370.4,
+      "text": "This is a control flow graph."
+    },
+    {
+      "start": 3370.4,
+      "end": 3373.8,
+      "text": "And so this mechanism, CFI, is intended"
+    },
+    {
+      "start": 3373.8,
+      "end": 3380.0800000000004,
+      "text": "to force the integrity of the control flow graph."
+    },
+    {
+      "start": 3380.0800000000004,
+      "end": 3383.2400000000002,
+      "text": "In other words, the graph, the control flow graph,"
+    },
+    {
+      "start": 3383.2400000000002,
+      "end": 3387.6400000000003,
+      "text": "can't be modified in these weird ways."
+    },
+    {
+      "start": 3387.64,
+      "end": 3389.7599999999998,
+      "text": "And runtime."
+    },
+    {
+      "start": 3389.7599999999998,
+      "end": 3392.04,
+      "text": "So how do you get to where this will change"
+    },
+    {
+      "start": 3392.04,
+      "end": 3394.0,
+      "text": "in other description?"
+    },
+    {
+      "start": 3394.0,
+      "end": 3395.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 3395.0,
+      "end": 3398.0,
+      "text": "So this will modify instruction."
+    },
+    {
+      "start": 3398.0,
+      "end": 3399.7599999999998,
+      "text": "It will modify code."
+    },
+    {
+      "start": 3399.7599999999998,
+      "end": 3402.04,
+      "text": "They implement CFI."
+    },
+    {
+      "start": 3402.04,
+      "end": 3405.8799999999997,
+      "text": "So a compiler, the compiler can be modified just like it"
+    },
+    {
+      "start": 3405.8799999999997,
+      "end": 3407.3599999999997,
+      "text": "would be with stack hard."
+    },
+    {
+      "start": 3407.3599999999997,
+      "end": 3409.7599999999998,
+      "text": "And so there the compiler is going to be modified"
+    },
+    {
+      "start": 3409.7599999999998,
+      "end": 3413.7999999999997,
+      "text": "to do all the canary work."
+    },
+    {
+      "start": 3413.8,
+      "end": 3417.28,
+      "text": "Here we're going to have to modify the compiler"
+    },
+    {
+      "start": 3417.28,
+      "end": 3419.36,
+      "text": "to add certain things."
+    },
+    {
+      "start": 3419.36,
+      "end": 3422.44,
+      "text": "So what we're going to do is before any computing"
+    },
+    {
+      "start": 3422.44,
+      "end": 3425.44,
+      "text": "jump instruction, we're going to have a check"
+    },
+    {
+      "start": 3425.44,
+      "end": 3427.32,
+      "text": "to make sure that we're jumping to 1"
+    },
+    {
+      "start": 3427.32,
+      "end": 3431.6800000000003,
+      "text": "of the allowed destinations of this jump."
+    },
+    {
+      "start": 3431.6800000000003,
+      "end": 3438.0800000000004,
+      "text": "So every jump has some set of destinations and structures."
+    },
+    {
+      "start": 3438.08,
+      "end": 3440.08,
+      "text": "So we have a control flow graph."
+    },
+    {
+      "start": 3448.64,
+      "end": 3450.7999999999997,
+      "text": "There are lots of ways you can build these control"
+    },
+    {
+      "start": 3450.7999999999997,
+      "end": 3452.3199999999997,
+      "text": "flow graphs here."
+    },
+    {
+      "start": 3452.3199999999997,
+      "end": 3458.84,
+      "text": "And the disc technique, it'll be instruction."
+    },
+    {
+      "start": 3458.84,
+      "end": 3462.92,
+      "text": "Here's a node in the graph, where a vertex."
+    },
+    {
+      "start": 3462.92,
+      "end": 3472.84,
+      "text": "And there's an edge from iKJ."
+    },
+    {
+      "start": 3472.84,
+      "end": 3476.52,
+      "text": "By the way, this is a directed graph."
+    },
+    {
+      "start": 3479.76,
+      "end": 3482.0,
+      "text": "A directed graph."
+    },
+    {
+      "start": 3482.0,
+      "end": 3485.36,
+      "text": "It is directed to the diagram."
+    },
+    {
+      "start": 3485.36,
+      "end": 3487.76,
+      "text": "So CFG's are diagrams."
+    },
+    {
+      "start": 3487.76,
+      "end": 3490.04,
+      "text": "Each instruction is a node."
+    },
+    {
+      "start": 3490.04,
+      "end": 3500.6,
+      "text": "And the existing edge from iKJ when instruction J,"
+    },
+    {
+      "start": 3500.6,
+      "end": 3508.04,
+      "text": "and immediately follow instruction i."
+    },
+    {
+      "start": 3516.24,
+      "end": 3519.7599999999998,
+      "text": "So now with CFG, CFG is going to use the control"
+    },
+    {
+      "start": 3519.76,
+      "end": 3520.76,
+      "text": "flow graph."
+    },
+    {
+      "start": 3520.76,
+      "end": 3531.1600000000003,
+      "text": "So this is intended to protect against wrong changes as well."
+    },
+    {
+      "start": 3531.1600000000003,
+      "end": 3533.76,
+      "text": "Yes."
+    },
+    {
+      "start": 3533.76,
+      "end": 3537.32,
+      "text": "OK, so this, well, it's hard to mean to be subjective."
+    },
+    {
+      "start": 3537.32,
+      "end": 3541.5200000000004,
+      "text": "But I would say this provides the strongest protections"
+    },
+    {
+      "start": 3541.5200000000004,
+      "end": 3544.1600000000003,
+      "text": "being that we'll talk about."
+    },
+    {
+      "start": 3544.16,
+      "end": 3552.7599999999998,
+      "text": "OK, so this isn't perfect."
+    },
+    {
+      "start": 3552.7599999999998,
+      "end": 3555.16,
+      "text": "This has one of the patients who has a control flow."
+    },
+    {
+      "start": 3555.16,
+      "end": 3558.8399999999997,
+      "text": "OK, so before any jump instruction, I'll"
+    },
+    {
+      "start": 3558.8399999999997,
+      "end": 3567.0,
+      "text": "check that the destination is valid."
+    },
+    {
+      "start": 3567.0,
+      "end": 3571.7599999999998,
+      "text": "OK, how are we going to do that?"
+    },
+    {
+      "start": 3571.76,
+      "end": 3580.1600000000003,
+      "text": "Well, OK, so we're going to implement this by real embed."
+    },
+    {
+      "start": 3580.1600000000003,
+      "end": 3589.6000000000004,
+      "text": "Match every valid destination."
+    },
+    {
+      "start": 3589.6000000000004,
+      "end": 3596.6000000000004,
+      "text": "Like a special code."
+    },
+    {
+      "start": 3596.6000000000004,
+      "end": 3598.6000000000004,
+      "text": "OK, turn it out."
+    },
+    {
+      "start": 3598.6,
+      "end": 3600.56,
+      "text": "I don't know if you want to spend a bunch of class time"
+    },
+    {
+      "start": 3600.56,
+      "end": 3602.0,
+      "text": "knowing you know this, but it turns out"
+    },
+    {
+      "start": 3602.0,
+      "end": 3604.16,
+      "text": "this special code doesn't have to be secret."
+    },
+    {
+      "start": 3604.16,
+      "end": 3607.48,
+      "text": "The attacker can know all these special codes."
+    },
+    {
+      "start": 3607.48,
+      "end": 3611.92,
+      "text": "OK, but we're going to put not going to call it a secret code"
+    },
+    {
+      "start": 3611.92,
+      "end": 3617.0,
+      "text": "because it doesn't need to be secret, but it's a code."
+    },
+    {
+      "start": 3617.0,
+      "end": 3620.68,
+      "text": "And technically it needs to be unique within the code"
+    },
+    {
+      "start": 3620.68,
+      "end": 3625.2799999999997,
+      "text": "and remember that I'll just say a special code."
+    },
+    {
+      "start": 3625.2799999999997,
+      "end": 3628.48,
+      "text": "Show a few code."
+    },
+    {
+      "start": 3628.48,
+      "end": 3633.08,
+      "text": "OK, and then we'll check before jumping."
+    },
+    {
+      "start": 3638.8799999999997,
+      "end": 3640.68,
+      "text": "For the crank code."
+    },
+    {
+      "start": 3647.68,
+      "end": 3650.3599999999997,
+      "text": "OK, so this is being embed as special code."
+    },
+    {
+      "start": 3650.36,
+      "end": 3655.32,
+      "text": "The way this is can be implemented is you"
+    },
+    {
+      "start": 3655.32,
+      "end": 3659.04,
+      "text": "would have like a no-walk here."
+    },
+    {
+      "start": 3659.04,
+      "end": 3660.36,
+      "text": "OK, so we're going to jump now."
+    },
+    {
+      "start": 3663.56,
+      "end": 3664.96,
+      "text": "So we're going to jump."
+    },
+    {
+      "start": 3664.96,
+      "end": 3668.36,
+      "text": "So you're jumping, well, maybe you can range."
+    },
+    {
+      "start": 3668.36,
+      "end": 3669.84,
+      "text": "It's a branch."
+    },
+    {
+      "start": 3669.84,
+      "end": 3673.04,
+      "text": "Branch in zero."
+    },
+    {
+      "start": 3673.04,
+      "end": 3678.2000000000003,
+      "text": "Branch of zero on, you know, register five."
+    },
+    {
+      "start": 3678.2000000000003,
+      "end": 3680.32,
+      "text": "OK, so this instruction could."
+    },
+    {
+      "start": 3680.32,
+      "end": 3684.1600000000003,
+      "text": "If r5 is not zero, the instruction might just fall through"
+    },
+    {
+      "start": 3684.1600000000003,
+      "end": 3685.1600000000003,
+      "text": "to the next one."
+    },
+    {
+      "start": 3685.1600000000003,
+      "end": 3689.32,
+      "text": "You'll have a program with assembly before."
+    },
+    {
+      "start": 3689.32,
+      "end": 3691.6400000000003,
+      "text": "OK, so you know, it could fall through,"
+    },
+    {
+      "start": 3691.6400000000003,
+      "end": 3697.52,
+      "text": "but then otherwise, so we'll say otherwise, some branch."
+    },
+    {
+      "start": 3697.52,
+      "end": 3702.7200000000003,
+      "text": "If r5 is zero to, I'm going to call this like program point number"
+    },
+    {
+      "start": 3702.7200000000003,
+      "end": 3703.96,
+      "text": "one."
+    },
+    {
+      "start": 3703.96,
+      "end": 3707.84,
+      "text": "And then I'm going to label this program point number one."
+    },
+    {
+      "start": 3707.84,
+      "end": 3710.28,
+      "text": "OK, so this instruction,"
+    },
+    {
+      "start": 3710.28,
+      "end": 3713.1600000000003,
+      "text": "this branch instruction, it could fall through to the next"
+    },
+    {
+      "start": 3713.1600000000003,
+      "end": 3715.2000000000003,
+      "text": "instruction, whatever it is."
+    },
+    {
+      "start": 3715.2000000000003,
+      "end": 3722.0800000000004,
+      "text": "Or it can jump to a no-walk with a code."
+    },
+    {
+      "start": 3722.0800000000004,
+      "end": 3724.6800000000003,
+      "text": "So we're going to embed a code inside a no-walk."
+    },
+    {
+      "start": 3724.6800000000003,
+      "end": 3726.48,
+      "text": "And it turns out many instructions"
+    },
+    {
+      "start": 3726.48,
+      "end": 3728.84,
+      "text": "have this capability."
+    },
+    {
+      "start": 3728.84,
+      "end": 3733.0400000000004,
+      "text": "I mean, in fact, now Intel has added this"
+    },
+    {
+      "start": 3733.0400000000004,
+      "end": 3736.2400000000002,
+      "text": "as a new kind of instruction for this technique."
+    },
+    {
+      "start": 3736.24,
+      "end": 3740.64,
+      "text": "OK, so you would have this."
+    },
+    {
+      "start": 3740.64,
+      "end": 3742.8399999999997,
+      "text": "And then you would have the normal code"
+    },
+    {
+      "start": 3742.8399999999997,
+      "end": 3743.9599999999996,
+      "text": "that you want to run here."
+    },
+    {
+      "start": 3743.9599999999996,
+      "end": 3745.56,
+      "text": "So like your normal instructions."
+    },
+    {
+      "start": 3748.68,
+      "end": 3752.68,
+      "text": "OK, so to hand jump here down."
+    },
+    {
+      "start": 3752.68,
+      "end": 3755.3199999999997,
+      "text": "So now, before you actually do this,"
+    },
+    {
+      "start": 3755.3199999999997,
+      "end": 3756.7999999999997,
+      "text": "you're going to do a check."
+    },
+    {
+      "start": 3756.7999999999997,
+      "end": 3760.2799999999997,
+      "text": "Like, hey, is register five actually zero?"
+    },
+    {
+      "start": 3760.2799999999997,
+      "end": 3765.0,
+      "text": "Anything is, then let's jump down here."
+    },
+    {
+      "start": 3765.0,
+      "end": 3770.0,
+      "text": "So we embed at the destination some special code."
+    },
+    {
+      "start": 3770.0,
+      "end": 3772.92,
+      "text": "And then we're going to check."
+    },
+    {
+      "start": 3772.92,
+      "end": 3778.8,
+      "text": "And so up here, we're actually going to check the code beforehand."
+    },
+    {
+      "start": 3778.8,
+      "end": 3780.8,
+      "text": "So there are different ways you can do this."
+    },
+    {
+      "start": 3780.8,
+      "end": 3783.8,
+      "text": "I guess I'll check the code."
+    },
+    {
+      "start": 3783.8,
+      "end": 3787.76,
+      "text": "And you don't have to put it on."
+    },
+    {
+      "start": 3787.76,
+      "end": 3789.2,
+      "text": "Where are we going to jump in?"
+    },
+    {
+      "start": 3789.2,
+      "end": 3790.2,
+      "text": "I'm going to count more."
+    },
+    {
+      "start": 3795.2,
+      "end": 3798.52,
+      "text": "OK, so that is if you check before you do the jump."
+    },
+    {
+      "start": 3798.52,
+      "end": 3800.48,
+      "text": "And at the jump destination, you've"
+    },
+    {
+      "start": 3800.48,
+      "end": 3802.9199999999996,
+      "text": "been betting a code in a way that it doesn't affect"
+    },
+    {
+      "start": 3802.9199999999996,
+      "end": 3805.48,
+      "text": "the computation."
+    },
+    {
+      "start": 3805.48,
+      "end": 3807.52,
+      "text": "OK, so this does have runtime over time."
+    },
+    {
+      "start": 3807.52,
+      "end": 3811.64,
+      "text": "Every computer jump now, you have a check."
+    },
+    {
+      "start": 3811.64,
+      "end": 3814.8399999999997,
+      "text": "In the clouds, ways you can implement this."
+    },
+    {
+      "start": 3814.8399999999997,
+      "end": 3818.3999999999996,
+      "text": "Like, you can reuse the same code throughout the whole program."
+    },
+    {
+      "start": 3818.4,
+      "end": 3821.56,
+      "text": "And all of the code memory, every computer jump"
+    },
+    {
+      "start": 3821.56,
+      "end": 3824.4,
+      "text": "could use the same code."
+    },
+    {
+      "start": 3824.4,
+      "end": 3825.84,
+      "text": "Like, you should think through that."
+    },
+    {
+      "start": 3825.84,
+      "end": 3827.44,
+      "text": "What does that mean?"
+    },
+    {
+      "start": 3827.44,
+      "end": 3830.12,
+      "text": "Why would you want to do that?"
+    },
+    {
+      "start": 3830.12,
+      "end": 3836.64,
+      "text": "You put the same in every valley destination of a jump."
+    },
+    {
+      "start": 3836.64,
+      "end": 3840.44,
+      "text": "You put the same code in place."
+    },
+    {
+      "start": 3840.44,
+      "end": 3842.4,
+      "text": "Does that mean anything?"
+    },
+    {
+      "start": 3842.4,
+      "end": 3845.28,
+      "text": "You can get a report code before you start."
+    },
+    {
+      "start": 3845.28,
+      "end": 3845.8,
+      "text": "Yeah."
+    },
+    {
+      "start": 3845.8,
+      "end": 3848.7200000000003,
+      "text": "So that's going to improve efficiency a lot."
+    },
+    {
+      "start": 3848.7200000000003,
+      "end": 3850.6800000000003,
+      "text": "OK, because you're only generating one code,"
+    },
+    {
+      "start": 3850.6800000000003,
+      "end": 3852.2000000000003,
+      "text": "checking for one code."
+    },
+    {
+      "start": 3852.2000000000003,
+      "end": 3855.2400000000002,
+      "text": "Does it give you an A-E security benefit?"
+    },
+    {
+      "start": 3855.2400000000002,
+      "end": 3860.1600000000003,
+      "text": "It can't be attacked because it's not code."
+    },
+    {
+      "start": 3860.1600000000003,
+      "end": 3862.84,
+      "text": "Yes, the attacker can't override code memory."
+    },
+    {
+      "start": 3862.84,
+      "end": 3866.5600000000004,
+      "text": "So we're assuming that the attacker is not"
+    },
+    {
+      "start": 3866.5600000000004,
+      "end": 3870.6800000000003,
+      "text": "able to write new code and be able to send the attacker"
+    },
+    {
+      "start": 3870.6800000000003,
+      "end": 3874.8,
+      "text": "can like, overwrite code memory."
+    },
+    {
+      "start": 3875.32,
+      "end": 3878.0800000000004,
+      "text": "We rely on it in a function that's sometimes"
+    },
+    {
+      "start": 3878.0800000000004,
+      "end": 3882.1200000000003,
+      "text": "well at the NWC, on no write code,"
+    },
+    {
+      "start": 3882.1200000000003,
+      "end": 3887.0,
+      "text": "it's a non-writeable code memory."
+    },
+    {
+      "start": 3892.96,
+      "end": 3896.0,
+      "text": "And also, so this is one of the assumptions, I guess."
+    },
+    {
+      "start": 3901.0800000000004,
+      "end": 3901.84,
+      "text": "OK, that's one."
+    },
+    {
+      "start": 3901.84,
+      "end": 3904.36,
+      "text": "Another one is the index bitter place."
+    },
+    {
+      "start": 3904.52,
+      "end": 3909.36,
+      "text": "OK, so it's called non-exput data."
+    },
+    {
+      "start": 3918.1600000000003,
+      "end": 3921.48,
+      "text": "So that means like, you know, index bits are in place."
+    },
+    {
+      "start": 3921.48,
+      "end": 3924.76,
+      "text": "And technically, there's a one last assumption, which"
+    },
+    {
+      "start": 3924.76,
+      "end": 3929.6800000000003,
+      "text": "is that these special codes are only"
+    },
+    {
+      "start": 3929.6800000000003,
+      "end": 3931.96,
+      "text": "used for this purpose."
+    },
+    {
+      "start": 3931.96,
+      "end": 3934.56,
+      "text": "OK, the special code is never used for any other purpose"
+    },
+    {
+      "start": 3934.56,
+      "end": 3936.76,
+      "text": "in code memory."
+    },
+    {
+      "start": 3936.76,
+      "end": 3938.0,
+      "text": "Because why?"
+    },
+    {
+      "start": 3938.0,
+      "end": 3940.08,
+      "text": "If they were, then those would be"
+    },
+    {
+      "start": 3940.08,
+      "end": 3943.48,
+      "text": "marking valid jump destinations."
+    },
+    {
+      "start": 3943.48,
+      "end": 3946.12,
+      "text": "So any time this special code appears in memory,"
+    },
+    {
+      "start": 3946.12,
+      "end": 3950.0,
+      "text": "it should be marking a jump destination."
+    },
+    {
+      "start": 3950.0,
+      "end": 3956.96,
+      "text": "This is called the unique assumption, which"
+    },
+    {
+      "start": 3956.96,
+      "end": 3968.52,
+      "text": "is that codes only appear in valid testing."
+    },
+    {
+      "start": 3977.36,
+      "end": 3980.32,
+      "text": "So it's only appeared in valid jump destinations."
+    },
+    {
+      "start": 3980.32,
+      "end": 3982.56,
+      "text": "OK, so let's assume that our programs"
+    },
+    {
+      "start": 3982.56,
+      "end": 3985.2,
+      "text": "are using the exact same code everywhere."
+    },
+    {
+      "start": 3985.2,
+      "end": 3990.6,
+      "text": "So every possible place you could jump to has the same code."
+    },
+    {
+      "start": 3990.6,
+      "end": 3994.44,
+      "text": "And before every computer jump, we check for that code."
+    },
+    {
+      "start": 3994.44,
+      "end": 3998.4,
+      "text": "Does that get us any security benefits?"
+    },
+    {
+      "start": 3998.4,
+      "end": 4002.6,
+      "text": "You've done the same code from the company"
+    },
+    {
+      "start": 4002.6,
+      "end": 4006.4,
+      "text": "unique only for children of the same parent."
+    },
+    {
+      "start": 4006.4,
+      "end": 4009.4,
+      "text": "No, so in this case, I'm saying, so I'm"
+    },
+    {
+      "start": 4009.4,
+      "end": 4011.7200000000003,
+      "text": "doing, having us think this is another case"
+    },
+    {
+      "start": 4011.7200000000003,
+      "end": 4014.2000000000003,
+      "text": "of a big spectrum of possibilities."
+    },
+    {
+      "start": 4014.2000000000003,
+      "end": 4016.6,
+      "text": "OK, so one end of this spectrum would be used"
+    },
+    {
+      "start": 4016.6,
+      "end": 4020.04,
+      "text": "to use the exact same code, the special code everywhere."
+    },
+    {
+      "start": 4020.04,
+      "end": 4023.2400000000002,
+      "text": "And every embedded, every, you know,"
+    },
+    {
+      "start": 4023.2400000000002,
+      "end": 4026.12,
+      "text": "in a no-op, it's every single possible place"
+    },
+    {
+      "start": 4026.12,
+      "end": 4028.7200000000003,
+      "text": "you could jump to."
+    },
+    {
+      "start": 4028.7200000000003,
+      "end": 4032.12,
+      "text": "OK, and before every jump, you check for that one code."
+    },
+    {
+      "start": 4032.12,
+      "end": 4034.08,
+      "text": "Does that get you any security benefits?"
+    },
+    {
+      "start": 4034.08,
+      "end": 4035.6,
+      "text": "Oh, that's a good case."
+    },
+    {
+      "start": 4035.6,
+      "end": 4038.52,
+      "text": "So I think it's a good case."
+    },
+    {
+      "start": 4038.52,
+      "end": 4039.36,
+      "text": "Perfect."
+    },
+    {
+      "start": 4039.36,
+      "end": 4041.12,
+      "text": "It may engage jumping in some places"
+    },
+    {
+      "start": 4041.12,
+      "end": 4044.28,
+      "text": "it should never get valid destination."
+    },
+    {
+      "start": 4044.28,
+      "end": 4046.96,
+      "text": "Like remember, we talked about jumping"
+    },
+    {
+      "start": 4046.96,
+      "end": 4049.24,
+      "text": "to so convince security checks."
+    },
+    {
+      "start": 4049.24,
+      "end": 4050.52,
+      "text": "Like you're opening a file."
+    },
+    {
+      "start": 4050.52,
+      "end": 4052.16,
+      "text": "Well, you should only be able to jump"
+    },
+    {
+      "start": 4052.16,
+      "end": 4054.96,
+      "text": "to the beginning of the file open code,"
+    },
+    {
+      "start": 4054.96,
+      "end": 4056.52,
+      "text": "where it does the security checks."
+    },
+    {
+      "start": 4056.52,
+      "end": 4061.32,
+      "text": "You shouldn't be able to just jump around the security checks."
+    },
+    {
+      "start": 4061.32,
+      "end": 4066.12,
+      "text": "Just jump straight to the code where you open the file."
+    },
+    {
+      "start": 4066.12,
+      "end": 4067.92,
+      "text": "It's also mitigates what else."
+    },
+    {
+      "start": 4067.92,
+      "end": 4071.2000000000003,
+      "text": "While remember, we talked about the rock chains,"
+    },
+    {
+      "start": 4071.2000000000003,
+      "end": 4074.16,
+      "text": "they could have variable width instructions."
+    },
+    {
+      "start": 4074.16,
+      "end": 4075.52,
+      "text": "This may engage that."
+    },
+    {
+      "start": 4075.52,
+      "end": 4081.96,
+      "text": "Now you can only jump to a valid beginning of an instruction."
+    },
+    {
+      "start": 4081.96,
+      "end": 4084.56,
+      "text": "So this still, even in this simple version,"
+    },
+    {
+      "start": 4084.56,
+      "end": 4089.28,
+      "text": "it still gets you some nice security benefits."
+    },
+    {
+      "start": 4089.28,
+      "end": 4091.96,
+      "text": "And then like at the other extreme of the spectrum"
+    },
+    {
+      "start": 4091.96,
+      "end": 4096.4400000000005,
+      "text": "movie, you can think of it as every destination"
+    },
+    {
+      "start": 4096.5199999999995,
+      "end": 4098.679999999999,
+      "text": "has its own unique code."
+    },
+    {
+      "start": 4098.679999999999,
+      "end": 4101.0,
+      "text": "So you never reuse these special codes."
+    },
+    {
+      "start": 4103.0,
+      "end": 4105.5599999999995,
+      "text": "And then like before you do a jump,"
+    },
+    {
+      "start": 4105.5599999999995,
+      "end": 4110.5599999999995,
+      "text": "like here, you can check whether you have code C or C-pronged."
+    },
+    {
+      "start": 4112.799999999999,
+      "end": 4113.879999999999,
+      "text": "It could be this."
+    },
+    {
+      "start": 4113.879999999999,
+      "end": 4117.0,
+      "text": "OK, so you can do more checks."
+    },
+    {
+      "start": 4117.0,
+      "end": 4120.24,
+      "text": "But if every destination has its own special code,"
+    },
+    {
+      "start": 4120.24,
+      "end": 4121.839999999999,
+      "text": "you need code in here."
+    },
+    {
+      "start": 4121.839999999999,
+      "end": 4125.759999999999,
+      "text": "Now we get a blog finder granularity control."
+    },
+    {
+      "start": 4125.76,
+      "end": 4128.64,
+      "text": "So now we're checking, OK, I'm only going to allow us"
+    },
+    {
+      "start": 4128.64,
+      "end": 4131.360000000001,
+      "text": "to jump from one of these two locations."
+    },
+    {
+      "start": 4131.360000000001,
+      "end": 4134.320000000001,
+      "text": "If you reuse codes everywhere, you can jump from here"
+    },
+    {
+      "start": 4134.320000000001,
+      "end": 4136.4800000000005,
+      "text": "to this one."
+    },
+    {
+      "start": 4136.4800000000005,
+      "end": 4139.6,
+      "text": "And because this is a valid jump destination."
+    },
+    {
+      "start": 4139.6,
+      "end": 4141.76,
+      "text": "But now I can only be unique codes everywhere."
+    },
+    {
+      "start": 4141.76,
+      "end": 4144.12,
+      "text": "I can only jump from one of these two, allow."
+    },
+    {
+      "start": 4144.12,
+      "end": 4146.68,
+      "text": "I don't know, OK, with that."
+    },
+    {
+      "start": 4146.68,
+      "end": 4149.52,
+      "text": "OK, so like CFI is a framework."
+    },
+    {
+      "start": 4149.52,
+      "end": 4152.4800000000005,
+      "text": "And you could have this spectrum of implementation"
+    },
+    {
+      "start": 4152.48,
+      "end": 4157.679999999999,
+      "text": "and possibility, a trade-offs."
+    },
+    {
+      "start": 4157.679999999999,
+      "end": 4161.5599999999995,
+      "text": "More different kinds of codes here than fire granularity,"
+    },
+    {
+      "start": 4161.5599999999995,
+      "end": 4165.0,
+      "text": "better security benefits, or just reuse the same code"
+    },
+    {
+      "start": 4165.0,
+      "end": 4165.599999999999,
+      "text": "everywhere."
+    },
+    {
+      "start": 4165.599999999999,
+      "end": 4170.5199999999995,
+      "text": "And then you get the soft security benefits, but also faster."
+    },
+    {
+      "start": 4170.5199999999995,
+      "end": 4175.879999999999,
+      "text": "If you created a unique special code for a unique jump,"
+    },
+    {
+      "start": 4175.879999999999,
+      "end": 4178.48,
+      "text": "wouldn't it become more expensive over time?"
+    },
+    {
+      "start": 4178.48,
+      "end": 4179.48,
+      "text": "It's just not worth it."
+    },
+    {
+      "start": 4179.48,
+      "end": 4180.799999999999,
+      "text": "Yeah, and right."
+    },
+    {
+      "start": 4180.8,
+      "end": 4183.04,
+      "text": "Yeah, and so it turns out there actually"
+    },
+    {
+      "start": 4183.04,
+      "end": 4187.2,
+      "text": "breaks the whole due to optimize this."
+    },
+    {
+      "start": 4187.2,
+      "end": 4190.0,
+      "text": "So like, for simplicity, I'm talking about like this."
+    },
+    {
+      "start": 4190.0,
+      "end": 4193.88,
+      "text": "Really, you could combine these into an equivalence class."
+    },
+    {
+      "start": 4193.88,
+      "end": 4197.6,
+      "text": "And you could say, well, CNC prime are valid destinations"
+    },
+    {
+      "start": 4197.6,
+      "end": 4198.4400000000005,
+      "text": "of this one."
+    },
+    {
+      "start": 4198.4400000000005,
+      "end": 4201.4400000000005,
+      "text": "So I'm going to combine those into like one equivalence class"
+    },
+    {
+      "start": 4201.4400000000005,
+      "end": 4202.88,
+      "text": "called C double prime."
+    },
+    {
+      "start": 4202.88,
+      "end": 4206.24,
+      "text": "And then the vote have C double prime here."
+    },
+    {
+      "start": 4206.24,
+      "end": 4209.04,
+      "text": "Because nothing else, let's say, might jumble them,"
+    },
+    {
+      "start": 4209.04,
+      "end": 4210.88,
+      "text": "although it is based on these colors."
+    },
+    {
+      "start": 4210.88,
+      "end": 4213.16,
+      "text": "I'm just saying there are optimizations"
+    },
+    {
+      "start": 4213.16,
+      "end": 4215.0,
+      "text": "that you can do to minimize this."
+    },
+    {
+      "start": 4215.0,
+      "end": 4218.36,
+      "text": "Without any optimizations, though, this is in square."
+    },
+    {
+      "start": 4218.36,
+      "end": 4224.64,
+      "text": "And a lot of times people are OK with adding in square"
+    },
+    {
+      "start": 4224.64,
+      "end": 4225.92,
+      "text": "to memory size."
+    },
+    {
+      "start": 4225.92,
+      "end": 4230.44,
+      "text": "Because it is in square and running for addition."
+    },
+    {
+      "start": 4230.44,
+      "end": 4232.48,
+      "text": "And this is a lot of extra details."
+    },
+    {
+      "start": 4232.48,
+      "end": 4235.24,
+      "text": "So the example you're saying about jumping"
+    },
+    {
+      "start": 4235.24,
+      "end": 4237.2,
+      "text": "to bits of code of reusing the same code"
+    },
+    {
+      "start": 4237.2,
+      "end": 4239.36,
+      "text": "throughout the entire program."
+    },
+    {
+      "start": 4239.36,
+      "end": 4241.72,
+      "text": "And let's use the same example with files."
+    },
+    {
+      "start": 4241.72,
+      "end": 4243.04,
+      "text": "You want to do the security check."
+    },
+    {
+      "start": 4243.04,
+      "end": 4246.36,
+      "text": "But the after the security check where you actually see"
+    },
+    {
+      "start": 4246.36,
+      "end": 4248.36,
+      "text": "the code is a valid destination."
+    },
+    {
+      "start": 4248.36,
+      "end": 4250.0,
+      "text": "So what does that provide?"
+    },
+    {
+      "start": 4250.0,
+      "end": 4253.08,
+      "text": "It may not be a valid destination."
+    },
+    {
+      "start": 4253.08,
+      "end": 4255.04,
+      "text": "I think it depends on how they go."
+    },
+    {
+      "start": 4255.04,
+      "end": 4256.28,
+      "text": "It's a good one."
+    },
+    {
+      "start": 4256.28,
+      "end": 4257.28,
+      "text": "Yeah."
+    },
+    {
+      "start": 4257.28,
+      "end": 4262.24,
+      "text": "It may not have to be depending on how you set up that."
+    },
+    {
+      "start": 4262.24,
+      "end": 4263.24,
+      "text": "OK."
+    },
+    {
+      "start": 4263.24,
+      "end": 4264.24,
+      "text": "Yeah."
+    },
+    {
+      "start": 4264.24,
+      "end": 4265.28,
+      "text": "That's an example."
+    },
+    {
+      "start": 4265.28,
+      "end": 4267.719999999999,
+      "text": "In general, we can think that the part"
+    },
+    {
+      "start": 4267.719999999999,
+      "end": 4271.639999999999,
+      "text": "after security checks may not be a valid place you can jump in."
+    },
+    {
+      "start": 4271.639999999999,
+      "end": 4271.92,
+      "text": "OK."
+    },
+    {
+      "start": 4271.92,
+      "end": 4274.719999999999,
+      "text": "And you can control all of this with CIPon."
+    },
+    {
+      "start": 4274.719999999999,
+      "end": 4277.759999999999,
+      "text": "So you can say what's a valid destination."
+    },
+    {
+      "start": 4277.759999999999,
+      "end": 4281.28,
+      "text": "And you could eliminate as a possibility something"
+    },
+    {
+      "start": 4281.28,
+      "end": 4285.44,
+      "text": "that in theory, maybe in the machine code, it could jump there."
+    },
+    {
+      "start": 4285.44,
+      "end": 4288.12,
+      "text": "You could say, no, actually my policy,"
+    },
+    {
+      "start": 4288.12,
+      "end": 4290.48,
+      "text": "my control flow policies can come down."
+    },
+    {
+      "start": 4290.48,
+      "end": 4292.48,
+      "text": "OK."
+    },
+    {
+      "start": 4292.48,
+      "end": 4295.44,
+      "text": "I believe the first two points are not"
+    },
+    {
+      "start": 4295.44,
+      "end": 4297.44,
+      "text": "necessarily CIPOs."
+    },
+    {
+      "start": 4297.44,
+      "end": 4300.679999999999,
+      "text": "Coons at a attacker like add a publisher to the file"
+    },
+    {
+      "start": 4300.679999999999,
+      "end": 4303.4,
+      "text": "and the same code to the other two."
+    },
+    {
+      "start": 4303.4,
+      "end": 4303.919999999999,
+      "text": "Yeah."
+    },
+    {
+      "start": 4303.919999999999,
+      "end": 4306.2,
+      "text": "So the attacker can write code memory."
+    },
+    {
+      "start": 4306.2,
+      "end": 4312.959999999999,
+      "text": "So the attacker can add new versions of these codes in memory."
+    },
+    {
+      "start": 4312.959999999999,
+      "end": 4313.48,
+      "text": "OK."
+    },
+    {
+      "start": 4313.48,
+      "end": 4316.599999999999,
+      "text": "So the attacker can, if the attacker does"
+    },
+    {
+      "start": 4316.6,
+      "end": 4318.52,
+      "text": "have a code that's here, you'd like the stack."
+    },
+    {
+      "start": 4318.52,
+      "end": 4321.08,
+      "text": "The attacker can jump in memory."
+    },
+    {
+      "start": 4321.08,
+      "end": 4322.08,
+      "text": "OK."
+    },
+    {
+      "start": 4322.08,
+      "end": 4325.04,
+      "text": "So no one in the code doesn't help the attacker."
+    },
+    {
+      "start": 4325.04,
+      "end": 4327.280000000001,
+      "text": "Because you can jump in with all the stack"
+    },
+    {
+      "start": 4327.280000000001,
+      "end": 4328.76,
+      "text": "with the main machine today."
+    },
+    {
+      "start": 4328.76,
+      "end": 4332.4800000000005,
+      "text": "And you can, the attacker can point the code in memory."
+    },
+    {
+      "start": 4332.4800000000005,
+      "end": 4334.04,
+      "text": "I think you're good."
+    },
+    {
+      "start": 4334.04,
+      "end": 4335.400000000001,
+      "text": "So what are limitations here?"
+    },
+    {
+      "start": 4335.400000000001,
+      "end": 4339.240000000001,
+      "text": "We have enough time with quickly limitations of CIPO."
+    },
+    {
+      "start": 4339.24,
+      "end": 4340.24,
+      "text": "OK."
+    },
+    {
+      "start": 4340.24,
+      "end": 4347.24,
+      "text": "And I have one."
+    },
+    {
+      "start": 4347.24,
+      "end": 4348.24,
+      "text": "OK."
+    },
+    {
+      "start": 4348.24,
+      "end": 4350.24,
+      "text": "It's a big one."
+    },
+    {
+      "start": 4350.24,
+      "end": 4352.639999999999,
+      "text": "Maybe some of you are starting to think about this."
+    },
+    {
+      "start": 4352.639999999999,
+      "end": 4357.24,
+      "text": "But it's an idea called mimic green."
+    },
+    {
+      "start": 4357.24,
+      "end": 4359.24,
+      "text": "It's a green."
+    },
+    {
+      "start": 4359.24,
+      "end": 4360.24,
+      "text": "It has."
+    },
+    {
+      "start": 4360.24,
+      "end": 4368.24,
+      "text": "So this is where an attacker could subvert the flow control."
+    },
+    {
+      "start": 4368.24,
+      "end": 4370.24,
+      "text": "As long as it follows this graph."
+    },
+    {
+      "start": 4370.24,
+      "end": 4373.76,
+      "text": "So maybe when we're running the program,"
+    },
+    {
+      "start": 4373.76,
+      "end": 4376.28,
+      "text": "it's supposed to jump over here."
+    },
+    {
+      "start": 4376.28,
+      "end": 4378.24,
+      "text": "Well, this is also a valid destiny."
+    },
+    {
+      "start": 4378.24,
+      "end": 4380.44,
+      "text": "So the attacker can is on the CIPO,"
+    },
+    {
+      "start": 4380.44,
+      "end": 4381.44,
+      "text": "the mimic's."
+    },
+    {
+      "start": 4381.44,
+      "end": 4384.5599999999995,
+      "text": "Because obviously the attacker can mimic the valid control"
+    },
+    {
+      "start": 4384.5599999999995,
+      "end": 4388.32,
+      "text": "flow in the hacker can send jump"
+    },
+    {
+      "start": 4388.32,
+      "end": 4392.4,
+      "text": "to places that shouldn't be allowed."
+    },
+    {
+      "start": 4392.4,
+      "end": 4395.8,
+      "text": "So the attacker should just constrain"
+    },
+    {
+      "start": 4395.8,
+      "end": 4398.2,
+      "text": "to the control flow graph."
+    },
+    {
+      "start": 4398.2,
+      "end": 4400.56,
+      "text": "And sometimes control flow graphs are really"
+    },
+    {
+      "start": 4400.56,
+      "end": 4402.08,
+      "text": "imprecise."
+    },
+    {
+      "start": 4402.08,
+      "end": 4405.2,
+      "text": "Sometimes they don't know where your jumping to."
+    },
+    {
+      "start": 4405.2,
+      "end": 4407.360000000001,
+      "text": "And so there could be a lot of possibilities"
+    },
+    {
+      "start": 4407.360000000001,
+      "end": 4410.6,
+      "text": "in the attacker could take the flow control."
+    },
+    {
+      "start": 4410.6,
+      "end": 4410.8,
+      "text": "OK."
+    },
+    {
+      "start": 4410.8,
+      "end": 4414.360000000001,
+      "text": "So let me just write something like that."
+    },
+    {
+      "start": 4414.360000000001,
+      "end": 4419.2,
+      "text": "As long as the attacker just means like a valid path."
+    },
+    {
+      "start": 4419.2,
+      "end": 4420.8,
+      "text": "So program."
+    },
+    {
+      "start": 4425.8,
+      "end": 4428.8,
+      "text": "So let me just write this."
+    },
+    {
+      "start": 4428.8,
+      "end": 4431.8,
+      "text": "Now two instructions."
+    },
+    {
+      "start": 4431.8,
+      "end": 4435.8,
+      "text": "So I'll add two instructions."
+    },
+    {
+      "start": 4435.8,
+      "end": 4436.8,
+      "text": "You shouldn't."
+    },
+    {
+      "start": 4441.8,
+      "end": 4445.8,
+      "text": "As long as it's on a valid control flow path."
+    },
+    {
+      "start": 4445.8,
+      "end": 4452.8,
+      "text": "As long as it stays on valid."
+    },
+    {
+      "start": 4455.8,
+      "end": 4465.8,
+      "text": "And the attacker stays on some valid path."
+    },
+    {
+      "start": 4465.8,
+      "end": 4468.8,
+      "text": "CIPO detects the attack."
+    },
+    {
+      "start": 4468.8,
+      "end": 4471.8,
+      "text": "And there are, again, there are papers,"
+    },
+    {
+      "start": 4471.8,
+      "end": 4474.8,
+      "text": "logs, if you have a certain frequency of volume."
+    },
+    {
+      "start": 4474.8,
+      "end": 4477.8,
+      "text": "That's why it's a lot of clever, mini-target packs"
+    },
+    {
+      "start": 4477.8,
+      "end": 4478.8,
+      "text": "against CIP."
+    }
+  ]
+}

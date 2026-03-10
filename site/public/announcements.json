@@ -1,6 +1,178 @@
 {
-  "generated_at": "2026-03-09T20:08:10.578Z",
+  "generated_at": "2026-03-10T01:00:35.284Z",
   "announcements": [
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "Remember we have the test coming up next last.",
+      "context": "...s. Yeah, so please read the assignment. I hope we answer those in your question of business about it. Okay, any other questions? Remember we have the test coming up next last. What's the days? Maybe, maybe. Anything you look about through me in the past today is fair game. Okay, where are the tests? Als...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "I haven't had the test yet.",
+      "context": "...t in class, I think it's pretty important. And if you think about it, how much time have we spent on buffer overflows? I would bet. I haven't had the test yet. I still need to make this test, but I would bet that the buffer overflows will work better. So, you know, you can kind of think through that. I...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "I still need to make this test, but I would bet that the buffer overflows will work better.",
+      "context": "...rtant. And if you think about it, how much time have we spent on buffer overflows? I would bet. I haven't had the test yet. I still need to make this test, but I would bet that the buffer overflows will work better. So, you know, you can kind of think through that. I think it's a lot of time. I would al...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "Actually, the timing and the test are pretty good in that sense.",
+      "context": "...er questions before we start covering any of the material? Okay. So today we should be able to wrap up buffer overflows. Actually, the timing and the test are pretty good in that sense. So, I want to make up where we left off last time, remember, what we've been thinking about. We've got protections for...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "When I ask a question like that, if something like that appears on the test, specifically referring to lawsuits like application coders.",
+      "context": "...igate buffer overflows? Okay. So, I'm not talking about things like in-exfits. When I ask a question like that, if something like that appears on the test, specifically referring to lawsuits like application coders. They were not using the in-exfits, but were not coding in-exfits. They were that's a har...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "This is right before our test.",
+      "context": "...ves, I can say we really don't expect any false positives. I would say false negatives here. This is a really good question. This is right before our test. False positives shouldn't be of the yield here because there's no reason that the engineers should be overwritten. There's no way any legitimate ove...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "So, the offset, the attacker can know by running this program in, you know, his own test environment.",
+      "context": "...y, so the attacker doesn't use A to have to wait, oh, the offset. So, the offset, the attacker can know by running this program in, you know, his own test environment. Okay, so the attacker can run the code through, like, the logger, and you can see, okay, well, on logger, you know, A is 100 bytes down...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "Well, I should be writing the test.",
+      "context": "...he address on these? Yeah, well, so, right. How expensive is it being, if you think about it, this is a great question. Well, I should be writing the test. So, you know, what I think about this, how often is a stack-art operation happening? Okay, so, there are different parts of stack-art. There's like,...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "Okay, so the attacker gets a prime, the attacker, you know, pick your towel, no prime, but just running it on the test environment.",
+      "context": "...knows this all session will prime. Okay, so the attacker gets a prime, the attacker, you know, pick your towel, no prime, but just running it on the test environment. Okay, and with that, the attacker goes B, the attacker also knows O, from his test environment, and then that gets finally disabled. I d...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "exam",
+      "quote": "Okay, and with that, the attacker goes B, the attacker also knows O, from his test environment, and then that gets finally disabled.",
+      "context": "...pick your towel, no prime, but just running it on the test environment. Okay, and with that, the attacker goes B, the attacker also knows O, from his test environment, and then that gets finally disabled. I don't know if maybe this is just pointer or anything, so taking, one to know some pointer in your...",
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "I've sent it, but the assignment that you've made.",
+      "context": "...afternoon to get the facts right and break. It will be within the event. It's on the right. I think one of the four questions. I've sent it, but the assignment that you've made. Are you on the course web page? Yes, course web page. Okay, I'll look at it. It's working for me, last time. It is for me. Thank yo...",
+      "keywords": [
+        "assignment"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Any questions about the assignment you go to our key AU end?",
+      "context": "...at the course web page unless you're not in the camera. Okay, so let's post it and... Right, so... All the more here, please. Any questions about the assignment you go to our key AU end? It was held in the front today. Okay, so send any questions about the assignments to you. Are submissions on Canvas? I know...",
+      "keywords": [
+        "assignment"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Yeah, the assignment explains you need to submit it on Canvas.",
+      "context": "...ont today. Okay, so send any questions about the assignments to you. Are submissions on Canvas? I know that's on the subject box. Yes, yes. Yeah, the assignment explains you need to submit it on Canvas. Yeah, so please read the assignment. I hope we answer those in your question of business about it. Okay, an...",
+      "keywords": [
+        "assignment",
+        "submit"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Yeah, so please read the assignment.",
+      "context": "...ssions on Canvas? I know that's on the subject box. Yes, yes. Yeah, the assignment explains you need to submit it on Canvas. Yeah, so please read the assignment. I hope we answer those in your question of business about it. Okay, any other questions? Remember we have the test coming up next last. What's the d...",
+      "keywords": [
+        "assignment"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Which is what assignment one asks you to do.",
+      "context": "...versions of things. So, there's one idea. In-area versions of library functions. And another idea would be to use a St.String library. Which is what assignment one asks you to do. Like, on assignment one. Use the St.Pur string library. That'll help with some buffer overflows. Right. String these buffer overf...",
+      "keywords": [
+        "assignment"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Like, on assignment one.",
+      "context": "...a. In-area versions of library functions. And another idea would be to use a St.String library. Which is what assignment one asks you to do. Like, on assignment one. Use the St.Pur string library. That'll help with some buffer overflows. Right. String these buffer overflows. I turn on P.V.S. out. We talked ab...",
+      "keywords": [
+        "assignment"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "It is in due until after it's time break.",
+      "context": "I'm going to put it on the course of the... It is in due until after it's time break. So you have some time to do it, but I wanted to give you as much time as I do it. And it gets you the Tuesday afternoon...",
+      "keywords": [
+        "due"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "Yeah, and so it turns out there actually breaks the whole due to optimize this.",
+      "context": "...jump, wouldn't it become more expensive over time? It's just not worth it. Yeah, and right. Yeah, and so it turns out there actually breaks the whole due to optimize this. So like, for simplicity, I'm talking about like this. Really, you could combine these into an equivalence class. And you could say,...",
+      "keywords": [
+        "due"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "type": "assignment",
+      "quote": "So what works in the attacker's lab may not work on a base, though.",
+      "context": "...like, is this Sack even begin, the memory? It might be different, and it's expected to be different on every machine. So what works in the attacker's lab may not work on a base, though. The attacker can just hard-pown one address here, or, you know, same, the attacker can just know, like, oh, I have a...",
+      "keywords": [
+        "lab"
+      ]
+    },
     {
       "date": "2026-03-02",
       "type": "exam",

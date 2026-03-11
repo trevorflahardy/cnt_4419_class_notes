@@ -1,4 +1,4 @@
-#import "./typst/xyznote/template/main.typ": *
+#import "@preview/xyznote:0.4.0": *
 
 #show: xyznote.with(
   title: "Secure Coding Typed Notes",
@@ -7,8 +7,6 @@
   bibliography-style: "ieee",
   lang: "en",
 )
-
-#set-admonition-defaults(title-size: 1em, body-size: 1em)
 
 = What Does It Mean for Software to Be Secure?
 

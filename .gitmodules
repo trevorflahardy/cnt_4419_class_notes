@@ -1,0 +1,3 @@
+[submodule "typst/xyznote"]
+	path = typst/xyznote
+	url = https://github.com/wardenxyz/xyznote

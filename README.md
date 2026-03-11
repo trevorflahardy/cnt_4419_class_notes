@@ -7,6 +7,8 @@ Built with [Nuxt 3](https://nuxt.com), [Nuxt UI](https://ui.nuxt.com), [Typst](h
 ## Live Site
 
 **[Open Study Hub](https://trevorflahardy.github.io/cnt_4419_class_notes/)**
+<img width="1308" height="751" alt="image" src="https://github.com/user-attachments/assets/75576f3f-0824-487b-8975-04e44dddf66c" />
+
 
 ## Features
 
@@ -22,8 +24,8 @@ Full, hand-typed lecture notes compiled from Typst to PDF and viewable directly 
 7. **Access Control** — Authentication, authorization, ACL/capabilities/ACM, RBAC, MAC, DAC, Bell-LaPadula, Biba
 8. **Memory & Buffers** — Stack frames, buffer overflows, NOP sleds, return-to-libc, ROP, stack guards, ASLR, CFI, fuzzing
 
-### Practice Quiz Engine (543 Questions)
-A full quiz system with **543 pre-generated questions** across all 8 chapters, featuring:
+### Practice Quiz Engine
+A full quiz system with over **500 pre-generated questions** across all 8+ chapters, featuring:
 
 - **Multiple question types**: Multiple choice (with easy/medium/hard difficulty), True/False, and Short Answer
 - **Chapter filtering**: Focus on specific chapters or mix across all
@@ -34,6 +36,8 @@ A full quiz system with **543 pre-generated questions** across all 8 chapters, f
 - **Score breakdown**: Per-chapter performance analysis after each quiz
 - **Confetti celebrations**: Score 80%+ and get rewarded
 
+<img width="1308" height="745" alt="image" src="https://github.com/user-attachments/assets/0071b1ca-5283-478e-b7b0-96b692dc5f5e" />
+
 ### AI Chat Assistant
 Ask natural language questions about the course material:
 
@@ -41,14 +45,22 @@ Ask natural language questions about the course material:
 - **Full conversational AI** (Chrome/Edge with WebGPU): On-device LLM generates detailed answers grounded in the actual class notes via RAG (Retrieval-Augmented Generation)
 - **Privacy-first**: Everything runs locally in your browser — no API calls, no data collection
 
+<img width="403" height="541" alt="image" src="https://github.com/user-attachments/assets/362a60ee-b90a-488a-b1fa-231265a4d890" />
+
 ### Lecture Transcripts
 Auto-transcribed lecture recordings with timestamps, searchable and browsable within the app.
+
+<img width="1312" height="736" alt="image" src="https://github.com/user-attachments/assets/237a27c7-7675-4b08-b44a-f53f6f5554a3" />
 
 ### Course Announcements
 Extracted lecture announcements for quick reference on assignments, exams, and deadlines.
 
+<img width="1489" height="753" alt="image" src="https://github.com/user-attachments/assets/cdbe9e92-a0fd-40fa-89ea-0a76fc6bb21c" />
+
 ### Flashcards
 Review key concepts in a flashcard format for spaced-repetition-style study.
+
+<img width="1486" height="741" alt="image" src="https://github.com/user-attachments/assets/87ccb681-f88f-499a-9a22-4756a8481608" />
 
 ### Additional Features
 - **Dark/light mode** with system preference detection

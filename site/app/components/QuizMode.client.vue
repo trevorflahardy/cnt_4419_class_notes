@@ -233,23 +233,43 @@
                   <span class="flex-1 leading-snug">{{ opt }}</span>
                   <UIcon v-if="isAnswered && idx === (currentQuestion as any).answer"
                     name="i-heroicons-check-circle-solid" class="h-5 w-5 shrink-0 text-green-500" />
-                  <UIcon v-else-if="isAnswered && idx === currentAnswer && idx !== (currentQuestion as any).answer"
+                  <UIcon v-else-if="isAnswered && currentAnswer !== IDK_SENTINEL && idx === currentAnswer && idx !== (currentQuestion as any).answer"
                     name="i-heroicons-x-circle-solid" class="h-5 w-5 shrink-0 text-red-500" />
+                </button>
+                <!-- IDK button -->
+                <button
+                  v-if="!isAnswered"
+                  class="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-default px-4 py-3 text-sm font-medium text-muted transition-all hover:border-violet-400/60 hover:bg-violet-500/5 hover:text-violet-600 active:scale-[0.99]"
+                  @click="submitIdk()"
+                >
+                  <UIcon name="i-heroicons-question-mark-circle" class="h-4.5 w-4.5" />
+                  I don't know — explain it to me
                 </button>
               </div>
 
               <!-- TF Options -->
-              <div v-else-if="currentQuestion?.type === 'tf'" class="grid grid-cols-2 gap-3">
+              <div v-else-if="currentQuestion?.type === 'tf'" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    v-for="val in [true, false]"
+                    :key="String(val)"
+                    class="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 py-6 text-sm font-bold transition-all duration-150 active:scale-[0.98]"
+                    :class="tfOptionClass(val)"
+                    :disabled="isAnswered"
+                    @click="submitTfAnswer(val)"
+                  >
+                    <UIcon :name="val ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'" class="h-7 w-7" />
+                    {{ val ? 'TRUE' : 'FALSE' }}
+                  </button>
+                </div>
+                <!-- IDK button -->
                 <button
-                  v-for="val in [true, false]"
-                  :key="String(val)"
-                  class="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 py-6 text-sm font-bold transition-all duration-150 active:scale-[0.98]"
-                  :class="tfOptionClass(val)"
-                  :disabled="isAnswered"
-                  @click="submitTfAnswer(val)"
+                  v-if="!isAnswered"
+                  class="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-default px-4 py-3 text-sm font-medium text-muted transition-all hover:border-violet-400/60 hover:bg-violet-500/5 hover:text-violet-600 active:scale-[0.99]"
+                  @click="submitIdk()"
                 >
-                  <UIcon :name="val ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'" class="h-7 w-7" />
-                  {{ val ? 'TRUE' : 'FALSE' }}
+                  <UIcon name="i-heroicons-question-mark-circle" class="h-4.5 w-4.5" />
+                  I don't know — explain it to me
                 </button>
               </div>
 
@@ -457,7 +477,7 @@
             <div v-for="(q, qi) in questions" :key="q.id" class="px-5 py-4 space-y-2.5">
               <div class="flex items-start gap-3">
                 <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                  :class="isCorrectAnswer(qi) ? 'bg-green-500' : 'bg-red-500'">
+                  :class="isCorrectAnswer(qi) ? 'bg-green-500' : answers[qi] === IDK_SENTINEL ? 'bg-violet-500' : 'bg-red-500'">
                   {{ qi + 1 }}
                 </span>
                 <div class="flex-1 min-w-0">
@@ -477,7 +497,11 @@
 
                   <!-- TF review -->
                   <div v-else-if="q.type === 'tf'" class="mt-2 text-xs">
-                    <span class="rounded-lg px-3 py-1.5" :class="isCorrectAnswer(qi) ? 'bg-green-500/10 text-green-700' : 'bg-red-500/10 text-red-700'">
+                    <span v-if="answers[qi] === IDK_SENTINEL" class="rounded-lg px-3 py-1.5 bg-violet-500/10 text-violet-700">
+                      Skipped •
+                      Correct: {{ q.answer ? 'TRUE' : 'FALSE' }}
+                    </span>
+                    <span v-else class="rounded-lg px-3 py-1.5" :class="isCorrectAnswer(qi) ? 'bg-green-500/10 text-green-700' : 'bg-red-500/10 text-red-700'">
                       You said: {{ answers[qi] ? 'TRUE' : 'FALSE' }} •
                       Correct: {{ q.answer ? 'TRUE' : 'FALSE' }}
                     </span>
@@ -564,9 +588,9 @@ const {
   xp, xpThisRound, currentLevel, nextLevel, xpToNextLevel,
   chapters, isPreparingQuiz, prepareQuizError,
   selectedChapter, selectedType, selectedDifficulty, selectedTag, questionCount,
-  startQuiz, submitMcAnswer, submitTfAnswer, submitSaText, selfGradeSa,
+  startQuiz, submitMcAnswer, submitTfAnswer, submitIdk, submitSaText, selfGradeSa,
   nextQuestion, prevQuestion, goToQuestion, finishQuiz, resetQuiz, explainWithAI,
-  isCorrectAnswer, modelAvailable,
+  isCorrectAnswer, modelAvailable, IDK_SENTINEL,
 } = useStaticQuiz()
 
 const LETTERS = ['A', 'B', 'C', 'D']
@@ -697,11 +721,11 @@ function mcOptionClass(idx: number): string {
   if (!currentQuestion.value || currentQuestion.value.type !== 'mc') return ''
   const q = currentQuestion.value as McQuestion
   const answered = isAnswered.value
-  const selected = currentAnswer.value as number | null
+  const selected = currentAnswer.value
 
   if (!answered) return 'border-default hover:border-primary/60 hover:bg-primary/5 cursor-pointer'
   if (idx === q.answer) return 'border-green-500/60 bg-green-500/[0.07]'
-  if (idx === selected) return 'border-red-500/60 bg-red-500/[0.07]'
+  if (selected !== IDK_SENTINEL && idx === selected) return 'border-red-500/60 bg-red-500/[0.07]'
   return 'border-default opacity-40'
 }
 
@@ -709,17 +733,17 @@ function mcLetterClass(idx: number): string {
   if (!currentQuestion.value || currentQuestion.value.type !== 'mc') return ''
   const q = currentQuestion.value as McQuestion
   const answered = isAnswered.value
-  const selected = currentAnswer.value as number | null
+  const selected = currentAnswer.value
 
   if (!answered) return 'bg-elevated border border-default group-hover:border-primary/50 group-hover:text-primary text-muted'
   if (idx === q.answer) return 'bg-green-500 text-white'
-  if (idx === selected) return 'bg-red-500 text-white'
+  if (selected !== IDK_SENTINEL && idx === selected) return 'bg-red-500 text-white'
   return 'bg-elevated text-muted'
 }
 
 function tfOptionClass(val: boolean): string {
   const answered = isAnswered.value
-  const selected = currentAnswer.value as boolean | null
+  const selected = currentAnswer.value
   const q = currentQuestion.value
 
   if (!answered) {
@@ -728,15 +752,15 @@ function tfOptionClass(val: boolean): string {
       : 'border-default hover:border-red-400 hover:bg-red-500/5 cursor-pointer text-muted hover:text-red-600'
   }
   const correct = q && q.type === 'tf' ? q.answer : null
-  if (val === correct && val === selected) return 'border-green-500 bg-green-500/10 text-green-600'
   if (val === correct) return 'border-green-500 bg-green-500/10 text-green-600'
-  if (val === selected && val !== correct) return 'border-red-500 bg-red-500/10 text-red-600'
+  if (selected !== IDK_SENTINEL && val === selected && val !== correct) return 'border-red-500 bg-red-500/10 text-red-600'
   return 'border-default opacity-40 text-muted'
 }
 
 function dotClass(qi: number): string {
   if (qi === currentIdx.value) return 'h-2.5 w-2.5 bg-primary border-2 border-primary scale-125'
   if (answers.value[qi] !== null && answers.value[qi] !== undefined) {
+    if (answers.value[qi] === IDK_SENTINEL) return 'h-2 w-2 bg-violet-400/70 border border-violet-400'
     return isCorrectAnswer(qi) ? 'h-2 w-2 bg-green-500/70 border border-green-500' : 'h-2 w-2 bg-red-400/70 border border-red-400'
   }
   return 'h-2 w-2 bg-transparent border border-default/60'
@@ -746,9 +770,9 @@ function reviewMcClass(qi: number, oi: number): string {
   const q = questions.value[qi]
   if (!q || q.type !== 'mc') return ''
   const mc = q as McQuestion
-  const userAns = answers.value[qi] as number | null
+  const userAns = answers.value[qi]
   if (oi === mc.answer) return 'bg-green-500/10 font-medium text-green-700'
-  if (oi === userAns && oi !== mc.answer) return 'bg-red-500/10 text-red-700'
+  if (userAns !== IDK_SENTINEL && oi === userAns && oi !== mc.answer) return 'bg-red-500/10 text-red-700'
   return 'text-muted'
 }
 </script>

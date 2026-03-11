@@ -169,6 +169,14 @@ function submitTfAnswer(val: boolean) {
   awardXp(val === q.answer ? 8 : 2)
 }
 
+const IDK_SENTINEL = '__idk__' as const
+
+function submitIdk() {
+  if (isAnswered.value) return
+  answers.value[currentIdx.value] = IDK_SENTINEL
+  awardXp(1)
+}
+
 function submitSaText(text: string) {
   if (saSubmitted.value[currentIdx.value]) return
   answers.value[currentIdx.value] = text
@@ -228,9 +236,10 @@ export function useStaticQuiz() {
       if (q.type === 'mc') correctAnswerText = q.options[(q as McQuestion).answer] ?? ''
       else if (q.type === 'tf') correctAnswerText = q.answer ? 'TRUE' : 'FALSE'
 
+      const wasIdk = answers.value[questionIdx] === IDK_SENTINEL
       const prompt = `You are a teaching assistant for a Secure Coding course (CNT 4419).
 
-A student got this question wrong. Explain clearly why the correct answer is right.
+${wasIdk ? 'A student didn\'t know the answer to this question. Explain the concept and why the correct answer is right.' : 'A student got this question wrong. Explain clearly why the correct answer is right.'}
 
 QUESTION: ${q.question}
 CORRECT ANSWER: ${correctAnswerText}
@@ -273,9 +282,9 @@ Give a 2-3 sentence explanation that helps the student understand the key concep
     // Loading state
     isPreparingQuiz, prepareQuizError,
     // Actions
-    startQuiz, submitMcAnswer, submitTfAnswer, submitSaText, selfGradeSa,
+    startQuiz, submitMcAnswer, submitTfAnswer, submitIdk, submitSaText, selfGradeSa,
     nextQuestion, prevQuestion, goToQuestion, finishQuiz, resetQuiz,
-    explainWithAI, isCorrectAnswer,
+    explainWithAI, isCorrectAnswer, IDK_SENTINEL,
     // Model availability for UI
     modelAvailable: model.isAvailable,
   }

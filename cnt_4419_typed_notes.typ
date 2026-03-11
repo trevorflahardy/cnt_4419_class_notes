@@ -1569,12 +1569,14 @@ What if you had an off by one? So what if you can overwrite by just one to the `
 == High level ideas for preventing buffer overflows
 All this information boils down to *a few high level ideas*:
 1. Find and use a safer library function that performs the same task but with built-in bounds checking, or
-2. Perform boundary checks yourself manually on array operations.
+2. Perform boundary checks yourself manually on array operations, or
 3. Use a type-safe programming language ($<-$ a side note; the professor notes that this is not always an option due to performance).
 
 == Protections modern machines give us against buffer overflow attacks
 
 === Compiler errors/warnings.
+
+Compiler warnings can help identify potential buffer overflow vulnerabilities in your code. Note that the professor does not go into great detail about this, but they do mention that modern compilers may complain if you use unsafe functions like `gets()`.
 
 === Static canaries (aka "stack guard"): the more modern name is called *stack guard*.
 

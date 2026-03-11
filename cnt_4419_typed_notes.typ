@@ -1530,7 +1530,7 @@ In general, you should be checking the boundaries of arrays that you are writing
 
 This ties back into the usage of `strcpy()`, which does not check the bounds of the destination buffer, making it a common source of buffer overflow vulnerabilities. So, you should be using safer functions or by manually doing bounds checks.
 
-The professor notes that using a programming language that has built-in bounds checking (like Python or Java) can help prevent buffer overflow vulnerabilities, as these languages automatically check array bounds and raise exceptions if an attempt is made to access out-of-bounds memory. However, in low-level programming languages like C and C++, it is the responsibility of the developer to ensure that they are properly checking bounds to prevent buffer overflows.
+The professor notes that using a programming language that have built-in bounds checking (like Python or Java) can help prevent buffer overflow vulnerabilities, as these languages automatically check array bounds and raise exceptions if an attempt is made to access out-of-bounds memory. However, in low-level programming languages like C and C++, it is the responsibility of the developer to ensure that they are properly checking bounds to prevent buffer overflows.
 
 === Replace unsafe functions with safer alternatives
 

@@ -1772,7 +1772,7 @@ Let's say you change some return address in the stack to point to some location 
 
 But, in this example, if some attacher can get he address of some pointer into code memory (some address `a'`, which the attacker can find using format string vulnerabilities and other techniques), then that allows you to figure out everything assuming the attacker knows the layout of the code in memory.
 
-=== Control Flow Integrity (CFA)
+=== Control Flow Integrity (CFI)
 
 CFI is a security technique that ensures that the control flow of a program follows a predetermined path, preventing attackers from redirecting execution to malicious code. CFI works by analyzing the program's control flow graph (CFG) and inserting checks at runtime to ensure that the program's execution follows the expected paths defined in the CFG. If an attacker attempts to redirect execution to an unexpected path, the CFI checks will detect this and can take appropriate action (such as terminating the program) to prevent the attack from succeeding.
 

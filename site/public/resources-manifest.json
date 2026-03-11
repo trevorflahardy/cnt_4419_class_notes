@@ -1,6 +1,12 @@
 [
   {
     "type": "file",
+    "name": "Test 1.pdf",
+    "path": "Test 1.pdf",
+    "ext": "pdf"
+  },
+  {
+    "type": "file",
     "name": "Test 2 Practice.pdf",
     "path": "Test 2 Practice.pdf",
     "ext": "pdf"

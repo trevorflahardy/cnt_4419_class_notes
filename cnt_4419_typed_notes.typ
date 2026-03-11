@@ -1546,7 +1546,12 @@ char* fgets(char* buf, int size, FILE* stream);
 // (where rsize_t is a restricted version of size_t that is used for bounds checking)
 char* gets_s(char* buf, rsize_t size);
 ```
-Why would the professor not necessarily call these a "safer" version? Can you misuse these things? Now, the programmer can specify the max number of bytes to read in, but if they specify a size that is larger than the actual buffer size, then you can still have a buffer overflow. So, while these functions provide a way to prevent buffer overflows, they still require the programmer to use them correctly and ensure that the specified size does not exceed the actual buffer size. Therefore, they are safer alternatives but still require careful usage to avoid vulnerabilities.
+
+#question[
+  *Why are these not necessarily "safer" versions of code?*
+
+  Well, can you misuse these things? Now, the programmer can specify the max number of bytes to read in, but if they specify a size that is larger than the actual buffer size, then you can still have a buffer overflow. So, while these functions provide a way to prevent buffer overflows, they still require the programmer to use them correctly and ensure that the specified size does not exceed the actual buffer size. Therefore, they are safer alternatives but still require careful usage to avoid vulnerabilities.
+]
 
 The fault is laid onto the programmer here. The professor notes "*off by one*" errors here, which is a common mistake where the programmer specifies a size that is one byte larger than the actual buffer size, leading to a potential buffer overflow. For example, if you have a buffer of size 1024 bytes, and you specify a size of 1025 bytes when using `fgets()`, you could still have a buffer overflow vulnerability. This is why it's important for programmers to be diligent and careful when using these functions to ensure that they are specifying the correct size for the buffer.
 ```cpp

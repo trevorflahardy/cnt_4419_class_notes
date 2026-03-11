@@ -1578,12 +1578,13 @@ All this information boils down to *a few high level ideas*:
 
 Compiler warnings can help identify potential buffer overflow vulnerabilities in your code. Note that the professor does not go into great detail about this, but they do mention that modern compilers may complain if you use unsafe functions like `gets()`.
 
-=== Static canaries (aka "stack guard"): the more modern name is called *stack guard*.
+=== Static canaries (aka "stack guard")
 
 #markbox[
   Notes hereon taken on Mar 9, 2026
 ]
 
+The more modern name for a stack canary is called a *stack guard*.
 $
   "Buffer Overflows (B.O.s)" subset "Out of Bounds"
 $

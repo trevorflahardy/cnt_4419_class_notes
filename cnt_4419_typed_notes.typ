@@ -1534,7 +1534,7 @@ The professor notes that using a programming language that have built-in bounds 
 
 === Replace unsafe functions with safer alternatives
 
-- Instead of `gets()`, use `fgets()`, which allows you to specify the size of the buffer and prevents buffer overflows by ensuring that you do not write more data than the allocated buffer can hold.
+- Instead of `gets()`, use `fgets()`, which allow you to specify the size of the buffer and prevents buffer overflows by ensuring that you do not write more data than the allocated buffer can hold.
 ```cpp
 // size: The max # of bytes you can read in
 // stream: the file stream to read from (e.g., stdin)

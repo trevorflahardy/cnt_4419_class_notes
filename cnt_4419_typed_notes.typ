@@ -1,4 +1,5 @@
 #import "@preview/xyznote:0.4.0": *
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #show: xyznote.with(
   title: "Secure Coding Typed Notes",
@@ -1791,14 +1792,198 @@ To implement the CFI, before any computed jump instruction we will check that th
 
 Consider some `beq` instruction in some assembly code. It could either fall through to the next instruction in the code *or* it could jump to some other special no-operation (NOP) instruction that we have designated as a valid jump target. With CFI, we would embed a special code at the valid jump target (the NOP instruction), and before executing the `beq` instruction, we would check for the presence of that special code at the destination address. If the special code is present, we allow the jump to proceed; if it is not present, we can take appropriate action (such as terminating the program) to prevent a potential attack.
 
+#figure(
+  block(
+    width: 100%,
+    inset: 16pt,
+    radius: 6pt,
+    fill: luma(248),
+    stroke: 0.75pt + luma(200),
+    {
+      set text(font: "Menlo", size: 8pt)
+
+      let addr-style(it) = text(fill: luma(140), it)
+      let cfi-tag = box(
+        inset: (x: 6pt, y: 3pt),
+        radius: 3pt,
+        fill: rgb("#e8f5e9"),
+        stroke: 0.75pt + rgb("#4caf50"),
+        text(fill: rgb("#2e7d32"), weight: "bold", size: 7pt, "CFI LABEL: 0x12345678"),
+      )
+      let bad-tag = box(
+        inset: (x: 6pt, y: 3pt),
+        radius: 3pt,
+        fill: rgb("#ffebee"),
+        stroke: 0.75pt + rgb("#ef5350"),
+        text(fill: rgb("#c62828"), weight: "bold", size: 7pt, sym.crossmark + " NO CFI LABEL"),
+      )
+
+      let instr-box(addr, content, tag: none) = {
+        block(
+          width: 100%,
+          inset: (x: 10pt, y: 6pt),
+          radius: 4pt,
+          fill: white,
+          stroke: 0.5pt + luma(180),
+          {
+            grid(
+              columns: (auto, 1fr),
+              column-gutter: 12pt,
+              addr-style(addr),
+              content,
+            )
+            if tag != none {
+              v(4pt)
+              tag
+            }
+          },
+        )
+      }
+
+      // Title
+      align(center, text(font: "Linux Libertine", size: 11pt, weight: "bold", "CFI Label Verification at Computed Jumps"))
+      v(10pt)
+
+      grid(
+        columns: (1fr, 40pt, 1fr),
+        column-gutter: 0pt,
+        // Left column: main code path
+        {
+          align(center, text(font: "Linux Libertine", size: 9pt, fill: luma(100), weight: "bold", smallcaps("Code Segment")))
+          v(8pt)
+          instr-box("0x1000:", raw("mov r1, #5"))
+          v(4pt)
+          instr-box("0x1004:", raw("add r2, r1, #3"))
+          v(4pt)
+          instr-box("0x1008:", raw("cmp r2, #8"))
+          v(4pt)
+          block(
+            width: 100%,
+            inset: (x: 10pt, y: 8pt),
+            radius: 4pt,
+            fill: rgb("#fff3e0"),
+            stroke: 1pt + rgb("#ff9800"),
+            {
+              grid(
+                columns: (auto, 1fr),
+                column-gutter: 12pt,
+                addr-style("0x100C:"),
+                raw("beq 0x1080"),
+              )
+              v(4pt)
+              box(
+                inset: (x: 6pt, y: 3pt),
+                radius: 3pt,
+                fill: rgb("#fff8e1"),
+                stroke: 0.75pt + rgb("#ffa000"),
+                text(fill: rgb("#e65100"), size: 7pt, weight: "bold", sym.arrow.r + " CHECK: does 0x1080 have label 0x12345678?"),
+              )
+            },
+          )
+          v(4pt)
+          instr-box("0x1010:", raw("sub r3, r2, #1"), tag: text(fill: luma(120), size: 7pt, sym.arrow.b + " fall-through path"))
+          v(4pt)
+          instr-box("0x1014:", raw("str r3, [sp]"))
+        },
+
+        // Middle column: arrow
+        {
+          v(100pt)
+          align(center + horizon)[
+            #text(size: 18pt, fill: rgb("#ff9800"), sym.arrow.r)
+            #v(-2pt)
+            #text(size: 6pt, fill: luma(120), "jump")
+          ]
+        },
+
+        // Right column: jump targets
+        {
+          align(center, text(font: "Linux Libertine", size: 9pt, fill: luma(100), weight: "bold", smallcaps("Jump Targets")))
+          v(8pt)
+
+          text(font: "Linux Libertine", size: 8pt, fill: rgb("#2e7d32"), weight: "bold", sym.checkmark + " Valid Target:")
+          v(4pt)
+          block(
+            width: 100%,
+            inset: (x: 10pt, y: 8pt),
+            radius: 4pt,
+            fill: rgb("#e8f5e9"),
+            stroke: 1pt + rgb("#4caf50"),
+            {
+              grid(
+                columns: (auto, 1fr),
+                column-gutter: 12pt,
+                addr-style("0x1080:"),
+                raw("prefetchnta 0x12345678"),
+              )
+              v(4pt)
+              cfi-tag
+              v(4pt)
+              grid(
+                columns: (auto, 1fr),
+                column-gutter: 12pt,
+                addr-style("0x1084:"),
+                raw("nop  ; actual target"),
+              )
+            },
+          )
+
+          v(16pt)
+
+          text(font: "Linux Libertine", size: 8pt, fill: rgb("#c62828"), weight: "bold", sym.crossmark + " Invalid Target (attacker-chosen):")
+          v(4pt)
+          block(
+            width: 100%,
+            inset: (x: 10pt, y: 8pt),
+            radius: 4pt,
+            fill: rgb("#ffebee"),
+            stroke: 1pt + rgb("#ef5350"),
+            {
+              grid(
+                columns: (auto, 1fr),
+                column-gutter: 12pt,
+                addr-style("0x2000:"),
+                raw("mov r0, #0xDEAD"),
+              )
+              v(4pt)
+              bad-tag
+              v(4pt)
+              box(
+                inset: (x: 6pt, y: 3pt),
+                radius: 3pt,
+                fill: rgb("#ffcdd2"),
+                stroke: 0.75pt + rgb("#e53935"),
+                text(fill: rgb("#b71c1c"), size: 7pt, weight: "bold", sym.excl.double + " PROGRAM TERMINATED"),
+              )
+            },
+          )
+        },
+      )
+
+      // Legend
+      v(12pt)
+      line(length: 100%, stroke: 0.5pt + luma(210))
+      v(6pt)
+      set text(font: "Linux Libertine", size: 8pt, fill: luma(80))
+      grid(
+        columns: (1fr, 1fr),
+        column-gutter: 12pt,
+        [The `prefetchnta` instruction encodes the CFI label as an immediate operand. It functions as a semantic NOP (does not affect program state) but carries the marker `0x12345678` that the CFI check reads before any computed jump.],
+        [If the destination lacks the expected label, CFI detects an illegal control flow transfer and halts execution, preventing ROP chains and arbitrary code-pointer overwrites.],
+      )
+    },
+  ),
+  caption: [CFI label verification: before a computed jump (`beq`), the runtime checks that the destination address contains the expected label. Valid targets are prefixed with the label; invalid targets cause program termination.],
+) <cfi-label-diagram>
+
 This does add some runtime overhead, as we have to perform these checks before every computed jump instruction, but it can significantly enhance the security of the program by preventing attackers from redirecting execution to malicious code. But, there are many ways to implement CFI, and some implementations may have more or less overhead depending on the specific techniques used and the level of security provided.
 
 Let's say you generated one of these special codes and put it everywhere you have a valid jump. This *mitigates*: jumping to random places in the code segment, ROP chains, and jumping to the middle of an instruction. However, it *does not mitigate*: jumping to the middle of a special code (if the special code is long enough that it has multiple instructions), or jumping to the middle of a valid instruction (if the valid instruction is long enough that it has multiple instructions). So, while CFI can provide strong protection against certain types of control flow attacks, it may not be able to prevent all possible attack vectors, especially if the attacker can find ways to bypass the checks or if there are limitations in the implementation of CFI.
 
 There are *multiple assumptions* for this:
-1. *NWC*: No write code. This means that the attacker cannot write to the code segment of memory, which is a common assumption in CFI implementations. If an attacker can write to the code segment, they could potentially modify the special codes used for CFI checks, allowing them to bypass the protection and redirect execution to malicious code.
-2. *NXD*: No execute data. This means that the attacker cannot execute code from the data segment of memory, which is another common assumption in CFI implementations. If an attacker can execute code from the data segment, they could potentially inject malicious code into the data segment and execute it, bypassing CFI protections that rely on the assumption that only code in the code segment can be executed.
-3. *NNQ*: No non-control data. This means that *the attacker cannot modify non-control data* (such as local variables or function arguments) *in a way that could affect the control flow of the program*. If an attacker can modify non-control data, they could potentially cause unintended behavior or exploit other vulnerabilities in the program, even if CFI is in place to protect against control flow redirection attacks.
+1. *No write code (NWC)*: This means that the *attacker cannot write to the code segment of memory*, which is a common assumption in CFI implementations. If an attacker can write to the code segment, they could potentially modify the special codes used for CFI checks, allowing them to bypass the protection and redirect execution to malicious code.
+2. *No execute data (NXD)*: This means that the *attacker cannot execute code from the data segment of memory*, which is another common assumption in CFI implementations. If an attacker can execute code from the data segment, they could potentially inject malicious code into the data segment and execute it, bypassing CFI protections that rely on the assumption that only code in the code segment can be executed.
+3. *No non-control data (NNQ)*: This means that *the attacker cannot modify non-control data* (such as local variables or function arguments) *in a way that could affect the control flow of the program*. If an attacker can modify non-control data, they could potentially cause unintended behavior or exploit other vulnerabilities in the program, even if CFI is in place to protect against control flow redirection attacks.
 
 Limitations:
 - "Mimicry" attack: An attacker could potentially craft a malicious payload that mimics the expected control flow of the program, including the presence of the special codes used for CFI checks. By carefully constructing their payload to include valid jump targets and special codes, an attacker could bypass CFI protections and redirect execution to their malicious code without triggering any alarms. This type of attack is known as a "mimicry" attack, and it highlights the importance of implementing CFI in a way that is robust against such evasion techniques.

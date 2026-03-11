@@ -1829,8 +1829,7 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
             grid(
               columns: (auto, 1fr),
               column-gutter: 12pt,
-              addr-style(addr),
-              content,
+              addr-style(addr), content,
             )
             if tag != none {
               v(4pt)
@@ -1841,7 +1840,12 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
       }
 
       // Title
-      align(center, text(font: "Linux Libertine", size: 11pt, weight: "bold", "CFI Label Verification at Computed Jumps"))
+      align(center, text(
+        font: "Linux Libertine",
+        size: 11pt,
+        weight: "bold",
+        "CFI Label Verification at Computed Jumps",
+      ))
       v(10pt)
 
       grid(
@@ -1849,7 +1853,13 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
         column-gutter: 0pt,
         // Left column: main code path
         {
-          align(center, text(font: "Linux Libertine", size: 9pt, fill: luma(100), weight: "bold", smallcaps("Code Segment")))
+          align(center, text(
+            font: "Linux Libertine",
+            size: 9pt,
+            fill: luma(100),
+            weight: "bold",
+            smallcaps("Code Segment"),
+          ))
           v(8pt)
           instr-box("0x1000:", raw("mov r1, #5"))
           v(4pt)
@@ -1867,8 +1877,7 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
               grid(
                 columns: (auto, 1fr),
                 column-gutter: 12pt,
-                addr-style("0x100C:"),
-                raw("beq 0x1080"),
+                addr-style("0x100C:"), raw("beq 0x1080"),
               )
               v(4pt)
               box(
@@ -1876,12 +1885,21 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
                 radius: 3pt,
                 fill: rgb("#fff8e1"),
                 stroke: 0.75pt + rgb("#ffa000"),
-                text(fill: rgb("#e65100"), size: 7pt, weight: "bold", sym.arrow.r + " CHECK: does 0x1080 have label 0x12345678?"),
+                text(
+                  fill: rgb("#e65100"),
+                  size: 7pt,
+                  weight: "bold",
+                  sym.arrow.r + " CHECK: does 0x1080 have label 0x12345678?",
+                ),
               )
             },
           )
           v(4pt)
-          instr-box("0x1010:", raw("sub r3, r2, #1"), tag: text(fill: luma(120), size: 7pt, sym.arrow.b + " fall-through path"))
+          instr-box("0x1010:", raw("sub r3, r2, #1"), tag: text(
+            fill: luma(120),
+            size: 7pt,
+            sym.arrow.b + " fall-through path",
+          ))
           v(4pt)
           instr-box("0x1014:", raw("str r3, [sp]"))
         },
@@ -1898,10 +1916,22 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
 
         // Right column: jump targets
         {
-          align(center, text(font: "Linux Libertine", size: 9pt, fill: luma(100), weight: "bold", smallcaps("Jump Targets")))
+          align(center, text(
+            font: "Linux Libertine",
+            size: 9pt,
+            fill: luma(100),
+            weight: "bold",
+            smallcaps("Jump Targets"),
+          ))
           v(8pt)
 
-          text(font: "Linux Libertine", size: 8pt, fill: rgb("#2e7d32"), weight: "bold", sym.checkmark + " Valid Target:")
+          text(
+            font: "Linux Libertine",
+            size: 8pt,
+            fill: rgb("#2e7d32"),
+            weight: "bold",
+            sym.checkmark + " Valid Target:",
+          )
           v(4pt)
           block(
             width: 100%,
@@ -1913,8 +1943,7 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
               grid(
                 columns: (auto, 1fr),
                 column-gutter: 12pt,
-                addr-style("0x1080:"),
-                raw("prefetchnta 0x12345678"),
+                addr-style("0x1080:"), raw("prefetchnta 0x12345678"),
               )
               v(4pt)
               cfi-tag
@@ -1922,15 +1951,20 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
               grid(
                 columns: (auto, 1fr),
                 column-gutter: 12pt,
-                addr-style("0x1084:"),
-                raw("nop  ; actual target"),
+                addr-style("0x1084:"), raw("nop  ; actual target"),
               )
             },
           )
 
           v(16pt)
 
-          text(font: "Linux Libertine", size: 8pt, fill: rgb("#c62828"), weight: "bold", sym.crossmark + " Invalid Target (attacker-chosen):")
+          text(
+            font: "Linux Libertine",
+            size: 8pt,
+            fill: rgb("#c62828"),
+            weight: "bold",
+            sym.crossmark + " Invalid Target (attacker-chosen):",
+          )
           v(4pt)
           block(
             width: 100%,
@@ -1942,8 +1976,7 @@ Consider some `beq` instruction in some assembly code. It could either fall thro
               grid(
                 columns: (auto, 1fr),
                 column-gutter: 12pt,
-                addr-style("0x2000:"),
-                raw("mov r0, #0xDEAD"),
+                addr-style("0x2000:"), raw("mov r0, #0xDEAD"),
               )
               v(4pt)
               bad-tag

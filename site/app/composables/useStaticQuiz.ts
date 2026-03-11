@@ -31,6 +31,7 @@ const chapters = ref<Chapter[]>([])
 const selectedChapter = ref<number | null>(null)
 const selectedType = ref<'mc' | 'tf' | 'sa' | 'all'>('all')
 const selectedDifficulty = ref<'easy' | 'medium' | 'hard' | 'mixed'>('mixed')
+const selectedTag = ref<string | null>(null)
 const questionCount = ref(10)
 
 // XP — persisted in localStorage
@@ -130,6 +131,7 @@ async function startQuiz() {
       chapter: selectedChapter.value,
       type: selectedType.value,
       difficulty: selectedDifficulty.value,
+      tag: selectedTag.value,
       count: questionCount.value,
       shuffle: true,
     })
@@ -260,7 +262,7 @@ Give a 2-3 sentence explanation that helps the student understand the key concep
 
   return {
     // Config
-    selectedChapter, selectedType, selectedDifficulty, questionCount, chapters,
+    selectedChapter, selectedType, selectedDifficulty, selectedTag, questionCount, chapters,
     // State
     view, questions, currentIdx, answers, saSubmitted, saGrades,
     aiExplanations, isExplaining, explainError,

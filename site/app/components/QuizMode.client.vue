@@ -103,6 +103,31 @@
           </div>
         </div>
 
+        <!-- Definitions toggle -->
+        <div class="rounded-xl border border-default bg-elevated/40 p-3.5">
+          <button
+            class="w-full flex items-center justify-between gap-3"
+            @click="selectedTag = selectedTag === 'definitions' ? null : 'definitions'"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-base">📖</span>
+              <div class="text-left">
+                <p class="text-xs font-semibold text-highlighted">Definitions Only</p>
+                <p class="text-[10px] text-muted/80">Key terms, abbreviations & vocab from the notes</p>
+              </div>
+            </div>
+            <div
+              class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200"
+              :class="selectedTag === 'definitions' ? 'bg-primary' : 'bg-elevated border border-default'"
+            >
+              <div
+                class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200"
+                :class="selectedTag === 'definitions' ? 'translate-x-4' : 'translate-x-0.5'"
+              />
+            </div>
+          </button>
+        </div>
+
         <!-- Available count warning -->
         <p v-if="!countsLoading && availableCount < questionCount" class="text-xs text-amber-600 flex items-center gap-1.5">
           <UIcon name="i-heroicons-information-circle" class="h-4 w-4 shrink-0" />
@@ -179,6 +204,10 @@
                 </span>
                 <span class="rounded-full border border-default px-2.5 py-0.5 text-xs text-muted uppercase tracking-wide">
                   {{ typeLabel }}
+                </span>
+                <span v-if="currentQuestion?.tags?.includes('definitions')"
+                  class="rounded-full bg-blue-500/10 border border-blue-400/30 px-2.5 py-0.5 text-xs font-medium text-blue-600">
+                  Definition
                 </span>
               </div>
 
@@ -521,6 +550,7 @@
 
 <script setup lang="ts">
 import {
+  filterQuestions,
   getChapters,
   getFilteredQuestionCount,
   getTotalQuestionCount,
@@ -533,7 +563,7 @@ const {
   currentQuestion, currentAnswer, isAnswered, score, chapterBreakdown,
   xp, xpThisRound, currentLevel, nextLevel, xpToNextLevel,
   chapters, isPreparingQuiz, prepareQuizError,
-  selectedChapter, selectedType, selectedDifficulty, questionCount,
+  selectedChapter, selectedType, selectedDifficulty, selectedTag, questionCount,
   startQuiz, submitMcAnswer, submitTfAnswer, submitSaText, selfGradeSa,
   nextQuestion, prevQuestion, goToQuestion, finishQuiz, resetQuiz, explainWithAI,
   isCorrectAnswer, modelAvailable,
@@ -578,16 +608,26 @@ function getChapterQuestionCount(chapterId: number) {
 async function refreshCounts() {
   countsLoading.value = true
   try {
-    const [total, filtered] = await Promise.all([
-      getTotalQuestionCount(null),
-      getFilteredQuestionCount({
+    const total = await getTotalQuestionCount(null)
+    totalQuestionCount.value = total
+
+    if (selectedTag.value) {
+      // When a tag filter is active, we need to actually load and filter questions
+      const filtered = await filterQuestions({
         chapter: selectedChapter.value,
         type: selectedType.value,
         difficulty: selectedDifficulty.value,
-      }),
-    ])
-    totalQuestionCount.value = total
-    availableCount.value = filtered
+        tag: selectedTag.value,
+        shuffle: false,
+      })
+      availableCount.value = filtered.length
+    } else {
+      availableCount.value = await getFilteredQuestionCount({
+        chapter: selectedChapter.value,
+        type: selectedType.value,
+        difficulty: selectedDifficulty.value,
+      })
+    }
   } finally {
     countsLoading.value = false
   }
@@ -606,7 +646,7 @@ onMounted(async () => {
   await loadQuizSetupData()
 })
 
-watch([selectedChapter, selectedType, selectedDifficulty], () => {
+watch([selectedChapter, selectedType, selectedDifficulty, selectedTag], () => {
   refreshCounts()
 })
 

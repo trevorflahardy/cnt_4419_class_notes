@@ -17,6 +17,7 @@ export interface McQuestion {
     options: string[]
     answer: number
     explanation: string
+    tags?: string[]
 }
 
 export interface TfQuestion {
@@ -26,6 +27,7 @@ export interface TfQuestion {
     question: string
     answer: boolean
     explanation: string
+    tags?: string[]
 }
 
 export interface SaQuestion {
@@ -34,6 +36,7 @@ export interface SaQuestion {
     type: 'sa'
     question: string
     answer: string
+    tags?: string[]
 }
 
 export type BankQuestion = McQuestion | TfQuestion | SaQuestion
@@ -62,6 +65,7 @@ interface QuestionStats {
     mc_easy: number
     mc_medium: number
     mc_hard: number
+    definitions: number
 }
 
 const indexCache = shallowRef<QuestionBankIndex | null>(null)
@@ -78,6 +82,7 @@ const defaultStats: QuestionStats = {
     mc_easy: 0,
     mc_medium: 0,
     mc_hard: 0,
+    definitions: 0,
 }
 
 function cloneStats(stats: Partial<QuestionStats> | undefined): QuestionStats {
@@ -173,6 +178,7 @@ export async function filterQuestions(opts: {
     chapter?: number | null
     type?: 'mc' | 'tf' | 'sa' | 'all'
     difficulty?: 'easy' | 'medium' | 'hard' | 'mixed'
+    tag?: string | null
     count?: number
     shuffle?: boolean
 }): Promise<BankQuestion[]> {
@@ -195,6 +201,11 @@ export async function filterQuestions(opts: {
             if (q.type !== 'mc') return true
             return q.difficulty === difficulty
         })
+    }
+
+    if (opts.tag) {
+        const tag = opts.tag
+        questions = questions.filter(q => q.tags?.includes(tag))
     }
 
     if (opts.shuffle !== false) {

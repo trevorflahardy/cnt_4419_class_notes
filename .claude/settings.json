@@ -2,5 +2,8 @@
   "enabledPlugins": {
     "nuxt-ui-v4@claude-skills": true,
     "shadcn-vue@claude-skills": true
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

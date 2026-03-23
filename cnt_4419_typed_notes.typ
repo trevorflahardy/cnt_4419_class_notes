@@ -1,4 +1,4 @@
-#import "@preview/xyznote:0.4.0": *
+#import "@preview/xyznote:0.5.0": *
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #show: xyznote.with(
@@ -8,6 +8,8 @@
   bibliography-style: "ieee",
   lang: "en",
 )
+
+#set-admonition-defaults(title-size: 0.95em, body-size: 1.0em)
 
 = What Does It Mean for Software to Be Secure?
 
@@ -2021,3 +2023,202 @@ There are *multiple assumptions* for this:
 Limitations:
 - "Mimicry" attack: An attacker could potentially craft a malicious payload that mimics the expected control flow of the program, including the presence of the special codes used for CFI checks. By carefully constructing their payload to include valid jump targets and special codes, an attacker could bypass CFI protections and redirect execution to their malicious code without triggering any alarms. This type of attack is known as a "mimicry" attack, and it highlights the importance of implementing CFI in a way that is robust against such evasion techniques.
   - Program can still jump to instructions it hsouldn't as long as it's on a valid control flow path, IE stays on valid control flow path.
+
+= Exam 2 Review
+The professor started with Exam 2 review. I missed some of the opening questions, but will continue annotationg from the point I started transcribing.
+
+#note[
+  If someone can fill in these notes to include the professor's comments for the first 4 questions, please do so.
+]
+
+== Question 5
+=== Part A
+
+#figure(
+  table(
+    columns: (1fr, 1.25fr, 2.2fr, 1fr),
+    stroke: 0.6pt + luma(170),
+    inset: 6pt,
+    align: (left, left, left, right),
+    table.header([*Region*], [*Frame / Block*], [*Contents*], [*Direction / Address*]),
+    [Stack], [main frame], [`s (points to s[0])` \ `sf (points to sf[0] addr)` ], [grows down],
+    [Stack], [`setup_flags` frame], [`RA` \ `SF`], [grows down],
+    [Gap], [between stack and heap], [`(empty)`], [],
+    [Heap], [struct referenced by `sf`], [`sf -> disNetworkAccess (1)` \ `sf -> disFileAccess (1)`], [grows down],
+    [Heap], [character buffer `s`], [`s[255]` \ $dots.v$ \ `s[0]`], [grows down],
+    [Code], [text segment], [`code section`], [low addresses],
+  ),
+  caption: [Point 1 memory model with stack and heap chunked by frame/block.],
+) <exam2-q5-point1-memory>
+
+==== Point 2
+
+#figure(
+  table(
+    columns: (1fr, 1.25fr, 2.2fr, 1fr),
+    stroke: 0.6pt + luma(170),
+    inset: 6pt,
+    align: (left, left, left, right),
+    table.header([*Region*], [*Frame / Block*], [*Contents*], [*Direction / Address*]),
+    [Stack], [main frame], [`s (points to s[0])` \ `sf (points to sf[0] addr)` ], [grows down],
+    [Stack], [`setup_flags` frame], [`RA` \ `SF`], [grows down],
+    [Gap], [between stack and heap], [`(empty)`], [],
+    [Heap], [struct referenced by `sf`], [`sf -> disNetworkAccess (1)` \ `sf -> disFileAccess (1)`], [grows down],
+    [Heap], [character buffer `s`], [`s[255]` \ $dots.v$ \ `s[0]`], [grows down],
+    [Code], [text segment], [`code section`], [low addresses],
+  ),
+  caption: [Point 2 memory model with stack and heap chunked by frame/block.],
+) <exam2-q5-point2-memory>
+
+
+The professor nots that `fgets()` will read up to `257`; this was the source of the overflow. Note that this is *not* a stack overflow but rather a *heap overflow*.
+
+So if the user is calling `fgets()` with a size of `257`, and the buffer `s` is only allocated to hold `256` bytes, then if the user inputs more than `256` bytes, it will overflow the buffer `sf` and change the `sf->disNetworkAccess` flag from `1` to `0` (due to the string's null terminator), which is the vulnerability that the attacker can exploit to gain unauthorized access to network resources. This is a classic example of a heap overflow vulnerability, where the attacker can overwrite adjacent memory on the heap (in this case, the `sf` struct) by providing more input than the allocated buffer can handle.
+
+=== Part B
+
+Explained in the above.
+
+=== Part C
+
+NX bits would not help.
+
+=== Part D
+
+Stack canaries would not help; they only protect return addresses.
+
+=== Part E
+
+Would ASLR mitigate this? No. Why? We're not overwriting pointers anyway.
+
+=== Part F
+
+Would CFI mitigate this? No, CFI helps jump to the right place, but here we're not jumping to the wrong place, we're just changing some flags that allow us to do something we shouldn't be able to do. So, CFI would not help in this case because it is designed to prevent control flow hijacking attacks (such as return-oriented programming), but it does not protect against data corruption vulnerabilities like heap overflows that can modify program state without altering control flow.
+
+=== Part G
+
+Two logically distinct modifications to the code that would mitigate this vulnerability are:
+1. Using a type safe programming language, or
+2. Use safer functions
+
+There are more examples of correct answers, however.
+
+== Question 6
+
+Two standard components of an access-control mechanism? Authorization and Authentication.
+
+== Question 7
+
+Define the concatenation of two properties $G_1$ and $G_2$ as the following:
+$
+  G_1;G_2 = {t_1 | t_1 "is infinite" and t_1 in G_1} union {t_1;t_2 | t_1 "is finite" and t_1 in G_1 and t_2 in G_2}
+$
+
+Prove or disprove the following
+
+=== Part A: Safety Properties are closed under Concatenation
+
+The problem is asking here if, given two safety properties $G_1$ and $G_2$, is the concatenation of these two properties (as defined above) also a safety property?
+
+Consider the hint $G_2 = emptyset$. Then, $G_1;G_2$ would be equal to $G_1;emptyset$, which according to the definition of concatenation, would be equal to:
+$ {t_1 | t_1 "is infinite" and t_1 in G_1} union {t_1;t_2 | t_1 "is finite" and t_1 in G_1 and t_2 in emptyset} $
+
+#note[
+  The professor notes that, ideally, you would elaborate how $G_2$ is a safety property by definition.
+]
+
+So, the second part of the union would be empty because there are no traces in $emptyset$. Therefore, we would have:
+$ G_1;emptyset = {t_1 | t_1 "is infinite" and t_1 in G_1} $
+Now, since $G_1$ is a safety property, it means that if a trace $t$ is not in $G_1$, then there exists a finite prefix of $t$ that is also not in $G_1$. However, the set $G_1;emptyset$ only includes infinite traces from $G_1$, and does not include any finite traces. Therefore, if we have a trace that is not in $G_1;emptyset$, it could be an infinite trace that is not in $G_1$, but there would be no finite prefix of that trace that is also not in $G_1;emptyset$ (since all finite traces are excluded). This means that $G_1;emptyset$ does not satisfy the definition of a safety property, and therefore, safety properties are not closed under concatenation.
+
+
+#tip[
+  Formally,
+
+  - Assume for the sake of contradiction that safety properties are closed under concatenation. Let $G_1$ be a safety property and let $G_2 = emptyset$ (which is also a safety property). Then, by our assumption, $G_1;G_2$ should also be a safety property.
+  - However, as we have shown, $G_1;emptyset$ only includes infinite traces from $G_1$ and does not include any finite traces. Therefore, if we have a trace $t$ that is not in $G_1;emptyset$, it could be an infinite trace that is not in $G_1$, but there would be no finite prefix of that trace that is also not in $G_1;emptyset$. This contradicts the definition of a safety property, which requires that if a trace is not in the property, there must be a finite prefix of that trace that is also not in the property.
+  - Therefore, our assumption that safety properties are closed under concatenation must be false. Hence, safety properties are not closed under concatenation.
+]
+
+=== Part B: Liveness Properties are closed under Concatenation
+
+The problem is asking here if, given two liveness properties $G_1$ and $G_2$, is the concatenation of these two properties (as defined above) also a liveness property?
+
+Let's try and prove that the concatenation of two liveness properties is also a liveness property. Let $G_1$ and $G_2$ be two liveness properties. We want to show that $G_1;G_2$ is also a liveness property. This may fail, and in the case it does, then liveness properties are not closed under concatenation.
+
+Assume $G_1$ and $G_2 != emptyset$. What is our goal? We want to show that for every trace $t$ in $G_1;G_2$, there exists a finite prefix of $t$ that is also in $G_1;G_2$. So, consider some finite trace $t$ in $G_1;G_2$. By the definition of concatenation, there are two cases to consider:
+
+So,
+$
+  exists t' in G, s.t. t subset t',
+$
+and there are two cases to consider:
+1. $t'$ is an infinite trace in $G_1$. Then, $t' in "Part1"$, so $t' in G_1;G_2$.
+2. $t'$ is a finite trace in $G_1$. Then, there must be some trace from $G_2$ that can concatenate with $t'$ to form a trace in $G_1;G_2$. Since $G_2$ is a liveness property, there exists a finite prefix of that trace in $G_2$ that is also in $G_2$. Therefore, we can concatenate that finite prefix with $t'$ to get a finite trace that is in $G_1;G_2$.
+
+And so, in either case, we have shown that for every trace $t$ in $G_1;G_2$, there exists a finite prefix of $t$ that is also in $G_1;G_2$. Therefore, $G_1;G_2$ is a liveness property, and liveness properties are closed under concatenation.
+
+#note()[
+  The professor notes that, ideally, a complete answer would have more formalism and would explicitly show how the definition of liveness is satisfied in each case.
+]
+
+The professor notes that this entire problem is basically extra credit, and went on to note how we are "behind" this semester and wants to continue new material (new memory vulnerabilities).
+
+The professor notes that students should not become pessimistic about this question, specifically, relating to seeing new material, and that the material is not meant to be intimidating. The professor also notes that the material is not meant to be "tricky" and that students should not worry about trying to find "tricks" in the questions. The professor encourages students to focus on understanding the concepts and applying them, rather than trying to find tricks or shortcuts in the questions.
+
+= Memory Corruption Continued
+The professor notes the textbook on page 104 to 105 on additional C vulnerabilities.
+
+== Format String Vulnerabilities
+The professor notes that be they mentioned the `%s` and `%d`'s in your C and C++ programs, and that they are actually "big vulnerabilities".
+
+Consider the following example:
+```c
+// An example of a format string
+printf("%s %d %x %o %%\n", "c", 91, 91, 91);
+>>> x 91 5B 133 %
+```
+Where:
+- `%s` is a format specifier that tells `printf` to expect a *string argument* and to print it.
+- `%d` is a format specifier that tells `printf` to expect an integer argument and to print it in decimal format. In this example, it will print `91` as a *decimal* number.
+- `%x` is a format specifier that tells `printf` to expect an integer argument and to print it in hexadecimal format. In this example, it will print `91` as a *hexadecimal* number (which is `5b`).
+- `%o` is a format specifier that tells `printf` to expect an integer argument and to print it in octal format. In this example, it will print `91` as an *octal* number (which is `133`).
+- `%%` is a format specifier that tells `printf` to print a literal percent sign (`%`). In this example, it will print a single `%` character.
+
+This C-feature (or originally thought of as a feature) is called the "varargs" feature (but does not want to go into too much detail).
+
+#important()[
+  The professor notes you must know these format specifiers and their meanings on an exam or test, and that they are very important to understand, especially in the context of format string vulnerabilities.
+
+  More importantly, you must be able to convert between different number systems (decimal, hexadecimal, octal) and understand how these format specifiers work in C and C++ to properly identify and exploit format string vulnerabilities.
+]
+
+#definition()[
+  *Varargs (Variadic functions) feature*: This is a feature in C and C++ that allows functions to accept a variable number of arguments. It is commonly used in functions like `printf` and `scanf`, where the number of arguments can vary based on the format string. The varargs feature is implemented using macros defined in the `<stdarg.h>` header, which provide a way to access the variable arguments passed to the function. However, if not used carefully, varadic functions can lead to vulnerabilities such as format string vulnerabilities, where an attacker can manipulate the format string to read or write arbitrary memory locations, potentially leading to information disclosure or code execution.
+]
+
+#definition()[
+  *Format String*
+
+  A format string is a string that contains format specifiers (such as `%s`, `%d`, `%x`, etc.) that are used in functions like `printf` to specify how the arguments should be formatted and displayed. Format strings can be vulnerable to attacks if they are not properly validated, as an attacker can manipulate the format string to read or write arbitrary memory locations, potentially leading to information disclosure or code execution. For example, if an attacker can control the format string passed to `printf`, they could use format specifiers like `%x` to read values from the stack or `%n` to write values to memory, which can be exploited to gain unauthorized access or execute malicious code.
+
+  The professor wants you to think of them as "holes" that get filled via the extra arguments passed to the function. If the format string is not properly validated, an attacker can manipulate it to read or write arbitrary memory locations, which can lead to vulnerabilities such as information disclosure or code execution.
+]
+
+Here is a glimpse of how complicated format specifiers actually are:
+```c
+%[flags][width][.precision][length]specifier
+```
+
+The professor notes that the complicated "weeds" of format specifiers are not important for the exam, but you should be familiar with the basic format specifiers and understand how they can be exploited in format string vulnerabilities.
+
+The professor wants to point to page `104` in the textbook.
+```c
+sprintf(buffer, "Warning %10s -- %8s", message, uname);
+```
+
+One very important thing here is `%10s`. For some reason, and the professor shrugs, the designers of C wanted this to be the *minimum* number of characters to print. The professor notes to "different times" where people weren't designing for attacks.
+
+So, what if the username is chosen by the user? Assume that `buffer` is 32-bytes. Then, if the user inputs a username that is longer than 32 characters, it will overflow the `buffer` and potentially overwrite adjacent memory on the stack, which can lead to vulnerabilities such as information disclosure or code execution. This is an example of a format string vulnerability, where an attacker can manipulate the format string (in this case, by providing a long username) to cause unintended behavior in the program.
+
+So, if the `uname` is greater than 8 characters, then the buffer will be overflowed.

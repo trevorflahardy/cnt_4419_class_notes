@@ -2557,6 +2557,8 @@ From our code example, however, due to the large `len`, `len - 1` is going to tr
 Note here that the only valid indices of `fa` are `f[0]` through `f[7]` because you shift twice to the left to get from `len` to `len * sizeof(float)`.
 
 Mitigations for this include:
-- Saver numeric libraries
+- Safer numeric libraries
 - Sometimes type safe languages can help.
 - Some static code analyzers may detect some of these vulnerabilities, but they may not catch all of them, especially if the code is complex or if the overflow occurs in a way that is not easily detectable by static analysis. Therefore, it is important for developers to be vigilant and to use secure coding practices when working with integers in C and C++ to prevent integer overflow vulnerabilities.
+- Sanitize inputs
+- Be careful with type casting

@@ -5,6 +5,7 @@ const activeView = ref<View>('notes')
 const chatPanelWidth = ref(420)
 const isResizing = ref(false)
 const mobileMenuOpen = ref(false)
+const sidebarVisible = ref(true)
 
 const views: { key: View; label: string; icon: string }[] = [
     { key: 'notes', label: 'Notes', icon: 'i-heroicons-document-text' },
@@ -93,18 +94,38 @@ onBeforeUnmount(() => {
         <!-- ===== Main Content ===== -->
         <main class="relative flex-1 overflow-hidden">
             <!-- Desktop split layout (notes + chat side-by-side) -->
-            <div v-show="activeView === 'notes'" class="flex h-full">
+            <div v-show="activeView === 'notes'" class="relative flex h-full">
                 <!-- Chat sidebar - left side, desktop only -->
-                <div class="hidden h-full shrink-0 lg:block" :style="{ width: `${chatPanelWidth}px` }">
+                <div v-show="sidebarVisible" class="hidden h-full shrink-0 relative lg:block" :style="{ width: `${chatPanelWidth}px` }">
+                    <!-- Close sidebar button -->
+                    <UButton
+                        icon="i-heroicons-x-mark"
+                        variant="ghost"
+                        color="neutral"
+                        size="xs"
+                        class="absolute top-2 right-2 z-20"
+                        aria-label="Close chat panel"
+                        @click="sidebarVisible = false"
+                    />
                     <ClientOnly>
                         <ChatSidebar />
                     </ClientOnly>
                 </div>
 
-                <!-- Drag handle -->
-                <div class="hidden lg:block h-full w-1.5 cursor-col-resize border-x border-default bg-elevated/70 hover:bg-elevated transition-colors"
+                <!-- Drag handle (hidden when sidebar closed) -->
+                <div v-show="sidebarVisible" class="hidden lg:block h-full w-1.5 cursor-col-resize border-x border-default bg-elevated/70 hover:bg-elevated transition-colors"
                     :class="isResizing ? 'bg-primary-500/20 border-primary-500' : ''" @mousedown="startResize"
                     aria-label="Resize chat panel" />
+
+                <!-- Re-open chat tab (desktop, shown when sidebar is hidden) -->
+                <button
+                    v-if="!sidebarVisible"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden lg:flex items-center justify-center w-6 h-14 bg-elevated/90 hover:bg-elevated border border-l-0 border-default rounded-r-lg shadow-sm transition-colors"
+                    aria-label="Open chat panel"
+                    @click="sidebarVisible = true"
+                >
+                    <UIcon name="i-heroicons-chat-bubble-left-right" class="h-3.5 w-3.5 text-muted" />
+                </button>
 
                 <!-- PDF Viewer -->
                 <div class="h-full w-full min-w-0 flex-1">

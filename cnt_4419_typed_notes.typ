@@ -923,16 +923,144 @@ How can attackers corrupt memory, and what can they do with it? To answer this, 
 
 When a program is compiled and loaded into memory, the compiler organizes it into distinct *segments*. Sometimes these segments are not contiguous in physical memory, but conceptually they follow a standard layout.
 
-#figure(
+#let memory-chunks-vertical(
+  stack: (),
+  heap: (),
+  middle: (),
+  show-addrs: false,
+  show-gap: true,
+  stack-growth: $arrow.b$,
+  heap-growth: $arrow.t$,
+  gap-cell: [#h(3em) $arrow.t.b$],
+) = {
+  let addr-cell(addr) = if addr == none { [] } else { [#addr] }
+
+  let row(addr, body) = {
+    if show-addrs {
+      (addr-cell(addr), body)
+    } else {
+      (body,)
+    }
+  }
+
+  let parse-chunk(chunk) = {
+    if type(chunk) == array {
+      (chunk.at(0), chunk.at(1, default: none))
+    } else {
+      (chunk, none)
+    }
+  }
+
+  let stack-block(chunk, first: false) = {
+    let (label, addr) = parse-chunk(chunk)
+    let body = if first {
+      [*#label* #h(1em) _(grows #stack-growth)_]
+    } else {
+      [*#label*]
+    }
+    row(addr, body)
+  }
+
+  let heap-block(chunk, first: false) = {
+    let (label, addr) = parse-chunk(chunk)
+    let body = if first {
+      [*#label* #h(1em) _(grows #heap-growth)_]
+    } else {
+      [*#label*]
+    }
+    row(addr, body)
+  }
+
+  let middle-block(chunk) = {
+    let (label, addr) = parse-chunk(chunk)
+    row(addr, [*#label*])
+  }
+
+  let gap-row = if show-gap { row(none, gap-cell) } else { () }
+
   table(
-    columns: 2,
-    align: (right, left),
+    columns: if show-addrs { 2 } else { 1 },
+    align: if show-addrs { (right, left) } else { left },
     stroke: 1pt,
-    [*Address 0* (high)], [*Stack* #h(1em) _(grows $arrow.b$)_],
-    [], [#h(3em) $arrow.t.b$],
-    [], [*Heap* #h(1em) _(grows $arrow.t$)_],
-    [], [*Data / Globals / Statics*],
-    [*Address max* (low)], [*Code (Program Text)*],
+    ..stack.enumerate().map(((idx, chunk)) => stack-block(chunk, first: idx == 0)).flatten(),
+    ..gap-row,
+    ..heap.enumerate().map(((idx, chunk)) => heap-block(chunk, first: idx == 0)).flatten(),
+    ..middle.map(chunk => middle-block(chunk)).flatten(),
+  )
+}
+
+#let stack-frames-separated(
+  frames,
+  title: none,
+) = {
+  block(
+    width: 100%,
+    inset: 14pt,
+    radius: 6pt,
+    fill: luma(248),
+    stroke: 0.75pt + luma(200),
+    {
+      set text(size: 8.5pt)
+
+      // Styled box for each stack entry (like instr-box in CFI diagram)
+      let entry-box(content) = block(
+        width: 100%,
+        inset: (x: 8pt, y: 5pt),
+        radius: 3pt,
+        fill: white,
+        stroke: 0.5pt + luma(180),
+        content,
+      )
+
+      // Colored badge for frame labels
+      let frame-badge(label) = box(
+        inset: (x: 8pt, y: 3pt),
+        radius: 3pt,
+        fill: rgb("#e3f2fd"),
+        stroke: 0.75pt + rgb("#42a5f5"),
+        text(fill: rgb("#1565c0"), weight: "bold", size: 8pt, label),
+      )
+
+      if title != none {
+        align(center, text(size: 10pt, weight: "bold", fill: luma(60), title))
+        v(10pt)
+      }
+
+      for (fidx, frame) in frames.enumerate() {
+        let label = frame.at(0)
+        let entries = frame.at(1)
+
+        frame-badge(label)
+        v(2pt)
+
+        for (eidx, entry) in entries.enumerate() {
+          entry-box([#entry])
+          if eidx < entries.len() - 1 { v(0pt) }
+        }
+
+        if fidx < frames.len() - 1 {
+          v(4pt)
+          align(center, text(fill: luma(160), size: 8pt, sym.arrow.b))
+          v(2pt)
+        }
+      }
+    },
+  )
+}
+
+#figure(
+  memory-chunks-vertical(
+    show-addrs: true,
+    stack: (
+      ([Stack], [*Address 0* (high)]),
+    ),
+    heap: (
+      ([Heap], none),
+    ),
+    middle: (
+      ([Data / Globals / Statics], none),
+      ([Code (Program Text)], [*Address max* (low)]),
+    ),
   ),
   caption: [Simplified program memory segmentation model. The stack grows downward toward lower addresses and the heap grows upward toward higher addresses. *Assume this model for all exams.*],
 )
@@ -2222,3 +2350,212 @@ One very important thing here is `%10s`. For some reason, and the professor shru
 So, what if the username is chosen by the user? Assume that `buffer` is 32-bytes. Then, if the user inputs a username that is longer than 32 characters, it will overflow the `buffer` and potentially overwrite adjacent memory on the stack, which can lead to vulnerabilities such as information disclosure or code execution. This is an example of a format string vulnerability, where an attacker can manipulate the format string (in this case, by providing a long username) to cause unintended behavior in the program.
 
 So, if the `uname` is greater than 8 characters, then the buffer will be overflowed.
+
+#note[
+  Notes hereon taken on Mar 25, 2026
+]
+
+A reall simple example, simplier than the previous. So, we are trying to print the user's name. We have a first call to printf to get the username. We have a check to make sure the username is defined before printing it. Otherwise, print none when it is not defined.
+
+```c
+printf("Username is: ");
+if (is UNdef)
+  printf(uname);
+else
+  printf("<none>");
+```
+
+#question()[
+  *But what if the user's username is `%s`?*
+
+  Then, the first `printf` will print "Username is: ", and then the second `printf` will interpret `%s` as a format specifier and try to read an argument from the stack to fill in for `%s`. Since there are no additional arguments provided, it *will read whatever happens to be on the stack at that point*, which could lead to unintended behavior or vulnerabilities such as information disclosure or code execution. This is an example of a format string vulnerability, where an attacker can manipulate the format string (in this case, by providing a username that contains format specifiers) to cause unintended behavior in the program.
+
+  The next item on the stack will be interpreted as a `char*` (a pointer to a string) and will be printed as the username, which could lead to information disclosure if the stack contains sensitive data. This is a classic example of a format string vulnerability, where an attacker can manipulate the format string to read arbitrary memory locations, potentially leading to security issues.
+]
+
+#definition()[
+  *Variadic Functions*
+
+  Variadic functions are functions that can accept a variable number of arguments. In C and C++, variadic functions are typically implemented using the `stdarg.h` header, which provides macros for accessing the variable arguments passed to the function. Variadic functions are commonly used in functions like `printf` and `scanf`, where the number of arguments can vary based on the format string. However, if not used carefully, variadic functions can lead to vulnerabilities such as format string vulnerabilities, where an attacker can manipulate the format string to read or write arbitrary memory locations, potentially leading to information disclosure or code execution.
+]
+
+How do we mitigate this? At a high level, never use input that comes from a user (attacker) as a format string. If we are going to use it, or have to, we have to sanitize it very well (this is NOT simple). As a general rule of thumb, however, you never want to use user input as a format string.
+
+This program example here will continue executing here without error, consuming whatever is next on the stack.
+
+Consider the following:
+```c
+#include <stdio.h>
+
+void f(char* u) {
+  char s[512];
+
+  // Printing into 's' (the target/buffer).
+  // sizeof(s) == 512
+  snprintf(s, sizeof(s), u);
+  s[sizeof(s) - 1] = '\0'; // Ensure null termination.
+  printf("%s", s);
+}
+```
+
+Let's draw memory:
+
+#figure(
+  stack-frames-separated(
+    (
+      (
+        [`f` frame],
+        (
+          [RA],
+          [u],
+          [`s[511]`],
+          [$dots.v$],
+          [`s[0]`],
+          [oldFP],
+        ),
+      ),
+      (
+        [`sprintf` frame],
+        (
+          [RA],
+          [u],
+          [`512`],
+          [s $arrow.r$ `s[0]` in `f`],
+          [oldFP $arrow.r$ RA in `f`],
+        ),
+      ),
+    ),
+  ),
+  caption: [Stack snapshot around the call with frames split into labeled sections (`f` first, `sprintf` second).],
+)
+
+Next, consider:
+1. `u = "%s"`, then:
+  - `snprintf` will read the next argument from the stack (which is `s`), and will print the contents of `s` into `s`, which could lead to a buffer overflow if the contents of `s` exceed its allocated size. And thus, we would be leaking the return address (RA).
+2. `u = %x%x`
+  - During this case, the `snprintf` will read the `RA` and the `oldFP` from `f` on the stack and print them in hexadecimal format.
+3. `u = %p %p`
+  - This is the same as (2) except that pointer values are going to be printed in the system specific format. In other words, the `RA` and `oldFP` will be printed in a format that is specific to the system's architecture and implementation of the C standard library.
+  - Where `%p` is a format specifier that tells `printf` to expect a pointer argument and to print it in an implementation-defined format (often hexadecimal). In this case, it will print the values of `RA` and `oldFP` as pointers, which could potentially leak sensitive information about the program's memory layout and be exploited by attackers.
+
+Attackers may use these approaches to leak canary values or other sensitive information from the stack, which can then be used to craft further attacks such as buffer overflows or return-oriented programming (ROP) chains. This is why format string vulnerabilities are considered serious security issues and should be mitigated by avoiding the use of user input as format strings or by properly sanitizing and validating any user input that is used in format strings.
+
+But, what if this was inlined by the compiler? You have a stack call to `snprintf()` with everything inlined into `f`. Then,
+
+#figure(
+  stack-frames-separated(
+    (
+      (
+        [`f` frame],
+        (
+          [RA],
+          [u],
+          [`s[511]`],
+          [$dots.v$],
+          [`s[0]`],
+          [oldFP $->$ points to who called `f`],
+          [u],
+          [`512`],
+          [s $->$ points to `s[0]` in `f`],
+        ),
+      ),
+    ),
+  ),
+)
+
+We can see this causes some differences to happen. What if `u` is `%s` now? It gets printed to by `f`'s `oldFP` as a `char*`. This is not good! With this, attackers can get around ASLR and leak the return address of the caller of `f`, which can be used to further exploit the program. This is a significant security vulnerability, as it allows attackers to gain insights into the program's memory layout and potentially execute arbitrary code by crafting malicious input that exploits this format string vulnerability.
+
+But how about another interesting input?
+
+`u = "abcd%d%n"`
+where:
+- `%d` is a format specifier that tells `printf` to expect an integer argument and to print it in decimal format. In this case, it will print the number of characters printed so far (which is 4, due to "abcd").
+
+Things are starting to get "clever" (one of the more clever attacks covered this semester). So what's going to happen here?
+
+This `u` value is `abcd`. So we're printing into `s`. This sets `s[0] = a`, `s[1] = b`, `s[2] = c`, and `s[3] = d`. Then, `s[4...7]` is going to contain the `oldFP` printed as a decimal number (assuming 4 bytes for the `oldFP`). Then, we have one more thing being printed out -- the `%n`.
+
+`%n` is unlike all the other specifiers. It does not print anything. Instead, it tells `printf` to write the number of characters printed so far into the memory location pointed to by the next argument on the stack. In this case, it will write the value `4` (the number of characters printed so far) into the memory location pointed to by the next argument on the stack, which could potentially overwrite important data or control information if the attacker can control the value of that argument. This is a powerful and dangerous format specifier that can be exploited in format string vulnerabilities to achieve arbitrary memory writes, which can lead to code execution or other malicious actions.
+
+In this case, the next thing on the stack is `s[0]` and we're going to interpret this as `int*`. Here, we're going to write `8` there.
+
+
+#note[
+  *As an Aside*
+
+  ```c
+  printf("ab%n", &i);
+  ```
+
+  This prints `ab` and then sets `i = 2`.
+]
+
+So, back to our thing. `abcd` is going to be interpreted as a pointer value -> we are going to dereference that and write `8` there. `8` comes from the fact that we have printed `abcd` (4 characters) and then the `oldFP` (4 characters), so in total, we have printed 8 characters. So, we are going to write `8` into the memory location pointed to by `abcd`. This is a powerful attack because it allows an attacker to write arbitrary values to arbitrary memory locations, which can lead to code execution or other malicious actions if the attacker can control the value of the pointer and the data being written.
+
+#important()[
+  *Summing this example for you easily*:
+
+  _It is recommended to read this note while also looking at the stack diagram above._
+
+  `u` starts with `abcd`, so you write it into `s[0..4]` on the stack. Then, `u` has a hole, so you go up the stack one word and increment the pointer value (consuming `oldFP`). This gets added to the string at positions at `s[4...7]`. Then, you have the `%n`, which doesn't print anymore, but says "Hey, take the next thing on the stack, interpret it as a pointer, and write the number of characters printed so far (which is 8) into that memory location". So, you are writing `8` into the memory location pointed to by `s[0]` (think: walking up another one value from `oldFP` into the stack is the start of `s[0]`), which could potentially overwrite important data or control information if the attacker can control the value of that argument. This is a powerful and dangerous format specifier that can be exploited in format string vulnerabilities to achieve arbitrary memory writes, which can lead to code execution or other malicious actions.
+]
+
+By increasing the number of characters printed so far, an attacker can control the value that gets written to the memory location pointed to by the next argument on the stack. This allows for precise manipulation of memory, which can be used to overwrite critical data structures, function pointers, or return addresses, ultimately leading to arbitrary code execution if exploited successfully. This is why format string vulnerabilities are considered severe security issues and should be mitigated by avoiding the use of user input as format strings or by properly sanitizing and validating any user input that is used in format strings.
+
+The professor notes that the attacker can choose where to write and what to write. *This is one of the most powerful attacks* because it allows for arbitrary memory writes.
+
+In this case, if the attacker wants to write to a different location, they would fill the `abcd` with more values (a different `u` value here) to get to the desired memory location on the stack, and then use the `%n` specifier to write the desired value to that location. This level of control over memory manipulation is what makes format string vulnerabilities particularly dangerous and a critical security concern in software development.
+
+#important[
+  On the final exam or next test, assume something about format specifiers will show up. Unless otherwise noted, assume chars are 1 byte and integers are 4 bytes as these are the standard sizes.
+]
+
+
+But what are the mitigations for this? Some compilers with high warning settings can catch this, but it's really undecidable to catch all these vulnerabilities. There is no way to statically catch them all. So,
+- Don't use untrusted inputs as format strings. This is like the biggest thing and a large rule of thumb.
+- You can generalize this to all variadic functions.. don't use untrusted inputs as format strings or as arguments to variadic functions.
+
+== Integer Overflows
+
+We can overflow integer values. Attacker can exploit overflows (and underflows) to mount attacks. This is really bad for us as secure coders. So far we're like "okay we need to be real careful with strings", but unfortunately this also applies to all kinds of integer values.
+
+And what are integers in C and C++? Pretty much everything.
+- characters
+- shorts
+- ints, unsigned and unsigned
+- long
+- long long
+- long long ints
+- pointers (yes, pointers are integers in C and C++)
+- floating point numbers (yes, floating point numbers are also integers in C and C++)
+
+Really, all of the "*primitive data types*" of C and C++ require care as a secure coder. So, let's look at some new code:
+```c
+// Assume:
+// - A 32-bit arch
+// - "len" is some untrusted input from the user (very naughty)
+void f(unsigned int len) {
+  float *fa = (float*) malloc(len * sizeof(float)); // An array of floats
+
+  fa[len - 1] = 3.14;
+}
+```
+
+Note that `len * sizeof(float)` is of type `size_t`, which simply means "some unsigned integer type that is big enough to hold the size of any object in memory". So, `size_t` is an unsigned integer type that is used to represent the size of objects in memory. It is typically defined as an alias for `unsigned int` or `unsigned long`, depending on the platform and architecture.
+
+So, if this is 32-bits, then it can go $0 dots 2^32 - 1$. Then, `len` could look something like:
+```
+31 30 29 ... 2 1 0 (bit positions)
+--------------------
+0  1  0  ... 0 1 0 (bit values)
+```
+
+Suppose the attacker has a ` 1` bit in the values of $2^30$ and $2^1$. Then, the value of this integer `len` equal to $2^30 + 2^1 = 1073741824 + 2 = 1073741826$. This is about 1 billion. So, the attacker is asking for an array of 1 billion floats. This is a very large allocation request, and it may exceed the available memory on the system.
+
+From our code example, however, due to the large `len`, `len - 1` is going to try and access $2^30 + 2^1 - 1 = 1073741825$. This is an out of bounds write... oh no! This is a classic example of an integer overflow vulnerability, where the calculation of the size of the memory allocation can overflow and lead to unintended behavior, such as allocating a smaller amount of memory than intended or accessing out-of-bounds memory, which can be exploited by attackers to cause crashes, data corruption, or even arbitrary code execution. This is why it is crucial to properly validate and handle integer values in C and C++ to prevent such vulnerabilities.
+
+Note here that the only valid indices of `fa` are `f[0]` through `f[7]` because you shift twice to the left to get from `len` to `len * sizeof(float)`.
+
+Mitigations for this include:
+- Saver numeric libraries
+- Sometimes type safe languages can help.

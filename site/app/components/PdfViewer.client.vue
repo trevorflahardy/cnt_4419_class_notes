@@ -17,6 +17,8 @@
                     </span>
                     <UButton icon="i-lucide-chevron-right" variant="ghost" size="xs"
                         :disabled="currentPage >= totalPages" @click="nextPage" aria-label="Next page" />
+                    <UButton icon="i-lucide-chevrons-right" variant="ghost" size="xs"
+                        :disabled="currentPage >= totalPages" @click="goToLastPage" aria-label="Last page" />
                 </div>
 
                 <!-- Zoom Controls -->
@@ -131,6 +133,13 @@ let sharedObjectUrl: string | null = null
 let sharedSourceKey: string | null = null
 
 let objectUrl: string | null = null
+
+function goToLastPage() {
+    if (totalPages.value > 0) {
+        currentPage.value = totalPages.value
+        scrollToPage(totalPages.value)
+    }
+}
 
 async function loadPdf() {
     if (sharedObjectUrl && sharedSourceKey === resolvedSource.value) {

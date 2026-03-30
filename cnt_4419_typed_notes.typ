@@ -2477,7 +2477,7 @@ This is one of the more clever attacks covered this semester. Here is what happe
 
 2. Then `%d` consumes the next stack word (`oldFP`) and prints it as a decimal integer. Suppose `oldFP`'s decimal representation is $N$ digits long. Characters printed so far: $4 + N$.
 
-3. Then `%n` consumes the *next* stack word, which is `s[0..3]`. It interprets those 4 bytes (`'a'`, `'b'`, `'c'`, `'d'` $= $ `0x64636261` on little-endian) as a *pointer* and writes the total character count ($4 + N$) to that memory address.
+3. Then `%n` consumes the *next* stack word, which is `s[0..3]`. It interprets those 4 bytes (`'a'`, `'b'`, `'c'`, `'d'` $=$ `0x64636261` on little-endian) as a *pointer* and writes the total character count ($4 + N$) to that memory address.
 
 For a simplified exam-style analysis: assume `oldFP` prints as exactly 4 decimal digits, so the total is $4 + 4 = 8$. Then `%n` writes the value `8` to the address `0x64636261`.
 
@@ -2564,3 +2564,260 @@ To see why the valid indices are only `fa[0]` through `fa[1]`: multiplying `len`
 - Type-safe languages (Rust, Java, etc.) can help --- Rust panics on overflow in debug mode and provides explicit wrapping/checked arithmetic in release mode.
 - Static analysis tools (e.g., Coverity, PVS-Studio) can detect some overflow patterns, but cannot catch all of them --- especially when the overflow depends on runtime input.
 - Be careful with type casting
+
+#note[
+  Notes hereon taken on Mar 30, 2026
+]
+
+Consider this code snippet again:
+$
+  "fa" = dots "malloc"("len" * "sizeof"("float")) \
+  dots.v \
+  "fa"["len" - 1] = 3.14
+$
+
+This is very hard to interpret in practice. So what is the root cause here? The professor argues the int overflow, but the actual exhibited problem is the out of bounds write that occurs at the bottom. The professor could argue both, and notes they software security metrics are not precise (there is a lot of opinion).
+
+The professor notes as one of the best examples in the semester. The other point is how overflows can still happen in a lot of type-safe programming languages. Java, by default, won't warn when you overflow numbers, however, it will throw an exception if you try to access an array out of bounds. So, in Java, you would get an `ArrayIndexOutOfBoundsException` instead of silent memory corruption --- but the underlying logic error (the overflow) is still present.
+
+This also gets tricky because if we categorize this as int overflow then we know that Java wouldn't help. But if we categorize this as an out of bounds access, then Java would help. So, the categorization can affect our assessment of mitigations.
+
+The professor wants to continue to wrapping the discussion about memory corruption vulnerabilities.
+
+== Additional Memory Corruption Vulnerabilities
+
+But what have we already visited? A recap:
+- OOB Write/Read (includes buffer overflows)
+- Format string vulnerabilities
+- Integer overflow vulnerabilities (or any numeric type such as `float`s and `double`s).
+
+=== Null Pointer Dereference
+
+If an attacker make some pointer unexpectedly be `NULL`, then what could happen? Well, a SEGFAULT, which is a kind of denial of service (DoS) attack (think back to the definition of these earlier in the semester).
+
+This may crash or segfault the program, but it is not typically exploitable for code execution. However, it can still be a significant issue as it can lead to denial of service or other unintended behavior.
+
+#definition()[
+  *Segfault*
+
+  A segmentation fault (segfault) is a specific kind of error that occurs when a program tries to access a memory location that it is not allowed to access. This can happen, for example, when a program dereferences a null pointer (i.e., tries to access memory at address `0x0`), or when it tries to read or write to an array index that is out of bounds. When a segfault occurs, the operating system typically terminates the program and may generate a core dump for debugging purposes. While segfaults can be indicative of bugs in the code, they are generally not exploitable for arbitrary code execution, but they can lead to denial of service if an attacker can trigger them repeatedly.
+]
+
+A null pointer dereference could also cause a program to enter some insecure error state, which could potentially be exploited by an attacker. For example, if the program has a fallback mechanism that is triggered when a null pointer dereference occurs, and that fallback mechanism is not properly secured, an attacker could potentially exploit it to gain unauthorized access or execute malicious code.
+
+In short, causing errors to happen could be a form of attack, even if it doesn't lead to code execution. It can still be a significant issue as it can lead to denial of service or other unintended behavior.
+
+=== Use After Free (UAF)
+
+This error stems from the fact that C/C++ do not have automatic memory management. If a program frees a block of memory but continues to use the pointer to that memory, it can lead to a use-after-free vulnerability. An attacker could potentially exploit this by allocating new memory at the same location and then using the dangling pointer to access or modify that memory, which could lead to information disclosure or arbitrary code execution.
+
+#question()[
+  *But why is this bad?*
+
+  A lot of times on computers when you delete things (such as popping things off the stack) - that garbage does not actually get wiped. That old data remains on the stack but the pointer is updated.
+
+  Well, similar: when you call `free()` on heap allocated memory, it is still ON the heap (it isn't until it's overwritten using `calloc()` such that it gets `0`'d out). This is the root of this problem.
+
+  So, see below:
+]
+
+Let's say you have `P1` pointing at some record/structure of type `S`. Then, you have an alias `P2` pointing to the same location of `S` (with both `P1` and `P2` being pointers to the same memory):
+
+1. `P1` and `P2` both point to the same memory location that contains an instance of `S`.
+2. `free(P1)` is called, which deallocates the memory that `P1` (and `P2`) point to, but does not change the values of `P1` and `P2`.
+3. Malloc some `P3` of type `T` that happens to reuse the same memory location that `P1` and `P2` point to. Now, if you access `*P2`, you are accessing the memory that `P3` now owns, which can lead to unintended behavior or vulnerabilities if `P3` is controlled by an attacker.
+
+We conceptually deleted a structure of type `S` from the heap and `malloc`'d a structure of type `T` to the same spot (location in memory). Now, you could have a situation where `P2` is still pointing to that memory, but the contents of that memory have changed from an `S` to a `T`. If `P2` is used after the free, it could lead to undefined behavior, information disclosure, or even arbitrary code execution if the attacker can control the contents of `T`.
+
+In this case, we have a *type mismatch* and this breaks the type system. We can *completely break the type protections that you get in a system from a use after free error*. Once you get a *single* type confusion then the entire type system is broken.
+
+With this, you may be able to access nonexistent fields of `S` (which are actually fields of `T`), or you may be able to call methods on `S` that are actually methods of `T` (very bad!).
+
+*TLDR*; use after free can lead to type confusion, which can break the type system and lead to severe vulnerabilities such as arbitrary code execution.
+
+=== Double Free
+
+This is when a program calls `free()` on the same pointer twice. This can lead to undefined behavior, as the second `free()` may attempt to deallocate memory that has already been deallocated, which can corrupt the heap and potentially allow an attacker to execute arbitrary code.
+
+#question()[
+  *Why is this bad*?
+
+  When you freed something you already freed, you can corrupt the data structure that the memory allocator uses to keep track of free and allocated memory. This can lead to a situation where the allocator's internal data structures are in an inconsistent state, which can be exploited by an attacker to manipulate the heap and potentially execute arbitrary code.
+
+  This data structure may allocate new things on top of old things, or it may allow you to write to memory that you shouldn't be able to write to, or it may allow you to read from memory that you shouldn't be able to read from.
+
+  This is called the *heap manager*, and it's saying that your heap manager essentially won't know what's going on. The burden is on you as a `C` programmer to not make this mistake (you dirty dog).
+]
+
+So, a double free may corrupt the data structure, called a *freelist*, for managing heap memory.
+
+#definition()[
+  *Freelist*
+
+  A freelist is a data structure used by memory allocators to keep track of free memory blocks on the heap. When a block of memory is freed, it is added to the freelist, which is typically implemented as a linked list or a tree. The allocator uses the freelist to find suitable blocks of memory for future allocation requests. If a double free occurs, it can corrupt the freelist, leading to undefined behavior and potential security vulnerabilities such as arbitrary code execution.
+]
+
+This, in practice, is freeing the same memory block twice. So, if you malloc between the time that you do the first and second free, you could be clearing some NEW data that you just allocated, which is very bad. This is a common pattern in heap exploitation, where an attacker can manipulate the freelist to gain control over future allocations and potentially execute arbitrary code.
+
+This can create a use after free vulnerability, where the attacker can access or modify memory that has been freed, leading to information disclosure or code execution. The professor notes that this ties back into classification, where you could classify this as a double free or a use after free, and that the classification can affect our assessment of mitigations.
+
+There are ways to tackle this problem statically and dynamically, but the best way to prevent it is to simply not do it. Be careful with your memory management and avoid freeing the same pointer twice. If you need to free a pointer, set it to `NULL` afterwards to prevent accidental double frees.
+
+#note[
+  The professor took a moment mid-class to take a quiz. The question was: "What does the %n specifier do?"
+
+  Answer: It does not print anything. Instead, it reads the next word from the stack, interprets it as an `int*`, and writes the number of characters printed so far to that address. This can write to a stack location _or_ a heap location, depending on the stack layout and the contents of the format string. This is a powerful primitive for exploitation, as it allows an attacker to write an arbitrary value to an arbitrary memory address.
+]
+
+This concludes a large chapter, the professor notes.
+
+= Networking
+
+The way that computer networking is often discussed is in terms of layers. One of the big ideas of software engineering, if we had to summarize how to solve any big problem, you "modularize" (decompose) the problem into a lot of smaller problems and build interfaces between them. This is how networking is handled.
+
+There are two popular ways to think about networking layers. We're going to go through the easier one first (the harder being the OSI model). The easier one is the TCP/IP model.
+
+You could say,
+
+$
+  exists 2 "common layered models for computer communications"
+$
+
+== TCP/IP Model (aka. The Internet Protocol Suite)
+
+This is when we want a Host to communicate with another Host:
+$
+  "Host" -> "Router" -> dots -> "Router" -> "Host"
+$
+
+Within the TCP/IP model has 4 layers:
+1. Application layer
+2. Transport layer
+3. Internet layer
+4. Link layer $->$ link
+
+
+
+#figure(
+  $
+    & "App Layer"       &    & "App Layer" \
+    & arrow.b           &    & arrow.t \
+    & "Transport Layer" &    & "Transport layer" \
+    & arrow.b           &    & arrow.t \
+    & "Internet Layer"  &    & "Internet" \
+    & arrow.b           &    & arrow.t \
+    & "Link Layer"      & -> & "link"
+  $,
+  caption: "The connectio between two independent applications running on two different hosts, with the layers of the TCP/IP model shown. The left side represents one host, and the right side represents another host. The arrows indicate the flow of data through the layers as it is transmitted from one host to the other.",
+)
+
+Applications/processes communicate.
+
+=== Link Layer
+This is the lowest layer of the TCP/IP model. It is responsible for the physical transmission of data over a network. It includes the hardware and protocols that enable devices to connect to a network and transmit data. Examples of link layer technologies include Ethernet, Wi-Fi, and Bluetooth.
+
+This is the physical layer of two connected machines.
+
+#definition()[
+  *Link Layer*
+
+  Transmits data (grouped into packets/frames) between devices on the same physical link.
+]
+
+Each device has its own link layer address (e.g., MAC address for Ethernet). Ethernet + Wifi networks use MAC addresses to identify devices on the same local network. The link layer is responsible for framing data, error detection, and media access control (e.g., CSMA/CD for Ethernet).
+
+MAC addresses are *48-bit identifiers* assigned to network interfaces. They are used for communication on the local network segment. When a device wants to send data to another device on the same local network, it uses the destination's MAC address to ensure the data is delivered to the correct recipient.
+
+#important[
+  The professor notes that the sizing of these addresses are worth memorizing (may come in handy for exams).
+]
+
+The MAC address standard is defined in IEEE 802. The first 24 bits (the OUI) identify the manufacturer, and the last 24 bits are a unique identifier assigned by the manufacturer. For example, a MAC address might look like `00:1A:2B:3C:4D:5E`, where `00:1A:2B` is the OUI and `3C:4D:5E` is the unique identifier.
+
+=== Internet Layer
+
+The internet layer is going to deal with communications between networks. So that's why the routers have to take the packets up to the internet layer because we are now communicating between networks. So, hm: _internet_. What does the prefix _inter_ mean? So, the internet layer handles communication between networks.
+
+One network is the set of devices communicating between the set of one physical medium. So, for example, if you have a home network with a router and several devices connected to it, those devices are all on the same local network. The internet layer is responsible for routing packets between different networks, such as between your home network and the wider internet.
+
+But, if we want to communicate across networks, we need to *internetwork*. The internet layer is responsible for this internetworking, which involves routing packets from the source network to the destination network. This is where IP (Internet Protocol) comes in, which is the primary protocol used at the internet layer.
+
+#definition()[
+  *Internet Layer*
+
+  Sends packets between hosts on possibly different networks --- ie, hosts on different physical links. Note that multiple hops through intermediate hosts may be necessary.
+]
+
+
+#definition()[
+  *ie* --- "id est" (Latin for "that is") --- is used to clarify or restate something in a different way. In this context, it means that the internet layer is responsible for sending packets between hosts that may be on different networks, which is the core function of the internet layer in the TCP/IP model.
+  *eg* --- "for example" --- is used to introduce an example that illustrates a point. In this context, it would be used to provide an example of how the internet layer functions or to give an example of a protocol that operates at the internet layer (such as IP).
+
+  The professor notes that if you misuse these you thought of _less than_ others.
+]
+
+So, let's talk about the address. What kinds of addresses are commonly introduced here? The most common one is the IP address. An IP address is a unique identifier assigned to each device on a network. It is used to identify and locate devices on the network, allowing them to communicate with each other. There are two versions of IP addresses: IPv4 and IPv6.
+
+Within the link layer, you considered how each _network device_ has a link-layer address, but here we're talking about how each _host_ has an internet-layer address. For example:
+- IPv4 addresses are *32-bit* numbers typically represented in dotted decimal notation.
+- IPv6 addresses are *128-bit* numbers typically represented in hexadecimal notation.
+  - Tried to address the lack of address space in IPv4 by using 128 bits instead of 32 bits.
+  - Even though this was introduced in the 90s, it's still about 50/50 split between IPv4 and IPv6 usage on the internet today. In France, it's about 80/20 in favor of IPv6. But in the US, it's still about 50/50.
+
+#important[
+  You are *expected to know the sizes of these addresses for exams*, and to understand the difference between link-layer addresses (e.g., MAC addresses) and internet-layer addresses (e.g., IP addresses).
+]
+
+There are two main things handled at this layer.
+
+==== Packet Routing
+
+At this layer, a lot of the time these packets are called "datagrams". This is all about sending datagrams from one host to another, and the internet layer is responsible for routing these datagrams across networks. This involves determining the best path for the datagram to take from the source host to the destination host, which may involve multiple hops through intermediate routers.
+
+==== Host Addressing
+
+Here, the internet layer is responsible for addressing hosts using IP addresses. This allows hosts to be uniquely identified on the network and enables communication between hosts on different networks. The internet layer also handles fragmentation and reassembly of datagrams, as well as error handling and diagnostics (e.g., ICMP).
+
+=== Transport Layer
+
+The type of address introduced at this layer is the "port number". This layer sends packets between processes on the same host. So, if you have two applications running on the same machine, they can communicate with each other using the transport layer. The transport layer is responsible for providing end-to-end communication between processes, and it uses port numbers to identify specific processes on a host.
+
+Each application has a transport layer address, called a *port number*. For example, 16-bit TCP and UDP port numbers are commonly used to identify specific applications or services running on a host. For example, HTTP typically uses port 80, while HTTPS uses port 443. The same goes with FTP, SFTP, and so on.
+
+If you make your own application you can choose your own port number. There are two things done at this layer:
+
+==== Application Addressing
+
+This is where the transport layer uses port numbers to identify specific applications or services running on a host. This allows multiple applications to use the network simultaneously without interfering with each other.
+
+#note[
+  Note that the professor did not discuss this purpose.
+]
+
+==== Reliability in Communication (eg. w/ TCP)
+
+This tries to provide assurances that data arrives. This applies literally (like the data actually arrives), it arrives in proper order, it arrives without errors, and it arrives without duplicate. Additionally, lost data is retransmitted, and flow control is provided to prevent overwhelming the receiver.
+
+Because your packets may go through different routes, they may arrive out of order, or some may get lost. TCP (Transmission Control Protocol) is a transport layer protocol that provides reliable, ordered, and error-checked delivery of data between applications. It uses a three-way handshake to establish a connection and ensures that data is delivered in the correct order and without errors.
+
+=== Application Layer
+
+This handles application/process specific data transmissions. This is where the actual applications (e.g., web browsers/clients, web servers, email clients/servers, etc.) operate and use the underlying layers to communicate with other applications over the network. The application layer provides protocols and services that enable applications to communicate with each other, such as HTTP for web browsing, SMTP for email, and FTP for file transfer.
+
+This hones in on the client/server model. The client initiates communication by sending a request to the server, which processes the request and sends back a response. The server listens for incoming requests on a specific port, while the client connects to the server's IP address and port to establish communication. The application layer protocols define the format and semantics of the messages exchanged between clients and servers, enabling them to understand each other and perform the desired operations.
+
+In the client/server model, you have a clear relationship between a data producer and consumer. The workload in this model is partitioned between the resource/data producer/provider and the resource consumer/requester. The producer/server provides resources or services, while the consumer/client requests and uses those resources or services. This model is fundamental to how applications communicate over the network, and it is the basis for many protocols and services that we use every day.
+
+This stands in contrast with the peer-to-peer (P2P) model, where each node can act as both a producer and consumer, and there is no central server. In the P2P model, nodes communicate directly with each other without relying on a central authority, which can provide benefits such as increased resilience and scalability, but also introduces challenges in terms of security and coordination. Workload is not partitioned in the P2P model --- every node can produce and consume resources, and they communicate directly with each other.
+
+#definition()[
+  *Client/Server Model*
+
+  A model of network communication where clients request resources or services from a central server, which processes the requests and provides the desired responses. The server listens for incoming requests on a specific port, while clients connect to the server's IP address and port to establish communication. This model is fundamental to how applications communicate over the network and is the basis for many protocols and services that we use every day.
+]
+
+#definition()[
+  *Peer-to-Peer (P2P) Model*
+
+  A model of network communication where each node can act as both a producer and consumer, and there is no central server. In the P2P model, nodes communicate directly with each other without relying on a central authority, which can provide benefits such as increased resilience and scalability, but also introduces challenges in terms of security and coordination. Workload is not partitioned in the P2P model --- every node can produce and consume resources, and they communicate directly with each other.
+]

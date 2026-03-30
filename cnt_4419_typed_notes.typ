@@ -2751,9 +2751,10 @@ But, if we want to communicate across networks, we need to *internetwork*. The i
 
 #definition()[
   *ie* --- "id est" (Latin for "that is") --- is used to clarify or restate something in a different way. In this context, it means that the internet layer is responsible for sending packets between hosts that may be on different networks, which is the core function of the internet layer in the TCP/IP model.
+
   *eg* --- "for example" --- is used to introduce an example that illustrates a point. In this context, it would be used to provide an example of how the internet layer functions or to give an example of a protocol that operates at the internet layer (such as IP).
 
-  The professor notes that if you misuse these you thought of _less than_ others.
+  The professor notes that if you misuse these you are thought of _less than_ others.
 ]
 
 So, let's talk about the address. What kinds of addresses are commonly introduced here? The most common one is the IP address. An IP address is a unique identifier assigned to each device on a network. It is used to identify and locate devices on the network, allowing them to communicate with each other. There are two versions of IP addresses: IPv4 and IPv6.

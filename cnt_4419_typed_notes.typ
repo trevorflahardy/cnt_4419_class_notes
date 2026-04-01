@@ -2822,3 +2822,113 @@ This stands in contrast with the peer-to-peer (P2P) model, where each node can a
 
   A model of network communication where each node can act as both a producer and consumer, and there is no central server. In the P2P model, nodes communicate directly with each other without relying on a central authority, which can provide benefits such as increased resilience and scalability, but also introduces challenges in terms of security and coordination. Workload is not partitioned in the P2P model --- every node can produce and consume resources, and they communicate directly with each other.
 ]
+
+#note[
+  Notes hereon taken on Apr 1, 2026
+]
+
+
+== Headers and Footers to Packets
+
+Headers and footers get added to packets as they make their way through the stack.
+
+The sender application starts with some data (payload) it wants to send to some recipient. The transport layer is going to prepend its own header.
+
+The transport layer adds things like the port number, TCP/UDP flags, sequence numbers, etc. Then the internet layer adds its own header, which includes the source and destination IP addresses, as well as other information like the protocol type and time to live (TTL). Finally, the link layer adds its own header and footer, which include the source and destination MAC addresses, as well as error detection codes.
+
+The link layer appends a footer usually appends the footer to denote the end of the frame. This footer often contains error detection information, such as a cyclic redundancy check (CRC), which allows the receiver to verify the integrity of the received frame. If the CRC check fails, the receiver can discard the frame and request a retransmission.
+
+All of the headers (and footer) can be considered metadata that is added to "get the data to its destination".
+
+== Protocols
+
+Let's go through some popular protocols at each layer. A "real" coding class would have you implement these protocols, but the professor notes that this class is surface level.
+
+#definition()[
+  *Protocol*
+
+  A system of rules for communicating. This is the "who", "what", "where", "when", and "how".
+
+  In a better, non-Ligatti sense, a protocol is a set of rules that govern the format, timing, sequencing, and error checking of messages exchanged between communicating entities. Protocols are essential for enabling communication between different devices and applications, as they ensure that data is transmitted and received in a consistent and understandable manner. Examples of protocols include HTTP for web communication, TCP for reliable transport, and IP for routing packets across networks.
+]
+
+This gets into message syntax. Well, what does a well-formed packet look like?
+
+=== Link Layer Protocols
+
+*IEEE 801.11* defines standards for wireless local area networks (WLANs), commonly known as Wi-Fi. It specifies the physical layer and media access control (MAC) layer for wireless communication, including protocols for authentication, encryption, and data transmission. The professor notes this as the "main thing"
+
+=== Internet
+
+- *IP (Internet Protocol)* is the primary protocol used at the internet layer. It is responsible for *addressing* and *routing packets* across networks. IP defines the format of packets (called datagrams) and provides a mechanism for addressing hosts using IP addresses. There are two versions of IP: IPv4 and IPv6.
+  - The professor describes this as relaying packets (datagrams) between networks.
+
+#definition()[
+  *Datagram*
+
+  Another term for a "packet".
+]
+
+- *IPSec (Internet Protocol Security)* is a suite of protocols that provides secure communication over IP networks. It includes protocols for authentication, encryption, and key exchange, allowing for secure data transmission between hosts and networks. Think of this like "IP" but with additional cryptographic protections.
+
+#question()[
+  *What can cryptography get us in communications?*
+
+  There are a few properties. The most natural one is *confidentiality* --- ensuring that only the intended recipient can read the message. This is typically achieved through encryption.
+
+  Another big thing would be *integrity* --- ensuring that the message has not been tampered with during transit. This can be achieved through message authentication codes (MACs) or digital signatures.
+
+  The third one is *authenticity* --- ensuring that the sender of the message is who they claim to be. This can be achieved through digital signatures or certificates.
+]
+
+=== Transport Layer Protocols
+
+- *TCP (Transmission Control Protocol)* is a transport layer protocol that provides *reliable* (the recipient acknowledges "acks" having received data), *ordered*, and *error-checked* delivery of data between applications. It uses a three-way handshake to establish a connection and ensures that data is delivered in the correct order and without errors. TCP is a *connection-oriented* protocol, meaning that it establishes a connection between the sender and receiver before data is transmitted.
+  - Retransmits lost data
+  - Uses timeouts...
+  - and more...
+- *UDP (User Datagram Protocol)* is a transport layer protocol that provides a connectionless, *unreliable* datagram service. It *does not guarantee* delivery, order, or error checking, making it *faster than TCP but less reliable*. UDP is often used for applications that require low latency, such as video streaming or online gaming.
+  - UDP still adds checksums and port numbers, but it does not have the reliability features of TCP (e.g., acknowledgments, retransmissions, flow control) or in-depth error checking (the data has not been corrupted in transit).
+  - The main thing here is the port numbers and some lightweight error checking.
+  - Not having to maintain state greatly simplifies UDP.
+- *QUIC (Quick UDP Internet Connections)* is a transport layer protocol developed by Google that provides a secure and efficient alternative to TCP. It is built on top of UDP and incorporates features such as multiplexing, connection migration, and improved congestion control. QUIC is designed to reduce latency and improve performance for web applications.
+  - Think of this as *reliability when needed* (lazy).
+  - Has *performance comporable to UDP*.
+
+The great thing about TCP is that it's well optimized, but it does add a lot of overhead for reliability. To make sure that packets end up at the destination, all of them accounted for, in teh right order. The sender has reason to believe that the reciever actually recieved them. Every time the reciever gets some packet there's acknowlegdements. The other protocols in this layer do this have this reliability, but they are faster because they don't have to do all of this work.
+
+#definition()[
+  *Ack/acks*
+
+  Short for "acknowledgment". In the context of TCP, an acknowledgment is a message sent by the receiver to the sender to indicate that a packet has been received successfully. This is part of TCP's reliability mechanism, where the sender waits for an acknowledgment from the receiver before sending the next packet. If the sender does not receive an acknowledgment within a certain time frame, it assumes that the packet was lost and retransmits it.
+]
+
+#definition()[
+  *Connection oriented*
+
+  A _stateful_ communication protocol where each packet is interpreted in the context of a "connection" --- a stream of packets.
+
+  *Connectionless*
+
+  A _stateless_ communication protocol where each packet is (or can be) interpreted independently (in isolation) of any other packets.
+]
+
+#definition()[
+  *Connection oriented vs Connectionless*
+
+  A connection-oriented protocol (like TCP) establishes a connection between the sender and receiver before data is transmitted, ensuring reliable communication. In contrast, a connectionless protocol (like UDP) does not establish a connection and does not guarantee delivery, order, or error checking, making it faster but less reliable.
+
+  A connection-oriented protocol requires a handshake to establish the connection, while a connectionless protocol can send data without any prior setup. The choice between the two depends on the requirements of the application and the trade-offs between reliability and performance.
+]
+
+#definition()[
+  *Checksum*
+
+  A checksum is a value calculated from a data set (such as a packet) that is used to detect errors in the data. It is typically computed using a specific algorithm (e.g., CRC, MD5, SHA) and is included in the packet header or footer. When the packet is received, the receiver can recalculate the checksum from the received data and compare it to the checksum included in the packet. If they match, it indicates that the data has not been corrupted during transit; if they do not match, it indicates that an error has occurred.
+
+  In class, the professor noted a *parity bit* as an example of this, which is a simple form of error detection where a single bit is added to the data to indicate whether the number of 1s in the data is even or odd. This allows for the detection of single-bit errors, but it is not as robust as more complex checksums.
+]
+
+=== Inbetween Layer Protocols
+
+=== Application Layer Protocols

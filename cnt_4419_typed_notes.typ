@@ -2997,6 +2997,8 @@ This gets especially tough when the attacker is "spoofing" (masking) IP addresse
 
 How do we mitigate this? One common mitigation is to use SYN cookies, which is a technique where the server does not allocate resources for a connection until it receives the final ACK packet from the client. Instead, the server encodes the necessary information in the SYN-ACK packet (the `Y` response) and waits for the ACK before allocating resources. This allows the server to handle a large number of SYN packets without being overwhelmed by half-open connections, as it only allocates resources for connections that are successfully established.
 
+The SYN sequence number is chosen to encode the half open state of the connection.
+
 With a SYN cookie, you can rebuild the state of the connection from the information encoded in the SYN-ACK packet when the final ACK is received. This allows the server to handle a large number of SYN packets without being overwhelmed by half-open connections, as it only allocates resources for connections that are successfully established.
 
 Firewalls may help with this mitigation as well, as they can be configured to detect and block SYN flood attacks by monitoring the rate of incoming SYN packets and blocking traffic from suspicious sources. Additionally, rate limiting can be implemented to limit the number of connections from a single IP address, which can help prevent SYN flooding attacks.

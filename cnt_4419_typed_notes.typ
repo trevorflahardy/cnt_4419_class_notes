@@ -2929,6 +2929,68 @@ The great thing about TCP is that it's well optimized, but it does add a lot of 
   In class, the professor noted a *parity bit* as an example of this, which is a simple form of error detection where a single bit is added to the data to indicate whether the number of 1s in the data is even or odd. This allows for the detection of single-bit errors, but it is not as robust as more complex checksums.
 ]
 
-=== Inbetween Layer Protocols
-
 === Application Layer Protocols
+
+==== Inbetween Layer Protocols: TLS/SSL
+
+TLS/SSL is *Transport Layer Security / Secure Sockets Layer*. These are cryptographic protocols that provide secure communication over a network. They operate between the application layer and the transport layer, providing encryption, authentication, and integrity for data transmitted between applications.
+
+This shows the gap in the TCP/IP model, where there are protocols that don't fit neatly into one layer. The professor notes that this "inbetween" is often put into the application layer.
+
+A socket, in programming, is an encapsulation of an endpoint for communication.
+
+#warning()[
+  Do not use SSL, use TLS instead. SSL is an older protocol that has known vulnerabilities and is no longer considered secure. TLS is the modern replacement for SSL and provides improved security features. When configuring secure communication, it is important to use the latest version of TLS (e.g., TLS 1.3) to ensure the best security.
+]
+
+TLS/SSL adds security features to TCP
+
+==== HTTP/HTTPS
+
+HTTP/HTTPs is *Hypertext Transfer Protocol / Hypertext Transfer Protocol Secure*. HTTP is an application layer protocol used for transmitting hypermedia documents, such as web pages, over the internet. HTTPS is the secure version of HTTP, which uses TLS/SSL to encrypt the communication between the client and server, providing confidentiality and integrity for the data transmitted.
+
+This has methods like GET, POST, PUT, DELETE, etc to request and recieve resourcess from a server. It also has status codes like 200 OK, 404 Not Found, etc. HTTP is a stateless protocol, meaning that each request is independent and does not retain any information about previous requests. HTTPS adds a layer of security by encrypting the communication using TLS/SSL, which helps protect against
+
+HTTPs is running HTTP over TLS. This means that the HTTP messages are encrypted using TLS before being transmitted over the network. The client and server establish a secure connection using TLS, and then HTTP messages are sent over that secure connection. This provides confidentiality and integrity for the data transmitted between the client and server, making it more secure than plain HTTP.
+
+=== TCP Connection Establishment
+
+TCP uses a three-way handshake to establish a connection between the sender and receiver. The sender and receiver are also known as "Alice" and "Bob" in the professor's examples. The three-way handshake is a process that ensures that both parties are ready to communicate and that the connection is established successfully.
+
+The process is as follows:
+
+1. The client (Alice) sends a *SYN* (synchronize) packet to the server to initiate the connection. The SYN contains a sequence number, let's call it `X`. This number is used to keep track of the order of packets and to ensure that data is delivered in the correct order. The SYN packet also indicates that the client wants to establish a connection with the server.
+2. The server (Bob) responds with a *SYN-ACK* (synchronize-acknowledgment) packet to acknowledge the client's request and indicate that it is ready to establish the connection. The SYN-ACK packet contains its own sequence number, let's call it `Y`, and it also *acknowledges the client's sequence* number `X` by including `X+1` in the acknowledgment field. This indicates that the server has received the client's SYN packet and is ready to establish the connection.
+3. The client (Alice) sends an *ACK* (acknowledgment) packet to the server to confirm the connection is established. The client sends an ACK packet that acknowledges the server's sequence number `Y` by including `Y+1` in the acknowledgment field. This indicates that the client has received the server's SYN-ACK packet and that the connection is now established.
+
+The three-way handshake ensures that both the client and server are ready to communicate and that the connection is established successfully. Once the handshake is complete, data can be transmitted between the client and server over the established TCP connection.
+
+There are multiple interesting states throughout this process.
+- When the server (Bob) is listening for incoming connections, it is in the *LISTEN* state.
+- When the client (Alice) has sent a SYN packet and is waiting for a SYN-ACK packet, it is in the *SYN_SENT* state. This is part of the "half-open" connection state, where the client has initiated the connection but has not yet received a response from the server.
+- When the server (Bob) has received a SYN packet and sent a SYN-ACK packet, it is in the *SYN_RCVD* state. Also a part of the "half-open" connection state, where the server has received a connection request but has not yet received an acknowledgment from the client.
+- When the client (Alice) has received a SYN-ACK packet and sent an ACK packet, it is in the *ESTABLISHED* state. Established means that the connection is now "fully open" and data can be transmitted between the client and server.
+- When the server (Bob) has received an ACK packet, it is also in the *ESTABLISHED* state.
+
+#figure(
+  table(
+    columns: (1.55fr, 2.1fr, 1.55fr),
+    stroke: 0.6pt + luma(170),
+    inset: 6pt,
+    align: (left, center, left),
+    table.header([*Alice (Client)*], [*Packet / Transition*], [*Bob (Server)*]),
+
+    [*CLOSED*], [Start], [*LISTEN*],
+    [*SYN_SENT*], [Alice $arrow.r$ Bob: `SYN(seq = X)`], [*SYN_RCVD*],
+    [*SYN_SENT*], [Bob $arrow.l$ Alice: `SYN-ACK(seq = Y, ack = X + 1)`], [*SYN_RCVD*],
+    [*ESTABLISHED*], [Alice $arrow.r$ Bob: `ACK(ack = Y + 1)`], [*ESTABLISHED*],
+  ),
+  caption: [TCP three-way handshake state transition diagram. The `SYN_SENT` and `SYN_RCVD` states are half-open; both endpoints reach `ESTABLISHED` after the final ACK.],
+)
+
+
+Let's say some attacker was to try and open many connections to the server (Bob) by sending many SYN packets but never completing the handshake. The server has to keep track of all these half-open connections in the SYN_RCVD state, which can exhaust the server's resources and prevent legitimate clients from establishing connections. Oh no!
+
+This opens us up to *SYN Flooding*, an attack when an attacker sends a large number of SYN packets to a server, but never completes the handshake by sending the final ACK packet. This leaves the server with many half-open connections in the SYN_RCVD state, which can exhaust the server's resources and prevent legitimate clients from establishing connections. This is a type of Denial of Service (DoS) attack that can disrupt the availability of a service.
+
+This gets especially tough when the attacker is "spoofing" (masking) IP addresses. If the attacker is spoofing IP addresses, they can make it appear as though the SYN packets are coming from different sources, making it more difficult for the server to identify and block the attack. This can lead to a situation where the server is overwhelmed with half-open connections, and legitimate clients are unable to establish connections.

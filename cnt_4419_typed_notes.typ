@@ -2994,3 +2994,17 @@ Let's say some attacker was to try and open many connections to the server (Bob)
 This opens us up to *SYN Flooding*, an attack when an attacker sends a large number of SYN packets to a server, but never completes the handshake by sending the final ACK packet. This leaves the server with many half-open connections in the SYN_RCVD state, which can exhaust the server's resources and prevent legitimate clients from establishing connections. This is a type of Denial of Service (DoS) attack that can disrupt the availability of a service.
 
 This gets especially tough when the attacker is "spoofing" (masking) IP addresses. If the attacker is spoofing IP addresses, they can make it appear as though the SYN packets are coming from different sources, making it more difficult for the server to identify and block the attack. This can lead to a situation where the server is overwhelmed with half-open connections, and legitimate clients are unable to establish connections.
+
+How do we mitigate this? One common mitigation is to use SYN cookies, which is a technique where the server does not allocate resources for a connection until it receives the final ACK packet from the client. Instead, the server encodes the necessary information in the SYN-ACK packet (the `Y` response) and waits for the ACK before allocating resources. This allows the server to handle a large number of SYN packets without being overwhelmed by half-open connections, as it only allocates resources for connections that are successfully established.
+
+With a SYN cookie, you can rebuild the state of the connection from the information encoded in the SYN-ACK packet when the final ACK is received. This allows the server to handle a large number of SYN packets without being overwhelmed by half-open connections, as it only allocates resources for connections that are successfully established.
+
+Firewalls may help with this mitigation as well, as they can be configured to detect and block SYN flood attacks by monitoring the rate of incoming SYN packets and blocking traffic from suspicious sources. Additionally, rate limiting can be implemented to limit the number of connections from a single IP address, which can help prevent SYN flooding attacks.
+
+#definition()[
+  *Cookie*
+
+  Some state information that one communicator passes off to another. This idea comes from the 1970s-1980s, originally from UNIX (magic cookies).
+
+  The idea is what remembering state, you encapsulate it in a cookie, which is a piece of data that can be passed around and used to maintain state without the server having to keep track of it.
+]

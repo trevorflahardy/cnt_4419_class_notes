@@ -3010,3 +3010,186 @@ Firewalls may help with this mitigation as well, as they can be configured to de
 
   The idea is what remembering state, you encapsulate it in a cookie, which is a piece of data that can be passed around and used to maintain state without the server having to keep track of it.
 ]
+
+#note[
+  Notes hereon taken on Mon Apr 6, 2026
+]
+
+#important[
+  Professor took a quiz at the beginning of class. The question was: "In bullet points, list all the four layers of the TCP/IP model, and for each layer, list one protocol that operates at that layer."
+
+  Answer:
+  - Link Layer: *Ethernet* (IEEE 802.3)
+  - Internet Layer: *IP* (Internet Protocol)
+  - Transport Layer: *TCP* (Transmission Control Protocol)
+  - Application Layer: *HTTP* (Hypertext Transfer Protocol)
+]
+
+== Denial of Service Attacks
+=== Bandwidth Amplification Attacks
+This is a type of attack where the attacker uses a 3rd party to attack the victim on behalf of the attacker. So the attacker does not even deal with the victim.
+
+This is similar to a confused deputy attack. In practice, the 3rd party should have a lot of computing resources (network bandwidth). For example, big tech like IBM, Google, Microsoft, etc. have a lot of bandwidth. So, if the attacker can trick one of these big companies into sending a large amount of traffic to the victim, it can overwhelm the victim's network and cause a denial of service.
+
+The attacker may send some "malformed" message (syntactically illegal). If they send, let's say, a bad network time service (NTS) request with a spoofed source IP address (the victim's IP address), the NTS server will respond to the victim with a large error response, which can overwhelm the victim's network.
+
+And so, the attacker can use *little bandwidth* to amplify their attack by leveraging the resources of the 3rd party (the NTS server in this case) to send a large amount of traffic to the victim. This is why it's called a "bandwidth amplification attack" --- the attacker is amplifying their attack by using the bandwidth of the 3rd party to overwhelm the victim's network.
+
+The victim seems some credible traffic from the 3rd party, but it's actually part of the attack. The 3rd party is the "confused deputy" in this scenario, as it is being tricked into sending traffic to the victim on behalf of the attacker.
+
+#definition()[
+  *Spoof*
+
+  Spoofing is the act of disguising a communication from an unknown source as being from a known, trusted source. In the context of network attacks, spoofing often involves falsifying the source IP address in a packet to make it appear as though it is coming from a different device. This can be used to bypass security measures, hide the attacker's identity, or redirect traffic to a different destination.
+]
+
+=== Firewalls (FWs) & Introduction Detection Systems (IDSs)
+
+These are firewalls and intrusion detection systems. Firewalls are network security devices that monitor and control incoming and outgoing network traffic based on predetermined security rules. They can be used to block or allow traffic based on factors such as IP addresses, port numbers, and protocols. Intrusion detection systems (IDS) are designed to detect and respond to unauthorized access or attacks on a network. They can analyze network traffic for signs of malicious activity and generate alerts or take action to mitigate the threat.
+
+Both of these can be used to watch packets coming into and out of an organization. Why would you want to inspect, and possibly disallow, packets going out of your network? *Confidentiality*. You may want to prevent secret information from going out. Universities a lof of the time want to prevent certain types of connections (especially copyrights).
+
+But how are they different? Now a days, there is not that much different. But, *firewalls are simplier* (looking at header information + packets and making decisions accordingly) through pattern matching, whereas intrustion detection systems are more having to deal with "AI machine learning" --- using AI to classify normal packets from abnormal packets (some sort of "classifier" to do this detection).
+
+Let's look at some firewall policies. A simple firewall policy might look like this:
+- A source IP
+- A source port
+- A destination IP
+- A destination port
+- An action
+
+In a table:
+#figure(
+  table(
+    columns: (1.5fr, 1.5fr, 1.5fr, 1.5fr, 1.5fr),
+    stroke: 0.6pt + luma(170),
+    inset: 6pt,
+    align: (center, center, center, center, center),
+    table.header([*Source IP*], [*Source Port*], [*Destination IP*], [*Destination Port*], [*Action*]),
+
+    [$131.247**$], [$*$], [$131.242.*.15$], [$80$], [Allow],
+    [$*.*.*.*$], [$*$], [$*s$], [$*$], [Drop],
+  ),
+  caption: [
+    Where $131.247**$ is USF's IP address range, $*$ is a wildcard for any port, $131.242.*.15$ is the IP address of a web server, and $80$ is the port number for HTTP. The action could be "allow" or "deny" based on the firewall's policy.
+
+    Where the *Action* can be one of:
+    $ "Drop" \ "Allow" \ "Log" \ f("packet") $
+  ],
+)
+
+With firewalls, *the first rule that matches takes priority*. So, if a packet matches the first rule, the firewall will take the action specified in that rule and will not check any subsequent rules. This is important to keep in mind when designing firewall policies, as the order of the rules can affect how traffic is handled.
+
+== OSI (Open Systems Interconnection) Model
+
+This is the larger model that has 7 layers instead of 4. The TCP/IP model is a simplified version of the OSI model, and it is more commonly used in practice. The OSI model is more theoretical and is often used for educational purposes to help understand the different layers of network communication. The layers of the OSI model are:
+1. Physical Layer
+2. Data Link Layer
+3. Network Layer
+4. Transport Layer
+5. Session Layer
+6. Presentation Layer
+7. Application Layer
+
+#tip[
+  There are mnemonics to remember these layers, such as "Please Do Not Throw Sausage Pizza Away" (Physical, Data Link, Network, Transport, Session, Presentation, Application).
+
+  Another one is "All People Seem To Need Data Processing" (Application, Presentation, Session, Transport, Network, Data Link, Physical).
+
+  Another one is "Please Do Not Touch Steve's Pet Alligator" (Physical, Data Link, Network, Transport, Session, Presentation, Application).
+
+  Another one is *"Please Do Not Teach Stupid People Acronyms"* (Physical, Data Link, Network, Transport, Session, Presentation, Application).
+]
+
+=== Physical Layer
+
+Transmits raw bits through a medium. There are no MAC addresses here.
+
+=== Data Link Layer
+
+Where MAX addresses are introduced.
+
+=== Network Layer
+
+Same as before. Where IP addresses are introduced.
+
+=== Transport Layer
+
+Same as before. Where port numbers are introduced.
+
+=== Session Layer
+
+Manages sessions. Where sessions are introduced. A session is a semi-permanent interactive information exchange between two or more communicating devices, or between a computer and user. A session is established at a certain point in time, and then torn down at some later point in time. The session layer is responsible for establishing, managing, and terminating sessions between applications.
+
+This layer would handle things like "checkpointing" sessions as well (so you can revert to old checkpoints if you needed to).
+
+=== Presentation Layer
+
+This is where TLS is. This is the layer respoinsible for the translation of data between the application layer and the network format. It is responsible for data encryption, decryption, compression, and decompression. The presentation layer ensures that the data is in a format that can be understood by the application layer on the receiving end.
+
+Additionally, cryptographic protocols and compression algorithms can be implemented at this layer to provide security and efficiency for data transmission. For example, TLS (Transport Layer Security) is a protocol that operates at the presentation layer to provide secure communication over a network by encrypting the data being transmitted.
+
+=== Application Layer
+
+Same as before. This is where applications operate and use the underlying layers to communicate with other applications over the network. The application layer provides protocols and services that enable applications to communicate with each other, such as HTTP for web browsing, SMTP for email, and FTP for file transfer.
+
+== Web Applications
+
+#definition()[
+  *Web Applications*
+
+  Client/server software, where a client runs in a browser (like a web browser).
+]
+
+Typically, web applications have multi-tiered architecture (sometimes called N-tier architecture). In practice these are usually 3 or 4 tier applications (physically separated software components).
+
+#definition()[
+  *Tier*
+
+  Physically separated software architecture component
+]
+
+The tiers usually are:
+1. *Presentation Tier*: This is the user interface layer, where the client interacts with the application through a web browser. It is responsible for displaying information to the user and collecting user input.
+2. *Application Tier*: This is the business logic layer, where the core functionality of the application is implemented. It processes user input, performs calculations, and makes decisions based on the application's requirements.
+3. *Data (Storage) Tier*: This is the database layer, where data is stored and managed. It is responsible for storing, retrieving, and updating data as needed by the application tier.
+
+So, based on a request (or data that a client fetches), the server will dynamically generate a response. So, we are dynamically generating content based on the request, and dynamically generating queries to the database based on the request. This is in contrast to static content, where the server simply serves pre-existing files without any dynamic processing.
+
+So, maybe the most important lesson about web applications from this class: *There are a lot of ways you can make security mistakes when coding web applications*. The biggest thing here is to _use a pre-build web library (or web app framework) to implement all the functionality you want_ (building queries, managing state, etc).
+
+Some examples of libraries/frameworks include:
+- ASP.NET for C\#
+- Django/Flask for Python
+- Express for Node.js (as well as other JavaScript/TypeScript frameworks like React, Angular, Vue, etc.)
+- Ruby on Rails for Ruby
+- Spring for Java
+- Axum for Rust
+- Laravel for PHP
+
+Sometimes you have a 4th tier, which is a *Data-Mapping Tier* tier using something like a ORM (Object-Relational Mapping) library. This is a layer that sits between the application tier and the data tier, and it is responsible for mapping objects in the application to records in the database. It provides an abstraction layer that allows developers to interact with the database using high-level programming constructs, rather than writing raw SQL queries.
+
+Using an ORM, a SQL statement such as:
+```sql
+SELECT * FROM users WHERE username = 'alice';
+```
+becomes:
+```python
+User.objects.filter(username='alice')
+```
+
+Operations on a database become operations on objects in the programming language.
+
+=== Issues that Arise with Web Applications
+
+#note[
+  _Chapter 7 of the textbook_, which the professor notes does a good job of covering *some* of the details outlined in class.
+]
+
+
+#definition()[
+  *Marshalling and Unmarshalling*
+
+
+  Marshalling is the process of converting an object or data structure into a format that can be transmitted over a network or stored in a file. Unmarshalling is the reverse process, where the transmitted or stored data is converted back into an object or data structure that can be used by the application.
+]

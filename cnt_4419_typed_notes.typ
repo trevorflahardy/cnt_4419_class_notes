@@ -11,6 +11,8 @@
 
 #set-admonition-defaults(title-size: 0.95em, body-size: 1.0em)
 
+#set par(justify: true)
+
 = What Does It Mean for Software to Be Secure?
 
 We abstract software security into two components: a *policy* and a *mechanism*.
@@ -3193,3 +3195,119 @@ Operations on a database become operations on objects in the programming languag
 
   Marshalling is the process of converting an object or data structure into a format that can be transmitted over a network or stored in a file. Unmarshalling is the reverse process, where the transmitted or stored data is converted back into an object or data structure that can be used by the application.
 ]
+
+
+#note[
+  Notes hereon taken on Wed Apr 8, 2026
+]
+
+== Client-state Manipulation
+
+The attacker modifies state stored on the client and returned to the server.
+
+But what are the mitigations to this? There are two approaches, but only one is done not both are usually done at once.
+1. *Keep state on server side but send client session id (sid)*, also sometimes a session key. A session key is a secret value that is used to identify a session and is typically stored on the server side. The client sends the session key with each request, and the server uses it to retrieve the corresponding session data. This approach allows the server to maintain control over the session data and can help prevent tampering by the client.
+2. *Send the client the state but use cryptography to protect it (enforce integrity on the state)*. This approach involves sending the client the state information, but encrypting it or using a message authentication code (MAC) to ensure its integrity. The client can then send this protected state back to the server with each request, and the server can verify that it has not been tampered with before using it.
+
+Let's dive into both of these approaches a bit further.
+
+=== Server-side State with Session IDs
+
+This is kind of similar to sending a cookie, which we talked about when mitigating send flooding attacks.
+
+(a) The server generates a unique session ID (or "random number" as the professor puts it) (sid) using the CSPRNG for each client session and uses a database (DB) to:
+$
+  "hash"("sid" + "client_details"_("e.g. IP addr")) ->_("Map to") "session_state"
+$
+
+Ideally, the attacker would need both the session ID and spoof the client details to successfully hijack the session, which can be difficult to achieve.
+
+(b) Then, from there, the app (aka the server) sends the client the session ID (sid), such as in a hidden field or value within an HTML form.
+
+(c) Following this, when the client communicates back to the server (or returns the session ID), such as `GET /submit_order?sid=<....>&pay=yes`, the server can look up, and modify if needed, the session state using the session ID and client details to verify the legitimacy of the request.
+
+#question()[
+  *But what if we start getting a bunch of requests and the hashes don't point to any valid state?*
+
+  I.e. we start getting a bunch of fake (or illegal/invalid) session IDs?
+
+  This can indicate that something, or someone, is trying to find a session ID that they don't have---so we probably want to block that IP address (or whoever is sending you these fake session IDs).
+]
+
+Another important note is that session IDs should expire (webapps frameworks can help with this). This means that after a certain period of time, the session ID will no longer be valid, and the user will need to log in again to obtain a new session ID. This can help mitigate the risk of session hijacking, as it limits the window of opportunity for an attacker to use a stolen session ID.
+
+=== Using Cryptography to Protect Client-side State and Enforce Integrity
+
+(a) An application creates and sends a MAC, or digital signature, which contains the state to the client.
+
+#definition()[
+  *MAC*
+
+  A message authentication code (MAC) is a short piece of information used to authenticate a message and to provide integrity and authenticity assurances on the message. It is typically generated using a secret key and a cryptographic algorithm, and it is included in the message sent to the client. When the client sends the message back to the server, the server can verify the MAC using the same secret key to ensure that the message has not been tampered with and that it came from a legitimate source.
+]
+
+(b) The client then returns the state plus the MAC (signature) to the server.
+
+(c) The server can then verify the MAC to ensure that the state has not been tampered with and that it came from a legitimate source. The idea here is that the server can check that the MAC is valid for the return state. If the MAC is valid, the server can trust the state and use it for processing the client's request. If the MAC is invalid, the server can reject the request and take appropriate action, such as logging the incident or blocking the client's IP address.
+
+=== Tradeoffs of both
+
+The idea here is that these are two different ways to maintain state. A server can be stateful, where it keeps track of the session state on the server side, or it can be stateless, where it sends the state to the client and relies on the client to return it with each request.
+
+The tradeoff is that a stateful server can be more secure, as it does not rely on the client to maintain the integrity of the state, but it can also be more resource-intensive, as the server needs to keep track of all active sessions. A stateless server can be more scalable, as it does not need to maintain session state on the server side, but it can also be less secure, as it relies on the client to maintain the integrity of the state.
+
+TCP is an example of a stateful protocol, as it maintains the state of the connection between the client and server. HTTP is an example of a stateless protocol, as it does not maintain any state between requests. However, web applications built on top of HTTP can implement their own state management using techniques such as cookies, session IDs, or cryptographic protections to maintain state across multiple requests.
+
+=== Problems with encoding values in the URL
+
+Specifically, we want to focus on session IDs being inside of URLs. Why is this bad? Well, there are several big problems that can arise from this:
+1. *URLs can be shared*, either intentionally or unintentionally. If a user shares a URL that contains a session ID, they may be sharing their session with someone else, which can lead to unauthorized access to their account or sensitive information. This other user may tamper with the session or use it to impersonate the original user, which can lead to security breaches.
+  - This is noted as *session hijacking* and is a relatively common attack.
+2. *Browser may send the HTTP referrer header* when navigating from one page to another. If the session ID is included in the URL, it may be sent in the referrer header to other websites. This may enable session hijacking by the destination website or system administrators of the destination website.
+3. *Session fixation* is another attack where an attacker can set a user's session ID to a known value before the user logs in. If the session ID is included in the URL, the attacker can trick the user into clicking on a link that contains the known session ID, allowing the attacker to hijack the user's session after they log in.
+
+#definition()[
+  *Session hijacking*
+
+  Session hijacking is a type of attack where an attacker gains unauthorized access to a user's session by stealing or guessing the session ID. This can occur when session IDs are included in URLs, as they can be shared, logged, or exposed in referrer headers. Once an attacker has the session ID, they can impersonate the user and gain access to their account or sensitive information. To mitigate this risk, it is important to avoid including session IDs in URLs and to use secure methods for managing sessions, such as using cookies with appropriate security flags (e.g., HttpOnly, Secure) and implementing proper session expiration policies.
+]
+
+So, hopefully it's becoming clear why you want the hash of the session ID _and_ the client details. The attacker has to spoof both the session ID and the client details to successfully hijack the session, which can be difficult to achieve. This adds an extra layer of security to the session management process and helps protect against session hijacking attacks. But, if the attacker knows the IP address of the victim there are ways to create packets using WGET and cURL that could contain the victim's IP address and a guessed session ID, which could potentially allow the attacker to hijack the session if they are able to guess the correct session ID.
+
+*But what are some defenses to this?*
+
+1. Don't put session IDs in URLs, dummy! Instead, use `POST` variables which are not exposed in URLs and are less likely to be shared or logged.
+  - Now, the request would look like `POST /submit_order HTTP/1.0` with the values `sid=<...>` and `pay=yes` in the body of the request, rather than in the URL.
+
+```curl
+curl -X POST -d "sid=<...>&pay=yes" http://example.com/submit_order
+```
+
+2. Change and expire session IDs frequently. This can help mitigate the risk of session hijacking, as it limits the window of opportunity for an attacker to use a stolen session ID. For example, you could set a short expiration time for session IDs (e.g., 15 minutes) and require users to log in again after the session expires to obtain a new session ID.
+  - This is especially true when any sensitive action is taken, such as making a purchase, changing account settings, logging in, etc. You could require the user to re-authenticate or obtain a new session ID before allowing them to perform these actions.
+
+3. Hash both the session ID and client details together to create a unique identifier for the session. This was discussed earlier, so the attacker has to both spoof the victim's IP address and guess the correct session ID to successfully hijack the session, which can be difficult to achieve.
+
+4. Use secure cookies with appropriate flags (e.g., HttpOnly, Secure) to store session IDs. This can help prevent session hijacking by making it more difficult for attackers to access the session ID through client-side scripts or by ensuring that the session ID is only transmitted over secure connections.
+  - Now, the HTTP header looks like this:
+  ```
+  Set-Cookie: sid=<...>; HttpOnly; Secure
+  ```
+  - And the whole curl request looks like:
+  ```curl
+  curl -X POST -d "pay=yes" --cookie "sid=<...>" http://example.com/submit_order
+  ```
+  - And the raw request looks like:
+  ```
+  HTTP/1.0 200 OK
+  Set-Cookie: sid=<...>; HttpOnly; Secure
+  ```
+  - The secure flag tells the browser, and server, that this cookie (session ID) should only ever be sent over TLS/HTTPS connections, and the HttpOnly flag tells the browser that this cookie should not be accessible via client-side scripts (e.g., JavaScript), which can help prevent cross-site scripting (XSS) attacks from stealing the session ID.
+
+So, when the user clicks "Yes", the browser sends something like:
+```
+GET /submit_order?pay=yes HTTP/1.0
+Cookie: sid=<...>
+```
+
+So you can see that the cookies are getting sent back and forth between each communication. You still need to expire them (timeouts) and update them.

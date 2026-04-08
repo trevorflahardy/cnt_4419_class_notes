@@ -3045,7 +3045,7 @@ The victim seems some credible traffic from the 3rd party, but it's actually par
   Spoofing is the act of disguising a communication from an unknown source as being from a known, trusted source. In the context of network attacks, spoofing often involves falsifying the source IP address in a packet to make it appear as though it is coming from a different device. This can be used to bypass security measures, hide the attacker's identity, or redirect traffic to a different destination.
 ]
 
-=== Firewalls (FWs) & Introduction Detection Systems (IDSs)
+=== Firewalls (FWs) & Intrusion Detection Systems (IDSs)
 
 These are firewalls and intrusion detection systems. Firewalls are network security devices that monitor and control incoming and outgoing network traffic based on predetermined security rules. They can be used to block or allow traffic based on factors such as IP addresses, port numbers, and protocols. Intrusion detection systems (IDS) are designed to detect and respond to unauthorized access or attacks on a network. They can analyze network traffic for signs of malicious activity and generate alerts or take action to mitigate the threat.
 

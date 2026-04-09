@@ -3201,6 +3201,38 @@ Operations on a database become operations on objects in the programming languag
   Notes hereon taken on Wed Apr 8, 2026
 ]
 
+#line(length: 100%)
+
+The professor began lecture with a handout. The handout had pages 108-109 of the textbook, which covers the Pizza Delivery Web Site Example. Attached here are uploaded references for your studying.
+
+#figure(
+  image("content/108.pdf"),
+  caption: [Pages 108 of the textbook.],
+) <page_108>
+
+#figure(
+  image("content/109.pdf"),
+  caption: [Pages 109 of the textbook.],
+) <page_109>
+
+Note here how the `HIDDEN` input field (from #link(<page_108>, "Page 108") in the HTML) is used to store the price of the pizza. This is a common practice in web applications, where hidden fields are used to store information that is not visible to the user but is still sent to the server when the form is submitted.
+
+But what could a user do in this case of the web server? Well, a couple of things:
+1. The user could change or alter the source code of the website. This could be as simple as changing the value to `0.01` or, if they are bold, changing it to a negative value.
+2. The user could enter the URL directly into the browser, such as `https://.../submit_order?price=0.01&pay=yes`, which would bypass the client-side validation and directly submit the order with the altered price.
+3. The user could use a tool such as WGET or cURL to create such HTTPs requests to the server, allowing them to manipulate the request and submit it with the altered price.
+  - Note that this differs from (2) in that (2) is just entering the URL directly into the browser, while (3) involves using a tool to craft and send the HTTP request, which can provide more control over the request and allow for more complex manipulations.
+
+#question[
+  *Would using POST instead of GET help with this?*
+
+  Yes, and no. `POST` would have the same vulnerability as `GET` in this case, because the price is still being sent from the client to the server and can be manipulated by the user. The main difference between `POST` and `GET` is that `POST` sends data in the body of the request, while `GET` sends data in the URL. However, both methods can be manipulated by the user, so using `POST` instead of `GET` would not necessarily prevent this type of attack.
+
+  To sum, using `POST` qould not prevent this underlying issue.
+]
+
+#line(length: 100%)
+
 == Client-state Manipulation
 
 The attacker modifies state stored on the client and returned to the server.

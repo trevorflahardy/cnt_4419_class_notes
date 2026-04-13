@@ -3585,3 +3585,26 @@ But what if we didn't want to put everything? We can do that, too:
 ```sql
 INSERT INTO inventory (sku, name) VALUES ('12345', 'Pizza');
 ```
+
+3. Deleting from a table
+```sql
+DELETE FROM inventory WHERE sku = '12345';
+```
+This will delete the row from the `inventory` table where the `sku` is '12345'.
+
+You could also use a `WHERE TRUE` statement to delete everything:
+```sql
+DELETE FROM inventory WHERE TRUE;
+```
+
+The professor notes an example:
+```sql
+DELETE FROM inventory WHERE price > 5 AND SKU <> '1' AND name LIKE '%Pizza%';
+```
+where the `WHERE` clause can be as complex as you want, and you can use various operators (e.g., `>`, `<`, `=`, `<>`, `LIKE`, etc.) to specify the conditions for deleting rows from the table. Additionally, the `%` sign is a wildcard character used in the `LIKE` operator to match any sequence of characters, so `name LIKE '%Pizza%'` would match any product name that contains the word "Pizza" anywhere in it.
+
+4. Updating data in a table:
+```sql
+UPDATE inventory SET price = 25 WHERE SKU = '1';
+```
+What if we left out the `WHERE` clause? Well, this would set all the prices in the `inventory` table to 25, which is probably not what we want. So, it's important to always include a `WHERE` clause when using the `UPDATE` statement to avoid unintentionally modifying all rows in the table.

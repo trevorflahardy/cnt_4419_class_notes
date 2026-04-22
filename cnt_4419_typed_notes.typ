@@ -3608,3 +3608,160 @@ where the `WHERE` clause can be as complex as you want, and you can use various 
 UPDATE inventory SET price = 25 WHERE SKU = '1';
 ```
 What if we left out the `WHERE` clause? Well, this would set all the prices in the `inventory` table to 25, which is probably not what we want. So, it's important to always include a `WHERE` clause when using the `UPDATE` statement to avoid unintentionally modifying all rows in the table.
+
+#note[
+  Notes hereon taken on Wed Apr 22, 2026
+]
+
+Here, we've been focusing on the `DDL` (the Data Definition Language), but we're going to start looking at the `DML` (the Data Manipulation Language) now, which is used to query and manipulate data within a database.
+
+== SQL Operations
+
+Consider the tiny database with the following schema:
+$
+  "inventory"(underline("sku": "string"), "name": "string", "price": "float", "brand": "string")
+$
+
+=== Selecting Data
+```sql
+SELECT name
+FROM inventory
+```
+
+The professor notes here that the result is denoted as a `row`, `record`, or `tuple`. In this case, we select one column (`name`) from the `inventory` table, so the result will be a set of values corresponding to the `name` column for all rows in the `inventory` table.
+
+`SELECT` is the important keyword to know here.
+
+But how about considering the following ```sql
+SELECT DISTINCT name
+FROM inventory
+ORDER BY name ASC
+```
+
+Here, we're using `SELECT DISTINCT` to retrieve only unique values from the `name` column, and `ORDER BY name` to sort the results alphabetically by the `name` column. The result will be a list of unique product names from the `inventory` table, sorted in alphabetical order.
+
+You can use both `ASC` and `DESC` to specify ascending or descending order, respectively. If you omit the `ASC` or `DESC` keyword, the default is ascending (`ASC`) order.
+
+How about selecting multiple things?
+```sql
+SELECT price, brand
+FROM inventory
+ORDER BY price DESC
+LIMIT 10
+OFFSET 1;
+```
+This gives us *two columns* as a result, and we order by price in descending order. So, the result will be a list of prices and their corresponding brands from the `inventory` table, sorted by price from highest to lowest, with a limit of 10 results. The `OFFSET 1` clause means that the query will skip the first result and return the next 10 results, effectively giving us the second through eleventh most expensive products in the inventory.
+
+You can also conditionally select using the `WHERE` clause:
+```sql
+SELECT *
+FROM inventory
+WHERE price > 5 AND name LIKE '%Pizza%';
+```
+This will select all columns (`*`) from the `inventory` table where the price is greater than 5 and the name contains the word "Pizza". The `LIKE` operator is used with the `%` wildcard to match any product name that contains "Pizza" anywhere in it. The result will be a list of all products in the inventory that are priced above 5 and have "Pizza" in their name.
+
+You can also use `OR` in the `WHERE` clause to specify multiple conditions:
+```sql
+SELECT *
+FROM inventory
+WHERE name = 'pencil' OR SKU = '12345';
+```
+
+You can also use aggregate functions like `COUNT` and things like `GROUPING` to perform more operations.
+```sql
+SELECT COUNT(sku), brand
+FROM inventory
+GROUP BY brand
+ORDER BY COUNT(sku) ASC;
+```
+This query counts the number of products (SKUs) for each brand in the `inventory` table, groups the results by brand, and orders the results by the count of SKUs in ascending order. The result will be a list of brands along with the count of products they have in the inventory, sorted from the least to the most products.
+
+You can also rename columns in the result using `AS`:
+```sql
+SELECT name AS product_name, price AS product_price
+FROM inventory;
+```
+
+The professor hops to `UNION` operations, which allow you to combine the results of two or more `SELECT` statements into a single result set. For example:
+```sql
+SELECT name
+FROM inventory
+WHERE price = 20
+UNION
+SELECT name
+FROM inventory
+WHERE price = 30;
+```
+
+The professor notes that `UNION ALL` is similar to `UNION`, but it does not remove duplicate rows from the result set. So, if there are products that are priced at both 20 and 30, they will appear twice in the result when using `UNION ALL`, whereas with `UNION`, they would only appear once.
+
+
+The professor goes onto types of joins, which are used to combine rows from two or more tables based on a related column between them. The most common types of joins are `INNER JOIN`, `LEFT JOIN`, `RIGHT JOIN`, and `FULL OUTER JOIN`.
+
+A `JOIN` operation allows you to retrieve data from multiple tables in a single query by specifying how the tables are related to each other. For example, if we have another table called `purchases` that contains information about customer purchases, we can use a `JOIN` to combine data from the `inventory` and `purchases` tables based on a common column, such as `sku`.
+
+An `INNER JOIN` returns only the rows that have matching values in both tables. For example:
+```sql
+SELECT inventory.name, purchases.time
+FROM inventory
+INNER JOIN purchases ON inventory.sku = purchases.sku;
+```
+This query retrieves the product names from the `inventory` table and the corresponding purchase times from the `purchases` table where the `sku` values match in both tables. The result will be a list of product names along with the times they were purchased, but only for products that have been purchased at least once.
+
+A `LEFT JOIN` returns all rows from the left table (in this case, `inventory`) and the matching rows from the right table (`purchases`). If there is no match, the result will contain `NULL` values for the columns from the right table. For example:
+```sql
+SELECT inventory.name, purchases.time
+FROM inventory
+LEFT JOIN purchases ON inventory.sku = purchases.sku;
+```
+This query retrieves all product names from the `inventory` table and the corresponding purchase times from the `purchases` table where the `sku` values match. If a product has not been purchased, the `time` column will show `NULL` for that product. The result will be a list of all product names along with the times they were purchased, including products that have not been purchased at all.
+
+A `RIGHT JOIN` is the opposite of a `LEFT JOIN`, returning all rows from the right table and the matching rows from the left table. If there is no match, the result will contain `NULL` values for the columns from the left table. For example:
+```sql
+SELECT inventory.name, purchases.time
+FROM inventory
+RIGHT JOIN purchases ON inventory.sku = purchases.sku;
+```
+
+A `FULL OUTER JOIN` returns all rows when there is a match in either left or right table. If there is no match, the result will contain `NULL` values for the columns from the table that does not have a match. For example:
+```sql
+SELECT inventory.name, purchases.time
+FROM inventory
+FULL OUTER JOIN purchases ON inventory.sku = purchases.sku;
+```
+This query retrieves all product names from the `inventory` table and all purchase times from the `purchases` table, matching them based on the `sku` values. If a product has not been purchased, the `time` column will show `NULL`, and if there is a purchase that does not have a corresponding product in the `inventory` table, the `name` column will show `NULL`. The result will be a comprehensive list of all products and their purchase times, including products that have not been purchased and purchases that do not have a corresponding product in the inventory.
+
+== SQL and Safety (SQL Injection)
+
+Webapps, generally speaking, have the client (frontend), the server (backend), and the database. The client sends requests to the server, which processes those requests and interacts with the database to retrieve or manipulate data as needed. The server then sends a response back to the client based on the results of the database operations.
+
+So, maybe the server generates some query based on the user input from the frontend and creates some result set. At a high level, the application is taking some untrusted input from the client and generating a SQL query with it for some output.
+
+
+How do we generate a database query into SQL code, though? Let's show some example Java code (maybe using the `JDBC API`, or the Java Database Connectivity API) that takes user input and generates a SQL query to retrieve data from the database.
+```java
+String login = req.getParameter("login");
+String pw = ...;
+String pin = ...;
+
+// Create a connection here
+Connection conn = createConnection("myDB");
+
+// And show a BAD way to generate a SQL query using string concatenation, which can lead to SQL injection vulnerabilities:
+String q = "SELECT * FROM ActInfo WHERE login = '" + login + "' AND pw = '" + pw + "' AND pin = '" + pin + "'";
+Statement stmt = conn.createStatement();
+ResultSet rs = stmt.executeQuery(q);
+```
+
+The key thing is that your SQL is generating some program that gets run. The following could be an example output program:
+```sql
+SELECT * FROM acctInfo
+WHERE Login = 'admin' AND pw = 'abc' AND pin = '1234
+```
+Where any string here is something that can come from untrusted user input. This is the ideal scenario, where the user acts as expected and provides valid input. However, if the user provides malicious input, such as:
+
+Example 1: What if the user enters their login as `'OR 1 = 1-- `? The resulting SQL query would be:
+```sql
+SELECT * FROM acctInfo WHERE login = '' OR 1=1-- ' AND pw = 'abc' AND pin = '1234'
+```
+Well, what is this doing? The `OR 1=1` condition will always evaluate to true, which means that the query will return all rows from the `acctInfo` table, effectively bypassing the authentication mechanism. The `--` is a comment operator in SQL, which means that anything following it will be ignored by the database, so the rest of the query after `OR 1=1` is not executed.
